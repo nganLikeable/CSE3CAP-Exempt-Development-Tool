@@ -1,0 +1,19 @@
+
+    <div class="text-center card border" style="background-color: white; border: 1px solid #dee2e6;">
+        
+          <a href="https://www.alburycity.nsw.gov.au/property/plan/planning-controls">
+            <img class="card-img-top" src="https://www.alburycity.nsw.gov.au/__data/assets/image/0010/198487/suburbs.jpg" alt="">
+          </a>
+        
+        <div class="card-body py-4">
+            <div>
+                <h5 class="mb-1 mt-2"><a href="https://www.alburycity.nsw.gov.au/property/plan/planning-controls">Planning Controls</a></h5>
+                
+                
+                
+                <p>Here you'll find exempt development information regarding planning decisions.</p>
+                
+                <a href="https://www.alburycity.nsw.gov.au/property/plan/planning-controls">Learn More</a>
+            </div>
+        </div>
+    </div>
