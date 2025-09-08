@@ -775,6 +775,14 @@
 					text-shadow: 0 0 10px black;
 				}
 
+				.tile a {
+					position:absolute;
+					z-index: 3;
+					width: 100%;
+					height: 100%;
+					opacity: 0;
+				}
+
 				.tile:hover {
 					border-width: 10px;
 				}
@@ -805,39 +813,205 @@
 				.examples div * {
 					padding: 5px;
 				}
+
+				.question {
+					width: 100%;
+					margin-top: 25px;
+					background-color: white;
+					border-radius: 15px;
+					overflow: hidden;
+					padding: 15px;
+					border: black 2px solid;
+					text-align: left;
+				}
+
+				.question-title {
+					background-color: #d3d3d3;
+					margin: -15px;
+					margin-bottom: 15px;
+					padding: 2px;
+					padding-left: 10px;
+					color: black;
+					font-weight: 600;
+					font-size: 1.25em;
+					user-select: none;
+					line-height: 1.25em;
+				}
+
+				.question label input[type="radio"] {
+					vertical-align: top;
+					margin-right: 5px;
+				}
+
+				.question label:has(> input) {
+					width: 10%;
+					display: inline-flex;
+  					align-items: center;
+					user-select: none;
+					margin-bottom: -5px;
+				}
+
+				.question-section {
+					color: red;
+					margin-top: 10px;
+					margin-bottom: 0px;
+				}
 			</style>
 
 			<div style="display: flex;">
 				<h2 class="tile">
 					<img src="shed.png"/>
+					<a href="#shed"></a>
 					<span>Shed</span>
 				</h2>
 				<h2 class="tile" style="margin-left: 2%;">
 					<img src="verandah.png"/>
+					<a href="#patio"></a>
 					<span>Verandah</span>
 				</h2>
 			</div>
 			<div style="display: flex; margin-top: 1%;">
 				<h2 class="tile">
 					<img src="carport.png"/>
+					<a href="#carport"></a>
 					<span>Carport</span>
 				</h2>
 				<h2 class="tile" style="margin-left: 2%;">
 					<img src="retaining_wall.png"/>
+					<a href="#retaining_wall"></a>
 					<span>Retaining Wall</span>
 				</h2>
 			</div>
 
-			<h2 style="text-align: center; margin-top: 50px;">Development Examples</h2>
-			<div class="examples" style="margin-left: 10%; width: 80%;">
-				<div>
-					<img src=""/>
-					<div style="padding: 0; flex-direction: column;">
-						<h4>Standard Shed</h4>
-						<p style="margin-top: -1rem">25m² Surface area, more than a meter from any other development, and no connections to mains services.</p>
+			<div style="margin-left: 10%; margin-right: 10%;">
+			<form id="examples" class="tab-form d-none">
+				<h2 style="text-align: center; margin-top: 50px;">Development Examples</h2>
+				<div class="examples" style="margin-left: 10%; width: 80%;">
+					<div>
+						<img src=""/>
+						<div style="padding: 0; flex-direction: column;">
+							<h4>Standard Shed</h4>
+							<p style="margin-top: -1rem">25m² Surface area, more than a meter from any other development, and no connections to mains services.</p>
+						</div>
 					</div>
 				</div>
-			</div>
+			</form>
+
+			<form id="shed" class="tab-form border p-3 rounded bg-light d-none" name="Shed Exemption Check" style="text-align: center;"></form>
+			<form id="patio" class="tab-form border p-3 rounded bg-light d-none" name="Patio Exemption Check" style="text-align: center;"></form>
+			<form id="carport" class="tab-form border p-3 rounded bg-light d-none" name="Carport Exemption Check" style="text-align: center;"></form>
+			<form id="retaining_wall" class="tab-form border p-3 rounded bg-light d-none" name="Retaining Wall Exemption Check" style="text-align: center;"></form>
+		</div>
+
+			<script>
+
+				var SEPP = {
+					// format: SEPP section, SEPP number, question, type (number, y/n, multi-part), ...
+					shed: [
+						{
+							section: "https://legislation.nsw.gov.au/view/html/inforce/current/epi-2008-0572#sec.2.11",
+							subsection: "a",
+							sanitised: "Section 2.11a of the SEPP (2008)",
+							question: "Is the construction or installation on a heritage site, draft heritage site, or an off-shore area?",
+							type: "yes/no",
+							errormsg: "New developments cannot be built on any of the aformentioned sites"
+						},
+						{
+							section: "https://legislation.nsw.gov.au/view/html/inforce/current/epi-2008-0572#sec.2.11",
+							subsection: "b",
+							sanitised: "Section 2.11b of the SEPP (2008)",
+							question: "Is it replacing an existing deck higher than one meter from ground level?",
+							type: "yes/no",
+						},
+						{
+							section: "https://legislation.nsw.gov.au/view/html/inforce/current/epi-2008-0572#sec.2.12",
+							subsection: "b",
+							sanitised: "Section 2.12b of the SEPP (2008)",
+							question: "What is the floor area of the installation (m²)?",
+							type: "numeric",
+						},
+						{
+							section: "https://legislation.nsw.gov.au/view/html/inforce/current/epi-2008-0572#sec.2.12",
+							subsection: "c",
+							sanitised: "Section 2.12c of the SEPP (2008)",
+							question: "What is the area of your lot (m²)?",
+							type: "numeric",
+						}
+					],
+					patio: [],
+					carport: [],
+					retaining_wall: [],
+				}
+
+				var selectedForm;
+
+				function addQuestion(rule)
+				{
+					const elem = document.createElement("div");
+					let options = ``
+					switch (rule.type)
+					{
+						case "numeric":
+							options += `<input type="number"><br>`;
+							break;
+						case "yes/no":
+							options += `<label><input type="radio" name="` + rule.section + rule.subsection + `" value="Yes">Yes</label><br>
+								<label><input type="radio" name="` + rule.section + rule.subsection + `" value="No">No</label><br>`;
+							break;
+					}
+					elem.classList.add("question");
+					elem.innerHTML = `
+						<p class="question-title">` + rule.question + `</p>` + options + `
+						<p class="question-section">` + (rule.errormsg ?? "That development doesn't qualify for exempt development") + ", please check <a href=" + rule.section + ` target="_blank">` + rule.sanitised + `</a> for more information.</p>
+					`;
+					selectedForm.appendChild(elem);
+				}
+
+				function loadSection(str)
+				{
+					str = String(str).substring(1);
+					document.querySelectorAll(".tab-form").forEach(form => {
+						form.classList.add("d-none");
+					})
+
+					selectedForm = document.getElementById(str);
+					if (selectedForm)
+					{
+						while (selectedForm.firstChild)
+							selectedForm.removeChild(selectedForm.firstChild);
+						selectedForm.classList.remove("d-none");
+						const title = document.createElement("h2");
+						title.textContent = selectedForm.getAttribute("name");
+						title.style.textAlign = "center";
+						selectedForm.appendChild(title);
+						if (SEPP[str])
+							for (let i = 0; i < SEPP[str].length; addQuestion(SEPP[str][i]), i++);
+						let offset = Math.max(...Array.from(document.getElementsByClassName("navbar")).map(h => h.offsetHeight));
+						window.scrollTo({top: selectedForm.getBoundingClientRect().top + window.scrollY - offset + 30, behavior: "smooth"});
+						const notes = document.createElement("p");
+						notes.innerHTML = `<i>*SEPP refers to the <a href="https://legislation.nsw.gov.au/view/html/inforce/current/epi-2008-0572" target="_blank">State Environmental Planning Policy</a> (2008)</i>`;
+						notes.style.textAlign = "left";
+						const check = document.createElement("button");
+						check.textContent = "Check";
+						check.style.marginTop = "20px";
+						check.id = "questionnaireCheck";
+						check.onclick = () => {
+							let offset = Math.max(...Array.from(document.getElementsByClassName("navbar")).map(h => h.offsetHeight));
+							window.scrollTo({top: selectedForm.getBoundingClientRect().top + window.scrollY - offset + 30, behavior: "smooth"});
+						};
+						selectedForm.appendChild(notes);
+						selectedForm.appendChild(check);
+					}
+					else
+						document.getElementById("examples").classList.remove("d-none");
+				}
+
+				window.addEventListener("hashchange", () => {
+					loadSection(window.location.hash);
+				});
+
+				loadSection(window.location.hash);
+			</script>
 
 		</section>
 		<!-- Design Body End -->
