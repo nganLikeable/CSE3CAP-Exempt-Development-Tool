@@ -238,4 +238,22 @@ window.PROPERTIES = [
       setbackFront_m: 8, setbackSide_m: 1, setbackRear_m: 1
     }
   },
+  {
+    id: "014",
+    address: "19 Pemberton Street, Albury",
+    zone: "R3",
+    lotSize_m2: 600,
+    bushfireProne: false,
+    heritageListed: true,
+    cornerLot: false,
+    floodAffected: false,
+    slopeRise_m: 0.2,
+    proposal: {
+      type: "carport", // Carport 3x6m side
+      width_m: 3, length_m: 6, height_m: 2.6,
+      attachedToDwelling: true,
+      location: "side",
+      setbackFront_m: 5.5, setbackSide_m: 0.9, setbackRear_m: 6
+    }
+  },
 ];
