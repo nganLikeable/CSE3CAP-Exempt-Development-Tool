@@ -202,4 +202,22 @@ window.PROPERTIES = [
       setbackFront_m: 7, setbackSide_m: 1, setbackRear_m: 1
     }
   },
+  {
+    id: "012",
+    address: "81 Bungambramatta Creek Road",
+    zone: "R5",
+    lotSize_m2: 2200,
+    bushfireProne: true,
+    heritageListed: false,
+    cornerLot: false,
+    floodAffected: false,
+    slopeRise_m: 1.0,
+    proposal: {
+      type: "verandah", // Pergola 6x4m attached
+      width_m: 6, length_m: 4, height_m: 2.8,
+      attachedToDwelling: true,
+      location: "rear",
+      setbackFront_m: 10, setbackSide_m: 2, setbackRear_m: 2
+    }
+  },
 ];
