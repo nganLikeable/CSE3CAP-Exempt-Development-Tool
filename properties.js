@@ -40,4 +40,22 @@ window.PROPERTIES = [
       setbackFront_m: 8, setbackSide_m: 0.9, setbackRear_m: 1.5
     }
   },
+  {
+    id: "003",
+    address: "88 Olive Street, Central Albury",
+    zone: "B4",
+    lotSize_m2: 480,
+    bushfireProne: false,
+    heritageListed: true,
+    cornerLot: false,
+    floodAffected: false,
+    slopeRise_m: 0.2,
+    proposal: {
+      type: "shed", // “near fence”
+      width_m: 2, length_m: 3, height_m: 2.4,
+      attachedToDwelling: false,
+      location: "side",
+      setbackFront_m: 6, setbackSide_m: 0.6, setbackRear_m: 1.0
+    }
+  },
 ];
