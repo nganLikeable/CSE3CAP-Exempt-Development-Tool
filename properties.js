@@ -58,4 +58,22 @@ window.PROPERTIES = [
       setbackFront_m: 6, setbackSide_m: 0.6, setbackRear_m: 1.0
     }
   },
+  {
+    id: "004",
+    address: "34 Mahogany Drive, Glenroy",
+    zone: "R5",
+    lotSize_m2: 1800,
+    bushfireProne: true,
+    heritageListed: false,
+    cornerLot: false,
+    floodAffected: false,
+    slopeRise_m: 0.8,
+    proposal: {
+      type: "verandah", // “Detached patio 6x4”
+      width_m: 6, length_m: 4, height_m: 2.7,
+      attachedToDwelling: false,
+      location: "rear",
+      setbackFront_m: 9, setbackSide_m: 1.2, setbackRear_m: 2.0
+    }
+  },
 ];
