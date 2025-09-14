@@ -94,4 +94,22 @@ window.PROPERTIES = [
       setbackFront_m: 7, setbackSide_m: 0.9, setbackRear_m: 1.2
     }
   },
+  {
+    id: "006",
+    address: "17 Norwood Street, Lavington",
+    zone: "R2",
+    lotSize_m2: 600,
+    bushfireProne: false,
+    heritageListed: false,
+    cornerLot: true,
+    floodAffected: false,
+    slopeRise_m: 0.3,
+    proposal: {
+      type: "shed",
+      width_m: 3, length_m: 6, height_m: 2.7,
+      attachedToDwelling: false,
+      location: "side",
+      setbackFront_m: 6, setbackSide_m: 1.0, setbackRear_m: 1.0
+    }
+  },
 ];
