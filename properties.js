@@ -184,4 +184,22 @@ window.PROPERTIES = [
       setbackFront_m: 4, setbackSide_m: 0.5, setbackRear_m: 1
     }
   },
+  {
+    id: "011",
+    address: "56 Stirling Way, Springdale Heights",
+    zone: "R2",
+    lotSize_m2: 650,
+    bushfireProne: false,
+    heritageListed: false,
+    cornerLot: false,
+    floodAffected: false,
+    slopeRise_m: 0.2,
+    proposal: {
+      type: "verandah", // Patio 5x5m rear corner
+      width_m: 5, length_m: 5, height_m: 2.7,
+      attachedToDwelling: false,
+      location: "rear",
+      setbackFront_m: 7, setbackSide_m: 1, setbackRear_m: 1
+    }
+  },
 ];
