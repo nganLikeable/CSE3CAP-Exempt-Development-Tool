@@ -148,4 +148,22 @@ window.PROPERTIES = [
       setbackFront_m: 5.5, setbackSide_m: 0.9, setbackRear_m: 6
     }
   },
+  {
+    id: "009",
+    address: "3 Boundary Rd, Table Top",
+    zone: "RU1",
+    lotSize_m2: 40000,
+    bushfireProne: true,
+    heritageListed: false,
+    cornerLot: false,
+    floodAffected: false,
+    slopeRise_m: 2.0,
+    proposal: {
+      type: "shed", // Detached shed 12x6m
+      width_m: 12, length_m: 6, height_m: 4.0,
+      attachedToDwelling: false,
+      location: "rear",
+      setbackFront_m: 20, setbackSide_m: 10, setbackRear_m: 10
+    }
+  },
 ];
