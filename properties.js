@@ -76,4 +76,22 @@ window.PROPERTIES = [
       setbackFront_m: 9, setbackSide_m: 1.2, setbackRear_m: 2.0
     }
   },
+  {
+    id: "005",
+    address: "22 Clyne Ave, East Albury",
+    zone: "R1",
+    lotSize_m2: 850,
+    bushfireProne: false,
+    heritageListed: false,
+    cornerLot: false,
+    floodAffected: false,
+    slopeRise_m: 0.4,
+    proposal: {
+      type: "verandah", // “Pergola 3x4m attached”
+      width_m: 3, length_m: 4, height_m: 2.6,
+      attachedToDwelling: true,
+      location: "rear",
+      setbackFront_m: 7, setbackSide_m: 0.9, setbackRear_m: 1.2
+    }
+  },
 ];
