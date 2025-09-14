@@ -256,4 +256,22 @@ window.PROPERTIES = [
       setbackFront_m: 5.5, setbackSide_m: 0.9, setbackRear_m: 6
     }
   },
+  {
+    id: "015",
+    address: "50 Gap Road, Ettamogah",
+    zone: "RU1",
+    lotSize_m2: 20000,
+    bushfireProne: true,
+    heritageListed: false,
+    cornerLot: false,
+    floodAffected: false,
+    slopeRise_m: 1.5,
+    proposal: {
+      type: "shed", // Freestanding shed 10x8m
+      width_m: 10, length_m: 8, height_m: 3.5,
+      attachedToDwelling: false,
+      location: "farm",
+      setbackFront_m: 20, setbackSide_m: 5, setbackRear_m: 5
+    }
+  }
 ];
