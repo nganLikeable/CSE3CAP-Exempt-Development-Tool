@@ -112,4 +112,22 @@ window.PROPERTIES = [
       setbackFront_m: 6, setbackSide_m: 1.0, setbackRear_m: 1.0
     }
   },
+  {
+    id: "007",
+    address: "90 Ryan Rd, Splitters Creek",
+    zone: "RU4",
+    lotSize_m2: 10000,
+    bushfireProne: true,
+    heritageListed: false,
+    cornerLot: false,
+    floodAffected: false,
+    slopeRise_m: 1.0,
+    proposal: {
+      type: "shed", // Shed 9x7m farm use
+      width_m: 9, length_m: 7, height_m: 3.5,
+      attachedToDwelling: false,
+      location: "farm",
+      setbackFront_m: 15, setbackSide_m: 5, setbackRear_m: 5
+    }
+  },
 ];
