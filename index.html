@@ -735,7 +735,7 @@
 		<section style="margin-left: 5%; margin-right: 5%;">
 
 			<!-- This is where we will be working -->
-			<h1 style="text-align: center;">What type of development?</h1>
+			<h1 class="text-center">What type of development?</h1>
 
 			<style>
 				.tile {
@@ -885,7 +885,7 @@
 
 			<div style="margin-left: 10%; margin-right: 10%;">
 			<form id="examples" class="tab-form d-none">
-				<h2 style="text-align: center; margin-top: 50px;">Development Examples</h2>
+				<h2 style="text-align: center; margin-top: 50px;" class="text-center mt-5">Development Examples</h2>
 				<div class="examples" style="margin-left: 10%; width: 80%;">
 					<div>
 						<img src=""/>
@@ -951,8 +951,9 @@
 					let options = ``
 					switch (rule.type)
 					{
+						// added min value for input
 						case "numeric":
-							options += `<input type="number"><br>`;
+							options += `<input type="number" min="0" step="1" oninput="if(this.value < 0) this.value = 0;"><br>`;
 							break;
 						case "yes/no":
 							options += `<label><input type="radio" name="` + rule.section + rule.subsection + `" value="Yes">Yes</label><br>
@@ -962,7 +963,7 @@
 					elem.classList.add("question");
 					elem.innerHTML = `
 						<p class="question-title">` + rule.question + `</p>` + options + `
-						<p class="question-section">` + (rule.errormsg ?? "That development doesn't qualify for exempt development") + ", please check <a href=" + rule.section + ` target="_blank">` + rule.sanitised + `</a> for more information.</p>
+						<p class="question-section">` + (rule.errormsg ?? "Such development doesn't qualify for exempt development") + ", please check <a href=" + rule.section + ` target="_blank">` + rule.sanitised + `</a> for more information.</p>
 					`;
 					selectedForm.appendChild(elem);
 				}
