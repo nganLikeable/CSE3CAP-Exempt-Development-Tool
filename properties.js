@@ -130,4 +130,22 @@ window.PROPERTIES = [
       setbackFront_m: 15, setbackSide_m: 5, setbackRear_m: 5
     }
   },
+  {
+    id: "008",
+    address: "76 Fallon Street, North Albury",
+    zone: "R2",
+    lotSize_m2: 520,
+    bushfireProne: false,
+    heritageListed: false,
+    cornerLot: false,
+    floodAffected: false,
+    slopeRise_m: 0.2,
+    proposal: {
+      type: "carport", // Carport 3x5m front
+      width_m: 3, length_m: 5, height_m: 2.6,
+      attachedToDwelling: true,
+      location: "front",
+      setbackFront_m: 5.5, setbackSide_m: 0.9, setbackRear_m: 6
+    }
+  },
 ];
