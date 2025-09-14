@@ -886,7 +886,23 @@
 			<div style="margin-left: 10%; margin-right: 10%;">
 			<form id="examples" class="tab-form d-none">
 				<h2 style="text-align: center; margin-top: 50px;">Development Examples</h2>
-				<div class="examples" style="margin-left: 10%; width: 80%;">
+
+				<section id="sample-box" style="max-width:1000px;margin:24px auto;padding:0 12px">
+					<h2 style="margin:0 0 8px">Property Samples</h2>
+
+					<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px">
+						<button type="button" onclick="showSamples('shed')">Shed</button>
+                        <button type="button" onclick="showSamples('verandah')">Verandah</button>
+                        <button type="button" onclick="showSamples('carport')">Carport</button>
+                        <button type="button" onclick="showSamples('retaining_wall')">Retaining Wall</button>
+					</div>
+					<div id="samples-list" style="
+					display:grid;
+					grid-template-columns:repeat(auto-fill,minmax(260px,1fr));
+					gap:10px;">
+					</div>
+				</section>
+				<!-- <div class="examples" style="margin-left: 10%; width: 80%;">
 					<div>
 						<img src=""/>
 						<div style="padding: 0; flex-direction: column;">
@@ -894,7 +910,7 @@
 							<p style="margin-top: -1rem">25m² Surface area, more than a meter from any other development, and no connections to mains services.</p>
 						</div>
 					</div>
-				</div>
+				</div> -->
 			</form>
 
 			<form id="shed" class="tab-form border p-3 rounded bg-light d-none" name="Shed Exemption Check" style="text-align: center;"></form>
@@ -1262,6 +1278,32 @@
 				environment: 'apse2',
 				deploymentId: 'b8c69752-63e6-4f5f-b4be-f74e233fe260'
 			});
+		</script>
+		<script src="properties.js"></script>
+		<script>
+			function showSamples(type){
+				const list = document.getElementById('samples-list');
+				const items = (window.PROPERTIES||[]).filter(p => (p.proposal?.type||'').toLowerCase() === type);
+
+				list.innerHTML = items.map(p => `
+				  <div style="border:1px solid #eee;border-radius:10px;padding:10px">
+					<div style="font-weight:600;margin-bottom:4px">${p.id} — ${p.address}</div>
+					<div style="font-size:13px;color:#555;line-height:1.45">
+						<div><b>Zone:</b> ${p.zone} • <b>Lot:</b> ${p.lotSize_m2} m²</div>
+						<div><b>Bushfire:</b> ${p.bushfireProne?'Yes':'No'} • <b>Heritage:</b> ${p.heritageListed?'Yes':'No'}</div>
+						<div><b>Proposed:</b> ${p.proposal.type.replace('_',' ')} 
+							${p.proposal.width_m?`• ${p.proposal.width_m}×${p.proposal.length_m}×${p.proposal.height_m}m`:''}
+						</div>
+					</div>
+					<a href="property.html?id=${encodeURIComponent(p.id)}" style="display:inline-block;margin-top:8px;
+                       padding:6px 8px;border:1px solid #ddd;border-radius:8px;text-decoration:none;color:#222">
+					   View details
+					</a>
+				  </div>
+				`).join('') || `<div style="color:#666">No samples for this type yet.</div>`;
+			}
+		document.addEventListener('DOMContentLoaded', () => showSamples('shed'));
+
 		</script>
 		<!-- endnoindex -->
 	</body>
