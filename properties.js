@@ -220,4 +220,22 @@ window.PROPERTIES = [
       setbackFront_m: 10, setbackSide_m: 2, setbackRear_m: 2
     }
   },
+  {
+    id: "013",
+    address: "62 Jones Street, West Albury",
+    zone: "R1",
+    lotSize_m2: 780,
+    bushfireProne: false,
+    heritageListed: false,
+    cornerLot: false,
+    floodAffected: false,
+    slopeRise_m: 0.3,
+    proposal: {
+      type: "shed", // Shed 4x4m rear
+      width_m: 4, length_m: 4, height_m: 2.6,
+      attachedToDwelling: false,
+      location: "rear",
+      setbackFront_m: 8, setbackSide_m: 1, setbackRear_m: 1
+    }
+  },
 ];
