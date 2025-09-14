@@ -166,4 +166,22 @@ window.PROPERTIES = [
       setbackFront_m: 20, setbackSide_m: 10, setbackRear_m: 10
     }
   },
+  {
+    id: "010",
+    address: "45 Alexandra St, Albury CBD",
+    zone: "B2",
+    lotSize_m2: 350,
+    bushfireProne: false,
+    heritageListed: true,
+    cornerLot: false,
+    floodAffected: false,
+    slopeRise_m: 0.1,
+    proposal: {
+      type: "verandah", // Attached pergola 2x3m
+      width_m: 2, length_m: 3, height_m: 2.4,
+      attachedToDwelling: true,
+      location: "side",
+      setbackFront_m: 4, setbackSide_m: 0.5, setbackRear_m: 1
+    }
+  },
 ];
