@@ -1090,10 +1090,10 @@
 										good &= SEPP[str][key].check(SEPP[str][key].id, elem, readBool(SEPP[str][key].id));
 									else if (SEPP[str][key].type === "numeric")
 										good &= SEPP[str][key].check(SEPP[str][key].id, elem, readNumeric(SEPP[str][key].id));
+									console.log(good, key);
 								}
 							});
-							if (good)
-
+							console.log(good ? "Success" : "Failure");
 						};
 						selectedForm.appendChild(notes);
 						selectedForm.appendChild(check);
