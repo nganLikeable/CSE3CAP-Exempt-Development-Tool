@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Property Details</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    body { font-family: Arial, sans-serif; margin: 20px; }
+    .card { border:1px solid #eee; border-radius:10px; padding:15px; max-width:800px; margin:auto; }
+    h1 { font-size: 22px; margin-bottom: 12px; }
+    .kv { display:grid; grid-template-columns:150px 1fr; row-gap:6px; column-gap:8px; }
+    .back { display:inline-block; margin-bottom:12px; text-decoration:none; color:#0077cc; }
+  </style>
+</head>
+<body>
+
+<a href="index.html#sample-box" class="back" onclick="history.back(); return false;">← Back to Property Samples</a>
+
+<div class="card">
+  <h1 id="title">Property</h1>
+  <div class="kv" id="details"></div>
+</div>
+
+<!-- load the property data -->
+<script src="properties.js"></script>
+<script>
+function getParam(name){
+  const url = new URL(window.location.href);
+  return url.searchParams.get(name);
+}
+
+function showDetails(){
+  const id = getParam('id');
+  const prop = (window.PROPERTIES||[]).find(p => p.id === id);
+
+  if (!prop){
+    document.getElementById('title').textContent = "Property not found";
+    return;
+  }
+
+  document.getElementById('title').textContent = `${prop.id} — ${prop.address}`;
+  const d = document.getElementById('details');
+  d.innerHTML = `
+    <div><b>Zone:</b></div><div>${prop.zone}</div>
+    <div><b>Lot size:</b></div><div>${prop.lotSize_m2} m²</div>
+    <div><b>Bushfire prone:</b></div><div>${prop.bushfireProne ? "Yes":"No"}</div>
+    <div><b>Heritage listed:</b></div><div>${prop.heritageListed ? "Yes":"No"}</div>
+    <div><b>Proposal type:</b></div><div>${prop.proposal.type}</div>
+    <div><b>Dimensions:</b></div><div>${prop.proposal.width_m} × ${prop.proposal.length_m} × ${prop.proposal.height_m} m</div>
+    <div><b>Location:</b></div><div>${prop.proposal.location}</div>
+    <div><b>Setbacks:</b></div><div>Front ${prop.proposal.setbackFront_m} m, Side ${prop.proposal.setbackSide_m} m, Rear ${prop.proposal.setbackRear_m} m</div>
+  `;
+}
+
+document.addEventListener('DOMContentLoaded', showDetails);
+</script>
+
+</body>
+</html>
