@@ -843,6 +843,11 @@
 					margin-right: 5px;
 				}
 
+				.question label input[type="radio"] {
+					vertical-align: top;
+					margin-right: 5px;
+				}
+
 				.question label:has(> input) {
 					width: 10%;
 					display: inline-flex;
@@ -991,7 +996,10 @@
 							subsection: "b",
 							sanitised: "Section 2.18b of the SEPP (2008)",
 							question: "Is your development in one of the following zones: RU1, RU3, RU4, RU6, or R5?",
-							type: "yes/no"
+							type: "dropdown",
+							options: [
+								"RU1", "RU3", "RU4", "RU6", "R5", "Other"
+							]
 						},
 						{
 							id: 3,
@@ -1033,7 +1041,7 @@
 							question: "How far is it located from the lot boundary (m)?",
 							type: "numeric",
 							check: (id, elem, v) => {
-								var zoned = readBool(2);
+								let zoned = readBool(2);
 								if (zoned === true && v < 5 || zoned === false && v < 9)
 									show(elem);
 								else
@@ -1195,6 +1203,11 @@
 							options += `<label><input type="radio" name="${String(rule.id)}" value="Yes">Yes</label><br>
 								<label><input type="radio" name="${String(rule.id)}" value="No">No</label><br>`;
 							break;
+						case "dropdown":
+							options +=
+							`<select name="${String(rule.id)}">
+								${rule.options.map(x => `<option value="${x}">${x}</option>`)}
+							</select>`;
 						case "lotBoundary":
 							options += `
 							<label for "lot-distance" class="d-block" > Distance (m):</label>
