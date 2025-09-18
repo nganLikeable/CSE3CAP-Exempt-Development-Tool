@@ -870,7 +870,7 @@
 				<h2 class="tile" style="margin-left: 2%;">
 					<img src="verandah.png"/>
 					<a href="#patio"></a>
-					<span>Verandah</span>
+					<span>Verandah/Patio</span>
 				</h2>
 			</div>
 			<div style="display: flex; margin-top: 1%;">
@@ -1034,7 +1034,100 @@
 							}
 						},
 					],
-					patio: [],
+					patio: [
+						{
+							id: null,
+							section: "https://legislation.nsw.gov.au/view/html/inforce/current/epi-2008-0572#sec.2.11",
+							subsection: "2.11a",
+							sanitised: "Section 2.11 (a) of the SEPP (2008)",
+							question: "Is the construction or installation on a <strong>heritage site, draft heritage site, or an foreshore area?</strong>",
+							type: "yes/no", // no
+							errormsg: "Structure <strong>cannot</strong> be constructed or installed on a heritage item or on land in a foreshore area"
+						},
+						{
+							id: null,
+							section: "https://legislation.nsw.gov.au/view/html/inforce/current/epi-2008-0572#sec.2.11",
+							subsection: "2.11b",
+							sanitised: "Section 2.11 (b) of the SEPP (2008)",
+							question: "Is this a replacement of an existing deck?",
+							type: "deckReplacement", // if yes, height <=1
+							errormsg: "The replacement deck <strong>must not </strong> be higher than <strong>1m</strong> above ground level"
+						},
+						{
+							id: null,
+							section: "https://legislation.nsw.gov.au/view/html/inforce/current/epi-2008-0572#sec.2.12",
+							subsection: "2.12 (1)b",
+							sanitised: "Section 2.12 (1)b of the SEPP (2008)",
+							question: "Does the development have any area of less than 25m²?",
+							type: "yes/no", // yes
+							errormsg: "The development <strong>must not</strong> have an area of  less than 25m²"
+						}, 
+						// unimplemented : c
+						{
+							id: null,
+							section: "https://legislation.nsw.gov.au/view/html/inforce/current/epi-2008-0572#sec.2.12",
+							subsection: "2.12 (1)c",
+							sanitised: "Section 2.12 (1)c of the SEPP (2008)",
+							type: null,
+						},
+						{
+							id: null,
+							section: "https://legislation.nsw.gov.au/view/html/inforce/current/epi-2008-0572#sec.2.12",
+							subsection: "2.12 (1)d",
+							sanitised: "Section 2.12 (1)d of the SEPP (2008)",
+							question: "Does it have an enclosing wall higher than 1.4m?",
+							type: "yes/no",
+							errormsg: "The development <strong>must not</strong> have an an enclosing wall of more than 1.4"
+						},
+						{							
+							id: null,
+							section: "https://legislation.nsw.gov.au/view/html/inforce/current/epi-2008-0572#sec.2.12",
+							subsection: "2.12 (1)e",
+							sanitised: "Section 2.12 (1)e of the SEPP (2008)",
+							type: "farmPremise",
+							errormsg: ""
+						},
+						{
+							section: "https://legislation.nsw.gov.au/view/html/inforce/current/epi-2008-0572#sec.2.12",
+							subsection: "1f",
+							sanitised: "Section 2.20 (1)f of the SEPP (2008)",
+							question: "What is the distance from the development to the nearest lot boundary?",
+							type: "lotBoundary", // custom type to handle numeric + zone 
+							errormsg: "Distance from lot boundary <strong>must be 5m</strong> for RU1, RU2, RU3, RU4, R6 or R5 zones, <strong>or 900mm</strong> for other zones"
+						},
+						{
+							id: null,
+							section: "https://legislation.nsw.gov.au/view/html/inforce/current/epi-2008-0572#sec.2.12",
+							subsection: "1h",
+							sanitised: "Section 2.12 (1)(h) of the SEPP (2008)",
+							question: "If your development is made of metal components, are they constructed of low reflective and factory pre-coloured materials?",
+							type: "yes/no", // yes
+							errormsg: "Metal components <strong>must</strong> be low reflective and factory pre-coloured materials"
+						},						
+						{
+							id: null,
+							section: "https://legislation.nsw.gov.au/view/html/inforce/current/epi-2008-0572#sec.2.12",
+							subsection: "1i",
+							sanitised: "Section 2.12 (1)(i) of the SEPP (2008)",
+							question: "What is the floor height above ground level (m)? ",
+							type: "numeric", // <=1m
+							errormsg: "The development <strong>must</strong> have a floor height not more than 1m above gruond level"
+						},
+						{
+							id: null,
+							section: "https://legislation.nsw.gov.au/view/html/inforce/current/epi-2008-0572#sec.2.12",
+							subsection: "1j",
+							sanitised: "Section 2.12 (1)(i) of the SEPP (2008)",
+							question: "What is the floor height above ground level (m)? ",
+							type: "numeric", // <=1m
+							errormsg: "The development <strong>must</strong> have a floor height not more than 1m above gruond level"
+						},
+
+						
+
+
+						 
+					],
 					carport: [
 						//{
 						//	section: "https://legislation.nsw.gov.au/view/html/inforce/current/epi-2008-0572#sec.2.19",
@@ -1121,7 +1214,7 @@
 							section: "https://legislation.nsw.gov.au/view/html/inforce/current/epi-2008-0572#sec.2.20",
 							subsection: "1e",
 							sanitised: "Section 2.20 (1)(e) of the SEPP (2008)",
-							question: "If connected to a fascia, does the connection comply with a professional engineer's specifications?",
+							question: "If connected to a fascia, does the connection comply with a professional engineer's specifications?", // consider adding yes/no for fascia
 							type: "yes/no", // yes
 							errormsg: "Carport <strong>must</strong> follow professional engineer's specifications when connected to a fascia"
 						},
@@ -1167,7 +1260,27 @@
 								{label: "There is a dwelling on the lot", value: "dwelling", errormsg: "Only one carport development is allowed per lot with a dwelling" },
 								{label: "No dwelling: per lot or per occupation, whichever is greater", value: "no_dwelling", errormsg: "Only one carport development is allowed per lot or per occupation" },
 								{label: "N/A", value:"n/a"}]
-						}
+						}, 
+						{
+							id: null,
+							section: "https://legislation.nsw.gov.au/view/html/inforce/current/epi-2008-0572#sec.2.12",
+							subsection: "1l",
+							sanitised: "Section 2.12 (1)(l) of the SEPP (2008)",
+							question: "Will the carport be constructred or installed so that roofwater is disposed of into the existing stormwater drainage system?",
+							type: "yes/no", // yes
+							errormsg: "Roofwater <strong>must</strong> be directed into the existing stormwater drainage system"
+						},
+						{
+							id: null,
+							section: "https://legislation.nsw.gov.au/view/html/inforce/current/epi-2008-0572#sec.2.12",
+							subsection: "1k",
+							sanitised: "Section 2.12 (1)(k) of the SEPP (2008)",
+							question: "Will it interfere with the funcitoning of existing drainage fixures/flowpaths?",
+							type: "yes/no", // yes
+							errormsg: "Roofwater <strong>must</strong> be directed into the existing stormwater drainage system"
+						},
+
+
   					],
 					retaining_wall: [],
 				}
@@ -1181,7 +1294,7 @@
 					switch (rule.type)
 					{
 						case "numeric":
-							options += `<input type="number" id="${String(rule.id) + "num"}"><br>`;
+							options += `<input type="number" id="${String(rule.id) + "num"} " min="1"><br>`;
 							break;
 						case "yes/no":
 							options += `<label><input type="radio" name="${String(rule.id)}" value="Yes">Yes</label><br>
@@ -1216,6 +1329,20 @@
 							select += `</select><br>`;
 
 							options += select;
+							break;
+						case "deckReplacement":
+							options += `
+								<label><input type="radio" name="${String(rule.id)}" value="Yes">Yes</label><br>
+								<label><input type="radio" name="${String(rule.id)}" value="No">No</label><br>
+								<label for "deckHeight" name="${String(rule.id)}" class="d-block">If yes, deck height: </label>
+								<input type = "number" name="${String(rule.id)}" min="0" step="1">
+								`
+							break;
+						case "farmPremise":
+							options += `
+							<label for 'farm'>
+
+							<select>`
 							break;
 					}
 					elem.classList.add("question");
