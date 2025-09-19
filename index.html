@@ -901,12 +901,10 @@
 
 			<div style="margin-left: 10%; margin-right: 10%;">
 			<form id="examples" class="tab-form d-none">
-				<h2 style="text-align: center; margin-top: 50px;">Development Examples</h2>
+				<h2 style="text-align: center; margin-top: 50px;">Property Samples</h2>
 
-				<section id="sample-box" style="max-width:1000px;margin:24px auto;padding:0 12px">
-					<h2 style="margin:0 0 8px">Property Samples</h2>
-
-					<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px">
+				<section id="sample-box" style="max-width:1000px; margin:24px auto; padding:0 12px">
+					<div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:10px">
 						<button type="button" onclick="showSamples('shed')">Shed</button>
                         <button type="button" onclick="showSamples('verandah')">Verandah</button>
                         <button type="button" onclick="showSamples('carport')">Carport</button>
@@ -918,15 +916,6 @@
 					gap:10px;">
 					</div>
 				</section>
-				<!-- <div class="examples" style="margin-left: 10%; width: 80%;">
-					<div>
-						<img src=""/>
-						<div style="padding: 0; flex-direction: column;">
-							<h4>Standard Shed</h4>
-							<p style="margin-top: -1rem">25m² Surface area, more than a meter from any other development, and no connections to mains services.</p>
-						</div>
-					</div>
-				</div> -->
 			</form>
 
 			<form id="shed" class="tab-form border p-3 rounded bg-light d-none" name="Shed Exemption Check" style="text-align: center;"></form>
@@ -967,7 +956,6 @@
 				function readDropdown(id)
 				{
 					const selected = document.getElementById(String(id) + "dd");
-					console.log(selected);
 					return selected ? selected.value : null;
 				}
 
@@ -976,8 +964,7 @@
 						{
 							id: 0,
 							section: "https://legislation.nsw.gov.au/view/html/inforce/current/epi-2008-0572#sec.2.17",
-							subsection: "a",
-							sanitised: "Section 2.17a of the SEPP (2008)",
+							sanitised: "Section 2.17 1a of the SEPP (2008)",
 							question: "Is the construction or installation on a heritage item, draft heritage item, or an off-shore area?",
 							type: "yes/no",
 							errormsg: "New developments cannot be built on any of the aformentioned sites",
@@ -986,14 +973,13 @@
 									show(elem);
 								else
 									hide(elem);
-								return bool === false;
+								return bool === null ? 1 : bool === false ? 4 : 2;
 							}
 						},
 						{
 							id: 1,
 							section: "https://legislation.nsw.gov.au/view/html/inforce/current/epi-2008-0572#sec.2.17",
-							subsection: "b",
-							sanitised: "Section 2.17b of the SEPP (2008)",
+							sanitised: "Section 2.17 1b of the SEPP (2008)",
 							question: "Is it replacing an existing deck higher than one meter from ground level?",
 							errormsg: "It cannot replace a pre-existing development higher than one meter above ground level",
 							type: "yes/no",
@@ -1002,14 +988,13 @@
 									show(elem);
 								else
 									hide(elem);
-								return bool === false;
+								return bool === null ? 1 : bool === false ? 4 : 2;
 							}
 						},
 						{
 							id: 2,
 							section: "https://legislation.nsw.gov.au/view/html/inforce/current/epi-2008-0572#sec.2.18",
-							subsection: "b",
-							sanitised: "Section 2.18b of the SEPP (2008)",
+							sanitised: "Section 2.18 1b of the SEPP (2008)",
 							question: "What zone is your development in?",
 							type: "dropdown",
 							options: [
@@ -1019,8 +1004,7 @@
 						{
 							id: 3,
 							section: "https://legislation.nsw.gov.au/view/html/inforce/current/epi-2008-0572#sec.2.18",
-							subsection: "b",
-							sanitised: "Section 2.18b of the SEPP (2008)",
+							sanitised: "Section 2.18 1b of the SEPP (2008)",
 							question: "What is the floor area of the installation (m²)?",
 							type: "numeric",
 							check: (id, elem, v) => {
@@ -1029,14 +1013,13 @@
 									show(elem);
 								else
 									hide(elem);
-								return zoned === true && v <= 50 || zoned === false && v <= 20;
+								return v === null ? 1 : (zoned === true && v <= 50 || zoned === false && v <= 20) ? 4 : 2;
 							}
 						},
 						{
 							id: 4,
 							section: "https://legislation.nsw.gov.au/view/html/inforce/current/epi-2008-0572#sec.2.18",
-							subsection: "c",
-							sanitised: "Section 2.18c of the SEPP (2008)",
+							sanitised: "Section 2.18 1c of the SEPP (2008)",
 							question: "What is the planned height above existing ground level (m)?",
 							errormsg: "Developments aren't exempt if they're above 3 meters from ground level",
 							type: "numeric",
@@ -1045,46 +1028,43 @@
 									show(elem);
 								else
 									hide(elem);
-								return v && v <= 3;
+								return v === null ? 1 : v <= 3 ? 4 : 2;
 							}
 						},
 						{
 							id: 5,
 							section: "https://legislation.nsw.gov.au/view/html/inforce/current/epi-2008-0572#sec.2.18",
-							subsection: "d",
-							sanitised: "Section 2.18d of the SEPP (2008)",
+							sanitised: "Section 2.18 1d of the SEPP (2008)",
 							question: "How far is it located from the lot boundary (m)?",
 							type: "numeric",
 							check: (id, elem, v) => {
 								var zoned = readDropdown(2) !== "Other";
-								if (zoned === true && v < 5 || zoned === false && v < 9)
+								if (v !== null && (zoned === true && v < 5 || zoned === false && v < 9))
 									show(elem);
 								else
 									hide(elem);
-								return zoned === true && v >= 5 || zoned === false && v >= 9;
+								return v === null ? 1 : (zoned === true && v >= 5 || zoned === false && v >= 9) ? 4 : 2;
 							}
 						},
 						{
 							id: 6,
 							section: "https://legislation.nsw.gov.au/view/html/inforce/current/epi-2008-0572#sec.2.18",
-							subsection: "e",
-							sanitised: "Section 2.18e of the SEPP (2008)",
+							sanitised: "Section 2.18 1e of the SEPP (2008)",
 							question: "Is it behind the building line or any road frontage?",
 							type: "yes/no",
 							check: (id, elem, bool) => {
 								var zoned = readDropdown(2) !== "Other";
-								if (zoned === false && bool === true)
+								if (zoned === false && bool === false)
 									show(elem);
 								else
 									hide(elem);
-								return zoned === true || bool === false;
+								return bool === null ? 1 : (zoned === true || bool === true) ? 4 : 2;
 							}
 						},
 						{
 							id: 7,
 							section: "https://legislation.nsw.gov.au/view/html/inforce/current/epi-2008-0572#sec.2.18",
-							subsection: "f",
-							sanitised: "Section 2.18f of the SEPP (2008)",
+							sanitised: "Section 2.18 1f of the SEPP (2008)",
 							question: "Is the development a shipping container?",
 							type: "yes/no",
 							check: (id, elem, bool) => {
@@ -1093,14 +1073,13 @@
 									show(elem);
 								else
 									hide(elem);
-								return zoned === true || bool === false;
+								return bool === null ? 1 : (zoned === true || bool === false) ? 4 : 2;
 							}
 						},
 						{
 							id: 8,
 							section: "https://legislation.nsw.gov.au/view/html/inforce/current/epi-2008-0572#sec.2.18",
-							subsection: "g",
-							sanitised: "Section 2.18g of the SEPP (2008)",
+							sanitised: "Section 2.18 1g of the SEPP (2008)",
 							question: "Does roofwater get disposed of without disrupting adjoining owners?",
 							type: "yes/no",
 							check: (id, elem, bool) => {
@@ -1109,14 +1088,13 @@
 									show(elem);
 								else
 									hide(elem);
-								return zoned === true || bool === true;
+								return bool === null ? 1 : (zoned === true || bool === true) ? 4 : 2;
 							}
 						},
 						{
 							id: 9,
 							section: "https://legislation.nsw.gov.au/view/html/inforce/current/epi-2008-0572#sec.2.18",
-							subsection: "h",
-							sanitised: "Section 2.18h of the SEPP (2008)",
+							sanitised: "Section 2.18 1h of the SEPP (2008)",
 							question: "Are all metal components low reflective, and factory pre-coloured?",
 							type: "yes/no",
 							check: (id, elem, bool) => {
@@ -1125,22 +1103,20 @@
 									show(elem);
 								else
 									hide(elem);
-								return zoned === true || bool === true;
+								return bool === null ? 1 : (zoned === true || bool === true) ? 4 : 2;
 							}
 						},
 						{
 							id: 10,
 							section: "https://legislation.nsw.gov.au/view/html/inforce/current/epi-2008-0572#sec.2.18",
-							subsection: "i",
-							sanitised: "Section 2.18i of the SEPP (2008)",
+							sanitised: "Section 2.18 1i of the SEPP (2008)",
 							question: "Is your development built in a bush fire prone area?",
 							type: "yes/no",
 						},
 						{
 							id: 11,
 							section: "https://legislation.nsw.gov.au/view/html/inforce/current/epi-2008-0572#sec.2.18",
-							subsection: "i",
-							sanitised: "Section 2.18i of the SEPP (2008)",
+							sanitised: "Section 2.18 1i of the SEPP (2008)",
 							question: "Is the plan less than 5m from a dwelling or built from combustible material?",
 							type: "yes/no",
 							check: (id, elem, bool) => {
@@ -1150,22 +1126,20 @@
 									show(elem);
 								else
 									hide(elem);
-								return zoned === true || bool === false || fireprone === false;
+								return bool === null ? 1 : (zoned === true || bool === false || fireprone === false) ? 4 : 2;
 							}
 						},
 						{
 							id: 12,
 							section: "https://legislation.nsw.gov.au/view/html/inforce/current/epi-2008-0572#sec.2.18",
-							subsection: "j",
-							sanitised: "Section 2.18j of the SEPP (2008)",
+							sanitised: "Section 2.18 1j of the SEPP (2008)",
 							question: "Is it being constructed or installed in a heritage or draft heritage conservation area?",
 							type: "yes/no",
 						},
 						{
 							id: 13,
 							section: "https://legislation.nsw.gov.au/view/html/inforce/current/epi-2008-0572#sec.2.18",
-							subsection: "j",
-							sanitised: "Section 2.18j of the SEPP (2008)",
+							sanitised: "Section 2.18 1j of the SEPP (2008)",
 							question: "Is it located in the 'rear yard'?",
 							type: "yes/no",
 							check: (id, elem, bool) => {
@@ -1175,14 +1149,13 @@
 									show(elem);
 								else
 									hide(elem);
-								return zoned === true || bool === true || heritage === false;
+								return bool === null ? 1 : (zoned === true || bool === true || heritage === false) ? 4 : 2;
 							}
 						},
 						{
 							id: 14,
 							section: "https://legislation.nsw.gov.au/view/html/inforce/current/epi-2008-0572#sec.2.18",
-							subsection: "k",
-							sanitised: "Section 2.18k of the SEPP (2008)",
+							sanitised: "Section 2.18 1k of the SEPP (2008)",
 							question: "If it is adjacent to another building, does it interfere with the entry, exit, or fire safety measures of that building?",
 							type: "yes/no",
 							check: (id, elem, bool) => {
@@ -1191,14 +1164,13 @@
 									show(elem);
 								else
 									hide(elem);
-								return zoned === true || bool === false;
+								return bool === null ? 1 : (zoned === true || bool === false) ? 4 : 2;
 							}
 						},
 						{
 							id: 15,
 							section: "https://legislation.nsw.gov.au/view/html/inforce/current/epi-2008-0572#sec.2.18",
-							subsection: "l",
-							sanitised: "Section 2.18l of the SEPP (2008)",
+							sanitised: "Section 2.18 1l of the SEPP (2008)",
 							question: `Is it a <a href="https://ncc.abcb.gov.au/ncc-navigator/building-classifications#class-10-buildings">Class 10</a> building and is not habitable?`,
 							type: "yes/no",
 							check: (id, elem, bool) => {
@@ -1207,15 +1179,14 @@
 									show(elem);
 								else
 									hide(elem);
-								return zoned === true || bool === false;
+								return bool === null ? 1 : (zoned === true || bool === false) ? 4 : 2;
 							}
 						},
 						{
 							id: 16,
 							section: "https://legislation.nsw.gov.au/view/html/inforce/current/epi-2008-0572#sec.2.18",
-							subsection: "m",
-							sanitised: "Section 2.18m of the SEPP (2008)",
-							question: "How far is it from any registered easement (m)?",
+							sanitised: "Section 2.18 1m of the SEPP (2008)",
+							question: "How far is it from any registered easement (m), leave empty if there's no nearby easements?",
 							type: "numeric",
 							check: (id, elem, v) => {
 								var zoned = readDropdown(2) !== "Other";
@@ -1223,7 +1194,36 @@
 									show(elem);
 								else
 									hide(elem);
-								return zoned === true || v >= 1;
+								return v === null || zoned === true || v >= 1 ? 4 : 2;
+							}
+						},
+						{
+							id: 16,
+							section: "https://legislation.nsw.gov.au/view/html/inforce/current/epi-2008-0572#sec.2.18",
+							sanitised: "Section 2.18 1n of the SEPP (2008)",
+							question: "If it is a cabana, is it connected to a water supply or sewerage service (m)?",
+							type: "yes/no",
+							check: (id, elem, bool) => {
+								var zoned = readDropdown(2) !== "Other";
+								if (zoned === false && bool === true)
+									show(elem);
+								else
+									hide(elem);
+								return bool === null ? 1 : (zoned === true || bool === false) ? 4 : 2;
+							}
+						},
+						{
+							id: 17,
+							section: "https://legislation.nsw.gov.au/view/html/inforce/current/epi-2008-0572#sec.2.18",
+							sanitised: "Section 2.18 2a of the SEPP (2008)",
+							question: "How many developments are already on the lot?",
+							type: "numeric",
+							check: (id, elem, bool) => {
+								if (zoned >= 2)
+									show(elem);
+								else
+									hide(elem);
+								return bool === null ? 1 : zoned < 2 ? 4 : 2;
 							}
 						},
 					],
@@ -1377,8 +1377,8 @@
 							options += `<input type="number" id="${String(rule.id) + "num"}"><br>`;
 							break;
 						case "yes/no":
-							options += `<label><input type="radio" id="${String(rule.id) + "yn"}" value="Yes">Yes</label><br>
-								<label><input type="radio" id="${String(rule.id) + "yn"}" value="No">No</label><br>`;
+							options += `<label><input type="radio" id="${String(rule.id) + "yn"}" name="${String(rule.id)}" value="Yes">Yes</label><br>
+								<label><input type="radio" id="${String(rule.id) + "yn"}" name="${String(rule.id)}" value="No">No</label><br>`;
 							break;
 						case "dropdown":
 							options +=
@@ -1454,25 +1454,67 @@
 						check.textContent = "Check";
 						check.id = "questionnaireCheck";
 						check.onclick = () => {
-							let offset = Math.max(...Array.from(document.getElementsByClassName("navbar")).map(h => h.offsetHeight));
-							window.scrollTo({top: selectedForm.getBoundingClientRect().top + window.scrollY - offset + 30, behavior: "smooth"});
-							let good = true;
+							// let offset = Math.max(...Array.from(document.getElementsByClassName("navbar")).map(h => h.offsetHeight));
+							// window.scrollTo({top: selectedForm.getBoundingClientRect().top + window.scrollY - offset + 30, behavior: "smooth"});
+							let good = 0;
 							Object.keys(SEPP[str]).forEach(key => {
 								if (SEPP[str][key].check)
 								{
 									const elem = document.getElementById(String(SEPP[str][key].id) + "e");
 									if (SEPP[str][key].type === "yes/no")
-										good &= SEPP[str][key].check(SEPP[str][key].id, elem, readBool(SEPP[str][key].id));
+										good |= SEPP[str][key].check(SEPP[str][key].id, elem, readBool(SEPP[str][key].id));
 									else if (SEPP[str][key].type === "numeric")
-										good &= SEPP[str][key].check(SEPP[str][key].id, elem, readNumeric(SEPP[str][key].id));
+										good |= SEPP[str][key].check(SEPP[str][key].id, elem, readNumeric(SEPP[str][key].id));
 									else if (SEPP[str][key].type === "dropdown")
-										good &= SEPP[str][key].check(SEPP[str][key].id, elem, readDropdown(SEPP[str][key].id));
+										good |= SEPP[str][key].check(SEPP[str][key].id, elem, readDropdown(SEPP[str][key].id));
 								}
 							});
-							console.log(good ? "Success" : "Failure");
+							if (good & 1)
+								hide(resultPass),
+								hide(resultFail),
+								show(resultUnfinished);
+							else if (good & 2)
+								hide(resultPass),
+								show(resultFail),
+								hide(resultUnfinished);
+							else if (good & 4)
+								show(resultPass),
+								hide(resultFail),
+								hide(resultUnfinished);
 						};
+						const results = document.createElement("div");
+						results.style.display = "flex";
+						results.style.justifyContent = "horizontal";
+						const resultPass = document.createElement("p");
+						resultPass.style.marginTop = "10px";
+						resultPass.style.left = "50%";
+						resultPass.style.transform = "translate(-50%, 0)";
+						resultPass.style.fontWeight = "bold";
+						resultPass.style.position = "absolute";
+						resultPass.innerText = "✔ Your development is exempt ✔";
+						const resultFail = document.createElement("p");
+						resultFail.style.marginTop = "10px";
+						resultFail.style.left = "50%";
+						resultFail.style.transform = "translate(-50%, 0)";
+						resultFail.style.fontWeight = "bold";
+						resultFail.style.position = "absolute";
+						resultFail.innerText = "❌ Your development isn't exempt ❌";
+						const resultUnfinished = document.createElement("p");
+						resultUnfinished.style.marginTop = "10px";
+						resultUnfinished.style.left = "50%";
+						resultUnfinished.style.transform = "translate(-50%, 0)";
+						resultUnfinished.style.fontWeight = "bold";
+						resultUnfinished.style.position = "absolute";
+						resultUnfinished.innerText = "⚠ Please finish the unanswered questions ⚠";
 						selectedForm.appendChild(notes);
 						selectedForm.appendChild(check);
+						results.appendChild(resultPass);
+						results.appendChild(resultFail);
+						results.appendChild(resultUnfinished);
+						selectedForm.appendChild(results);
+						hide(resultPass);
+						hide(resultFail);
+						hide(resultUnfinished);
 					}
 					else
 						document.getElementById("examples").classList.remove("d-none");
