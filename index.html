@@ -857,7 +857,9 @@
 				}
 
 				.question select {
-					width: 20%;
+					min-width: 20%;
+					max-width: 100%;
+					width: fit-content;
 					display: inline-flex;
   					align-items: center;
 					user-select: none;
@@ -1149,7 +1151,7 @@
 									show(elem);
 								else
 									hide(elem);
-								return bool === null ? 1 : (zoned === true || bool === true || heritage === false) ? 4 : 2;
+								return (bool === null || heritage === null) ? 1 : (zoned === true || bool === true || heritage === false) ? 4 : 2;
 							}
 						},
 						{
@@ -1186,7 +1188,7 @@
 							id: 16,
 							section: "https://legislation.nsw.gov.au/view/html/inforce/current/epi-2008-0572#sec.2.18",
 							sanitised: "Section 2.18 1m of the SEPP (2008)",
-							question: "How far is it from any registered easement (m), leave empty if there's no nearby easements?",
+							question: "How far is it from any registered easement (m)? Leave empty if there's no nearby easements.",
 							type: "numeric",
 							check: (id, elem, v) => {
 								var zoned = readDropdown(2) !== "Other";
@@ -1201,7 +1203,7 @@
 							id: 16,
 							section: "https://legislation.nsw.gov.au/view/html/inforce/current/epi-2008-0572#sec.2.18",
 							sanitised: "Section 2.18 1n of the SEPP (2008)",
-							question: "If it is a cabana, is it connected to a water supply or sewerage service (m)?",
+							question: "If it is a cabana, is it connected to a water supply or sewerage service? Leave blank if it isn't a cabana.",
 							type: "yes/no",
 							check: (id, elem, bool) => {
 								var zoned = readDropdown(2) !== "Other";
@@ -1209,7 +1211,7 @@
 									show(elem);
 								else
 									hide(elem);
-								return bool === null ? 1 : (zoned === true || bool === false) ? 4 : 2;
+								return bool === null || zoned === true || bool === false ? 4 : 2;
 							}
 						},
 						{
@@ -1218,12 +1220,12 @@
 							sanitised: "Section 2.18 2a of the SEPP (2008)",
 							question: "How many developments are already on the lot?",
 							type: "numeric",
-							check: (id, elem, bool) => {
-								if (zoned >= 2)
+							check: (id, elem, v) => {
+								if (v >= 2)
 									show(elem);
 								else
 									hide(elem);
-								return bool === null ? 1 : zoned < 2 ? 4 : 2;
+								return v === null ? 1 : v < 2 ? 4 : 2;
 							}
 						},
 					],
@@ -1367,7 +1369,7 @@
 
 				var selectedForm;
 
-				function addQuestion(rule)
+				function addQuestion(rule, num)
 				{
 					const elem = document.createElement("div");
 					let options = ``
@@ -1378,7 +1380,8 @@
 							break;
 						case "yes/no":
 							options += `<label><input type="radio" id="${String(rule.id) + "yn"}" name="${String(rule.id)}" value="Yes">Yes</label><br>
-								<label><input type="radio" id="${String(rule.id) + "yn"}" name="${String(rule.id)}" value="No">No</label><br>`;
+								<label><input type="radio" id="${String(rule.id) + "yn"}" name="${String(rule.id)}" value="No">No</label><br>
+								<input type="button" id="${String(rule.id) + "ync"}" value="Clear" style="height: 24px; margin-top: 10px; line-height: 24px; padding: 0 10px; display: none"/>`;
 							break;
 						case "dropdown":
 							options +=
@@ -1419,10 +1422,25 @@
 					}
 					elem.classList.add("question");
 					elem.innerHTML = `
-						<p class="question-title">` + rule.question + `</p>` + options + `
+						<p class="question-title">` + num + ". " + rule.question + `</p>` + options + `
 						<p class="question-section" id="${String(rule.id) + "e"}">` + (rule.errormsg ?? "That development doesn't qualify for exempt development") + ", please check <a href=" + rule.section + ` target="_blank">` + rule.sanitised + `</a> for more information.</p>
 					`;
 					selectedForm.appendChild(elem);
+					if (rule.type === "yes/no")
+					{
+						const radios = document.getElementsByName(String(rule.id));
+						const clear = document.getElementById(String(rule.id) + "ync");
+						radios.forEach(radio => {
+							radio.addEventListener("change", () => {
+								clear.style.display = Array.from(radios).some(r => r.checked) ? 'inline-block' : 'none';
+							})
+						});
+
+						clear.addEventListener("click", () => {
+							radios.forEach(radio => radio.checked = false);
+							clear.style.display = "none";
+						})
+					}
 				}
 
 				function loadSection(str)
@@ -1443,7 +1461,7 @@
 						title.style.textAlign = "center";
 						selectedForm.appendChild(title);
 						if (SEPP[str])
-							for (let i = 0; i < SEPP[str].length; addQuestion(SEPP[str][i]), i++);
+							for (let i = 0; i < SEPP[str].length; addQuestion(SEPP[str][i], i + 1), i++);
 						let offset = Math.max(...Array.from(document.getElementsByClassName("navbar")).map(h => h.offsetHeight));
 						window.scrollTo({top: selectedForm.getBoundingClientRect().top + window.scrollY - offset + 30, behavior: "smooth"});
 						const notes = document.createElement("p");
@@ -1457,26 +1475,32 @@
 							// let offset = Math.max(...Array.from(document.getElementsByClassName("navbar")).map(h => h.offsetHeight));
 							// window.scrollTo({top: selectedForm.getBoundingClientRect().top + window.scrollY - offset + 30, behavior: "smooth"});
 							let good = 0;
+							let unknown = [];
 							Object.keys(SEPP[str]).forEach(key => {
 								if (SEPP[str][key].check)
 								{
 									const elem = document.getElementById(String(SEPP[str][key].id) + "e");
+									let res;
 									if (SEPP[str][key].type === "yes/no")
-										good |= SEPP[str][key].check(SEPP[str][key].id, elem, readBool(SEPP[str][key].id));
+										res = SEPP[str][key].check(SEPP[str][key].id, elem, readBool(SEPP[str][key].id));
 									else if (SEPP[str][key].type === "numeric")
-										good |= SEPP[str][key].check(SEPP[str][key].id, elem, readNumeric(SEPP[str][key].id));
+										res = SEPP[str][key].check(SEPP[str][key].id, elem, readNumeric(SEPP[str][key].id));
 									else if (SEPP[str][key].type === "dropdown")
-										good |= SEPP[str][key].check(SEPP[str][key].id, elem, readDropdown(SEPP[str][key].id));
+										res = SEPP[str][key].check(SEPP[str][key].id, elem, readDropdown(SEPP[str][key].id));
+									if (res === 1)
+										unknown.push(Number(key) + 1);
+									good |= res;
 								}
 							});
-							if (good & 1)
-								hide(resultPass),
-								hide(resultFail),
-								show(resultUnfinished);
-							else if (good & 2)
+							if (good & 2)
 								hide(resultPass),
 								show(resultFail),
 								hide(resultUnfinished);
+							else if (good & 1)
+								hide(resultPass),
+								hide(resultFail),
+								resultUnfinished.innerText = "⚠ Please finish the unanswered questions ⚠\n(" + unknown.join(", ") + ")",
+								show(resultUnfinished);
 							else if (good & 4)
 								show(resultPass),
 								hide(resultFail),
@@ -1486,21 +1510,21 @@
 						results.style.display = "flex";
 						results.style.justifyContent = "horizontal";
 						const resultPass = document.createElement("p");
-						resultPass.style.marginTop = "10px";
+						resultPass.style.marginTop = "15px";
 						resultPass.style.left = "50%";
 						resultPass.style.transform = "translate(-50%, 0)";
 						resultPass.style.fontWeight = "bold";
 						resultPass.style.position = "absolute";
 						resultPass.innerText = "✔ Your development is exempt ✔";
 						const resultFail = document.createElement("p");
-						resultFail.style.marginTop = "10px";
+						resultFail.style.marginTop = "15px";
 						resultFail.style.left = "50%";
 						resultFail.style.transform = "translate(-50%, 0)";
 						resultFail.style.fontWeight = "bold";
 						resultFail.style.position = "absolute";
 						resultFail.innerText = "❌ Your development isn't exempt ❌";
 						const resultUnfinished = document.createElement("p");
-						resultUnfinished.style.marginTop = "10px";
+						resultUnfinished.style.marginTop = "15px";
 						resultUnfinished.style.left = "50%";
 						resultUnfinished.style.transform = "translate(-50%, 0)";
 						resultUnfinished.style.fontWeight = "bold";
