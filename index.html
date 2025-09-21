@@ -1193,6 +1193,19 @@
 							errormsg: "",
 							check: (id, elem, v) => { hide(elem); return true; }
 
+						},
+						{
+							id: 3,
+							section: "https://legislation.nsw.gov.au/view/html/inforce/current/epi-2008-0572#sec.2.30",
+							subsection: "",
+							sanitised: "Section 2.30 of the SEPP (2008)",
+							question: "Maximum cut or fill depth relative to existing ground level (m)?",
+							type: "numeric",
+							errormsg: "Cut or fill cannot exceed 6 m.",
+							check: (id, elem, v) => {
+								if (v > 6) show(elem); else hide(elem);
+								return v <= 6;
+							}
 						}
 					],
 				}
