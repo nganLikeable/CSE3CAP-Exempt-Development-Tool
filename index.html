@@ -1298,6 +1298,19 @@
 								if (v) show(elem); else hide(elem);
 								return !v;
 							}
+						},
+						{
+							id: 11,
+							section: "https://legislation.nsw.gov.au/view/html/inforce/current/epi-2008-0572#sec.2.30",
+							sucsection: "",
+							sanitised: "Section 2.30 of the SEPP (2008)",
+							question: "Percent of the lot occupied by fill deeper than 1.5 m",
+							type: "numeric",
+							errormsg: "If fill depth > 1.5 m, it cannot occupy more than 25% of the lot.",
+							check: (id, elem, v) => {
+								if (v > 25) show(elem); else hide(elem);
+								return v <= 25;
+							}
 						}
 					],
 				}
