@@ -1182,6 +1182,17 @@
 								if (v) show(elem); else hide(elem);
 								return !v;
 							}
+						},
+						{
+							id: 2,
+							section: "info",
+							subsection: "",
+							sanitised: "context",
+							question: "Is your site in a Rural or Conservation zone?",
+							type: "yes/no",
+							errormsg: "",
+							check: (id, elem, v) => { hide(elem); return true; }
+
 						}
 					],
 				}
