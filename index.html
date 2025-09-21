@@ -1285,6 +1285,19 @@
 								if (v) show(elem); else hide(elem);
 								return !v;
 							}
+						},
+						{
+							id: 10,
+							section: "https://legislation.nsw.gov.au/view/html/inforce/current/epi-2008-0572#sec.2.30",
+							subsection: "",
+							sanitised: "Section 2.30 of the SEPP (2008)",
+							question: "If imported fill is used, is it clean VENM and free of demolition waste?",
+							type: "yes/no",
+							errormsg: "Imported fill must be VENM and free of demolition waste.",
+							check: (id, elem, v) => {
+								if (v) show(elem); else hide(elem);
+								return !v;
+							}
 						}
 					],
 				}
