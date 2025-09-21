@@ -1169,7 +1169,21 @@
 								{label: "N/A", value:"n/a"}]
 						}
   					],
-					retaining_wall: [],
+					retaining_wall: [
+						{
+							id: 1,
+							section: "https://legislation.nsw.gov.au/view/html/inforce/current/epi-2008-0572#sec.2.29",
+							subsection: "15",
+							sanitised: "Section 2.29 of the SEPP (2008)",
+							question: "Is the site a heritage/draft heritage/off-shore area or an environmentally sensitive area?",
+							type: "yes/no",
+							errormsg: "Retaining walls on heritage/draft heritage/off-shore or environmentally sensitive areas are not exempt.",
+							check: (id, elem, v) => {
+								if (v) show(elem); else hide(elem);
+								return !v;
+							}
+						}
+					],
 				}
 
 				var selectedForm;
