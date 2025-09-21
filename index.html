@@ -1169,7 +1169,177 @@
 								{label: "N/A", value:"n/a"}]
 						}
   					],
-					retaining_wall: [],
+					retaining_wall: [
+						{
+							id: 1,
+							section: "https://legislation.nsw.gov.au/view/html/inforce/current/epi-2008-0572#sec.2.29",
+							subsection: "15",
+							sanitised: "Section 2.29 of the SEPP (2008)",
+							question: "Is the site a heritage/draft heritage/off-shore area or an environmentally sensitive area?",
+							type: "yes/no",
+							errormsg: "Retaining walls on heritage/draft heritage/off-shore or environmentally sensitive areas are not exempt.",
+							check: (id, elem, v) => {
+								if (v) show(elem); else hide(elem);
+								return !v;
+							}
+						},
+						{
+							id: 2,
+							section: "info",
+							subsection: "",
+							sanitised: "context",
+							question: "Is your site in a Rural or Conservation zone?",
+							type: "yes/no",
+							errormsg: "",
+							check: (id, elem, v) => { hide(elem); return true; }
+
+						},
+						{
+							id: 3,
+							section: "https://legislation.nsw.gov.au/view/html/inforce/current/epi-2008-0572#sec.2.30",
+							subsection: "",
+							sanitised: "Section 2.30 of the SEPP (2008)",
+							question: "Maximum cut or fill depth relative to existing ground level (m)?",
+							type: "numeric",
+							errormsg: "Cut or fill cannot exceed 6 m.",
+							check: (id, elem, v) => {
+								if (v > 6) show(elem); else hide(elem);
+								return v <= 6;
+							}
+						},
+						{
+							id: 4,
+							section: "https://legislation.nsw.gov.au/view/html/inforce/current/epi-2008-0572#sec.2.30",
+							subsection: "",
+							sanitised: "Section 2.30 of the SEPP (2008)",
+							question: "How far is the wall from any lot boundary (m)?",
+							type: "numeric",
+							errormsg: "Distance from the lot boundary must be at least 1 m.",
+							check: (id, elem, v) => {
+								if (v < 1) show(elem); else hide(elem);
+								return v >= 1;
+							}
+						},
+						{
+							id: 5,
+							section: "https://legislation.nsw.gov.au/view/html/inforce/current/epi-2008-0572#sec.2.30",
+							subsection: "",
+							sanitised: "Section 2.30 of the SEPP (2008)",
+							question: "If the wall is a structural support: total height from base to top (m)?",
+							type: "numeric",
+							errormsg: "Structural retaining walls cannot exceed 6 m in height.",
+							check: (id, elem, v) => {
+								if (v > 6) show(elem); else hide(elem);
+								return v <= 6;
+							}
+						},
+						{
+							id: 6,
+							section: "https://legislation.nsw.gov.au/view/html/inforce/current/epi-2008-0572#sec.2.30",
+							subsection: "",
+							sanitised: "Section 2.30 of the SEPP (2008)",
+							question: "Horizontal distance to any other retaining wall or structural support (m)?",
+							type: "numeric",
+							errormsg: "Must be at least 2 m from other retaining walls or supports.",
+							check: (id, elem, v) => {
+								if (v < 2) show(elem); else hide(elem);
+								return v >= 2;
+							}
+						},
+						{
+							id: 7,
+							section: "https://legislation.nsw.gov.au/view/html/inforce/current/epi-2008-0572#sec.2.30",
+							subsection: "",
+							sanitised: "Section 2.30 of the SEPP (2008)",
+							question: "Distance to any easement, sewer main, or water main (m)?",
+							type: "numeric",
+							errormsg: "Must be at least 1 m from easements and mains.",
+							check: (id, elem, v) => {
+								if (v < 1) show(elem); else hide(elem);
+								return v >= 1;
+							}
+
+						},
+						{
+							id: 8,
+							section: "https://legislation.nsw.gov.au/view/html/inforce/current/epi-2008-0572#sec.2.30",
+							subsection: "",
+							sanitised: "Section 2.30 of the SEPP (2008)",
+							question: "Distance to the nearest natural waterbody (m)?",
+							type: "numeric",
+							errormsg: "Must be at least 40 m from a natural waterbody.",
+							check: (id, elem, v) => {
+								if (v < 40) show(elem); else hide(elem);
+								return v >= 40;
+							} 
+						},
+						{
+							id: 9,
+							section: "https://legislation.nsw.gov.au/view/html/inforce/current/epi-2008-0572#sec.2.30",
+							subsection: "",
+							sanitised: "Section 2.30 of the SEPP (2008)",
+							question: "Will it redirect surface/ground water or cause sediment to affect neighbours?",
+							type: "yes/no",
+							errormsg: "Water must not be redirected and sediment must not impact adjoining property.",
+							check: (id, elem, v) => {
+								if (v) show(elem); else hide(elem);
+								return !v;
+							}
+						},
+						{
+							id: 10,
+							section: "https://legislation.nsw.gov.au/view/html/inforce/current/epi-2008-0572#sec.2.30",
+							subsection: "",
+							sanitised: "Section 2.30 of the SEPP (2008)",
+							question: "If imported fill is used, is it clean VENM and free of demolition waste?",
+							type: "yes/no",
+							errormsg: "Imported fill must be VENM and free of demolition waste.",
+							check: (id, elem, v) => {
+								if (v) show(elem); else hide(elem);
+								return !v;
+							}
+						},
+						{
+							id: 11,
+							section: "https://legislation.nsw.gov.au/view/html/inforce/current/epi-2008-0572#sec.2.30",
+							sucsection: "",
+							sanitised: "Section 2.30 of the SEPP (2008)",
+							question: "Percent of the lot occupied by fill deeper than 1.5 m",
+							type: "numeric",
+							errormsg: "If fill depth > 1.5 m, it cannot occupy more than 25% of the lot.",
+							check: (id, elem, v) => {
+								if (v > 25) show(elem); else hide(elem);
+								return v <= 25;
+							}
+						},
+						{
+							id: 12,
+							section: "https://legislation.nsw.gov.au/view/html/inforce/current/epi-2008-0572#sec.2.30",
+							subsection: "",
+							sanitised: "Section 2.30 of the SEPP (2008)",
+							question: "If you answered ‘Yes’ to Rural or Conservation zone earlier: total fill volume (m³)?",
+							type: "numeric",
+							errormsg: "In Rural or Conservation zones, total fill cannot exceed 100 m³.",
+							check: (id, elem, v) => {
+								const rural = readBool(2); 
+								if (rural && v > 100) { show(elem); return false; }
+								hide(elem); return true;
+							}
+						},
+						{
+							id: 13,
+							section: "https://legislation.nsw.gov.au/view/html/inforce/current/epi-2008-0572#sec.2.30",
+							subsection: "",
+							sanitised: "Section 2.30 of the SEPP (2008)",
+							question: "If in a heritage conservation area, is the wall located in the rear yard?",
+							type: "yes/no",
+							errormsg: "In heritage conservation areas, the wall must be located in the rear yard.",
+							check: (id, elem, v) => {
+								if (!v) show(elem); else hide(elem);
+								return v;
+							}
+						}
+					],
 				}
 
 				var selectedForm;
