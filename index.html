@@ -1206,6 +1206,19 @@
 								if (v > 6) show(elem); else hide(elem);
 								return v <= 6;
 							}
+						},
+						{
+							id: 4,
+							section: "https://legislation.nsw.gov.au/view/html/inforce/current/epi-2008-0572#sec.2.30",
+							subsection: "",
+							sanitised: "Section 2.30 of the SEPP (2008)",
+							question: "How far is the wall from any lot boundary (m)?",
+							type: "numeric",
+							errormsg: "Distance from the lot boundary must be at least 1 m.",
+							check: (id, elem, v) => {
+								if (v < 1) show(elem); else hide(elem);
+								return v >= 1;
+							}
 						}
 					],
 				}
