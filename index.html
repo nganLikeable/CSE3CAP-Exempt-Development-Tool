@@ -1272,6 +1272,19 @@
 								if (v < 40) show(elem); else hide(elem);
 								return v >= 40;
 							} 
+						},
+						{
+							id: 9,
+							section: "https://legislation.nsw.gov.au/view/html/inforce/current/epi-2008-0572#sec.2.30",
+							subsection: "",
+							sanitised: "Section 2.30 of the SEPP (2008)",
+							question: "Will it redirect surface/ground water or cause sediment to affect neighbours?",
+							type: "yes/no",
+							errormsg: "Water must not be redirected and sediment must not impact adjoining property.",
+							check: (id, elem, v) => {
+								if (v) show(elem); else hide(elem);
+								return !v;
+							}
 						}
 					],
 				}
