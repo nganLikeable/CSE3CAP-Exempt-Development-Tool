@@ -1311,6 +1311,20 @@
 								if (v > 25) show(elem); else hide(elem);
 								return v <= 25;
 							}
+						},
+						{
+							id: 12,
+							section: "https://legislation.nsw.gov.au/view/html/inforce/current/epi-2008-0572#sec.2.30",
+							subsection: "",
+							sanitised: "Section 2.30 of the SEPP (2008)",
+							question: "If you answered ‘Yes’ to Rural/Conservation zone earlier: total fill volume (m³)?",
+							type: "numeric",
+							errormsg: "In Rural or Conservation zones, total fill cannot exceed 100 m³.",
+							check: (id, elem, v) => {
+								const rural = readBool(2); 
+								if (rural && v > 100) { show(elem); return false; }
+								hide(elem); return true;
+							}
 						}
 					],
 				}
