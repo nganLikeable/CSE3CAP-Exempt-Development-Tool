@@ -1036,16 +1036,24 @@
 					],
 					patio: [
 						{
-							id: null,
+							id: 50,
 							section: "https://legislation.nsw.gov.au/view/html/inforce/current/epi-2008-0572#sec.2.11",
 							subsection: "2.11a",
 							sanitised: "Section 2.11 (a) of the SEPP (2008)",
 							question: "Is the construction or installation on a <strong>heritage site, draft heritage site, or an foreshore area?</strong>",
 							type: "yes/no", // no
-							errormsg: "Structure <strong>cannot</strong> be constructed or installed on a heritage item or on land in a foreshore area"
+							errormsg: "Structure <strong>cannot</strong> be constructed or installed on a heritage item or on land in a foreshore area",
+							check: (id, elem, bool) => {
+								if (bool === true)
+									show(elem);
+								else
+									hide(elem);
+								return bool === false;
+							}
+
 						},
 						{
-							id: null,
+							id: 51,
 							section: "https://legislation.nsw.gov.au/view/html/inforce/current/epi-2008-0572#sec.2.11",
 							subsection: "2.11b",
 							sanitised: "Section 2.11 (b) of the SEPP (2008)",
@@ -1054,33 +1062,48 @@
 							errormsg: "The replacement deck <strong>must not </strong> be higher than <strong>1m</strong> above ground level"
 						},
 						{
-							id: null,
+							id: 52,
 							section: "https://legislation.nsw.gov.au/view/html/inforce/current/epi-2008-0572#sec.2.12",
 							subsection: "2.12 (1)b",
 							sanitised: "Section 2.12 (1)b of the SEPP (2008)",
 							question: "Does the development have any area of less than 25m²?",
-							type: "yes/no", // yes
-							errormsg: "The development <strong>must not</strong> have an area of  less than 25m²"
+							type: "yes/no", // no
+							errormsg: "The development <strong>must not</strong> have an area of  less than 25m²",
+							check: (id, elem, bool) => {
+								if (bool === true)
+									show(elem);
+								else
+									hide(elem);
+								return bool === false;
+							}
 						}, 
 						// unimplemented : c
 						{
-							id: null,
+							id: 53,
 							section: "https://legislation.nsw.gov.au/view/html/inforce/current/epi-2008-0572#sec.2.12",
 							subsection: "2.12 (1)c",
 							sanitised: "Section 2.12 (1)c of the SEPP (2008)",
 							type: null,
 						},
 						{
-							id: null,
+							id: 54,
 							section: "https://legislation.nsw.gov.au/view/html/inforce/current/epi-2008-0572#sec.2.12",
 							subsection: "2.12 (1)d",
 							sanitised: "Section 2.12 (1)d of the SEPP (2008)",
 							question: "Does it have an enclosing wall higher than 1.4m?",
-							type: "yes/no",
-							errormsg: "The development <strong>must not</strong> have an an enclosing wall of more than 1.4"
+							type: "yes/no", // no
+							errormsg: "The development <strong>must not</strong> have an an enclosing wall of more than 1.4m",
+							check: (id, elem, bool) => {
+								if (bool === true)
+									show(elem);
+								else
+									hide(elem);
+								return bool === false;
+							}
+
 						},
 						{							
-							id: null,
+							id: 55,
 							section: "https://legislation.nsw.gov.au/view/html/inforce/current/epi-2008-0572#sec.2.12",
 							subsection: "2.12 (1)e",
 							sanitised: "Section 2.12 (1)e of the SEPP (2008)",
@@ -1088,6 +1111,7 @@
 							errormsg: ""
 						},
 						{
+							id: 56,
 							section: "https://legislation.nsw.gov.au/view/html/inforce/current/epi-2008-0572#sec.2.12",
 							subsection: "1f",
 							sanitised: "Section 2.20 (1)f of the SEPP (2008)",
@@ -1096,37 +1120,141 @@
 							errormsg: "Distance from lot boundary <strong>must be 5m</strong> for RU1, RU2, RU3, RU4, R6 or R5 zones, <strong>or 900mm</strong> for other zones"
 						},
 						{
-							id: null,
+							id: 57,
 							section: "https://legislation.nsw.gov.au/view/html/inforce/current/epi-2008-0572#sec.2.12",
 							subsection: "1h",
 							sanitised: "Section 2.12 (1)(h) of the SEPP (2008)",
 							question: "If your development is made of metal components, are they constructed of low reflective and factory pre-coloured materials?",
 							type: "yes/no", // yes
-							errormsg: "Metal components <strong>must</strong> be low reflective and factory pre-coloured materials"
+							errormsg: "Metal components <strong>must</strong> be low reflective and factory pre-coloured materials",
+							check: (id, elem, bool) => {
+								if (bool === false)
+									show(elem);
+								else
+									hide(elem);
+								return bool === false;
+							}
+
 						},						
 						{
-							id: null,
+							// incomplete i
+							id: 58,
 							section: "https://legislation.nsw.gov.au/view/html/inforce/current/epi-2008-0572#sec.2.12",
 							subsection: "1i",
 							sanitised: "Section 2.12 (1)(i) of the SEPP (2008)",
 							question: "What is the floor height above ground level (m)? ",
 							type: "numeric", // <=1m
-							errormsg: "The development <strong>must</strong> have a floor height not more than 1m above gruond level"
+							errormsg: "The development <strong>must</strong> have a floor height not more than 1m above ground level"
 						},
 						{
-							id: null,
+							// incomplete j
+							id: 59,
 							section: "https://legislation.nsw.gov.au/view/html/inforce/current/epi-2008-0572#sec.2.12",
 							subsection: "1j",
 							sanitised: "Section 2.12 (1)(i) of the SEPP (2008)",
 							question: "What is the floor height above ground level (m)? ",
 							type: "numeric", // <=1m
-							errormsg: "The development <strong>must</strong> have a floor height not more than 1m above gruond level"
+							errormsg: "The development <strong>must</strong> have a floor height not more than 1m above ground level",
 						},
+						{
+							id: 60,
+							section: "https://legislation.nsw.gov.au/view/html/inforce/current/epi-2008-0572#sec.2.12",
+							subsection: "k",
+							sanitised: "Section 2.12 (1)(k) of the SEPP (2008)",
+							question: "If connected to a fascia, does the connection comply with a professional engineer's specifications?<br> (Choose <strong>No</strong> if not applied)",
+							type: "yes/no", // yes
+							errormsg: "Carport <strong>must</strong> follow professional engineer's specifications when connected to a fascia",
+							check: (id, elem, bool) => {
+								if (bool === true)
+									show(elem);
+								else
+									hide(elem);
+								return bool === false;
+							}
+						},
+						{
+							id: 61,
+							section: "https://legislation.nsw.gov.au/view/html/inforce/current/epi-2008-0572#sec.2.12",
+							subsection: "1l",
+							sanitised: "Section 2.12 (1)(l) of the SEPP (2008)",
+							question: "Will the development be constructred or installed so that roofwater is disposed of into the existing stormwater drainage system?",
+							type: "yes/no", // yes
+							errormsg: "Roofwater <strong>must</strong> be directed into the existing stormwater drainage system",
+								check: (id, elem, bool) => {
+								if (bool === false)
+									show(elem);
+								else
+									hide(elem);
+								return bool === false;
+								}
+						},
+						{
+							id: 62,
+							section: "https://legislation.nsw.gov.au/view/html/inforce/current/epi-2008-0572#sec.2.12",
+							subsection: "1m",
+							sanitised: "Section 2.12 (1)(m) of the SEPP (2008)",
+							question: "Will it interfere with the funcitoning of existing drainage fixures/flowpaths?",
+							type: "yes/no", // yes
+							errormsg: "Roofwater <strong>must</strong> be directed into the existing stormwater drainage system",
+							check: (id, elem, bool) => {
+								if (bool === true)
+									show(elem);
+								else
+									hide(elem);
+								return bool === false;
+								}
+						},
+						{
+							id: 65,
+							section: "https://legislation.nsw.gov.au/view/html/inforce/current/epi-2008-0572#sec.2.12",
+							subsection: "1l",
+							sanitised: "Section 2.12 (1)(n) of the SEPP (2008)",
+							question: "If the development is on bushfire-prone land and less than 5m from a dwelling, is it made of non-combustible material?",
+							type: "yes/no", // yes
+							errormsg: "Carport <strong>must</strong> use non-combustible materials when on bushfire-prone land within <strong>5m</strong> from a dwelling",
+							check: (id, elem, bool) => {
+								if (bool === false)
+									show(elem);
+								else
+									hide(elem);
+								return bool === false;
+								}
+						},
+						{
+							id: 66,
+							section: "https://legislation.nsw.gov.au/view/html/inforce/current/epi-2008-0572#sec.2.12",
+							subsection: "2a",
+							sanitised: "Section 2.12 (2)(a) of the SEPP (2008)",
+							question: "Are equivalent or improved quality materials used in the development?",
+							type: "yes/no", // yes
+							errormsg: "The development <strong>must</strong> use equivalent or improved quality materials",
+							check: (id, elem, bool) => {
+								if (bool === false)
+									show(elem);
+								else
+									hide(elem);
+								return bool === false;
+								}
+						},
+						{
+							id: 67,
+							section: "https://legislation.nsw.gov.au/view/html/inforce/current/epi-2008-0572#sec.2.12",
+							subsection: "2b",
+							sanitised: "Section 2.12 (2)(b) of the SEPP (2008)",
+							question: "Does the development change the size or height of the existing deck?",
+							type: "yes/no", // no
+							errormsg: "The development <strong>must not</strong> change the measurements of the existing deck",
+							check: (id, elem, bool) => {
+								if (bool === true)
+									show(elem);
+								else
+									hide(elem);
+								return bool === false;
+								}
+						},
+						// (3) not considered yet
 
-						
-
-
-						 
+					
 					],
 					carport: [
 						//{
@@ -1277,7 +1405,8 @@
 							sanitised: "Section 2.12 (1)(k) of the SEPP (2008)",
 							question: "Will it interfere with the funcitoning of existing drainage fixures/flowpaths?",
 							type: "yes/no", // yes
-							errormsg: "Roofwater <strong>must</strong> be directed into the existing stormwater drainage system"
+							errormsg: "Roofwater <strong>must</strong> be directed into the existing stormwater drainage system",
+
 						},
 
 
