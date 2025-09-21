@@ -888,12 +888,12 @@
 
 			<div style="margin-left: 10%; margin-right: 10%;">
 			<form id="examples" class="tab-form d-none">
-				<h2 style="text-align: center; margin-top: 50px;">Development Examples</h2>
+				<h2 style="text-align: center; margin-top: 50px;">Property Samples</h2>
 
 				<section id="sample-box" style="max-width:1000px;margin:24px auto;padding:0 12px">
-					<h2 style="margin:0 0 8px">Property Samples</h2>
+					
 
-					<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px">
+					<div style="display:flex;gap:100px; justify-content: center; flex-wrap:wrap;margin-bottom:10px">
 						<button type="button" onclick="showSamples('shed')">Shed</button>
                         <button type="button" onclick="showSamples('verandah')">Verandah</button>
                         <button type="button" onclick="showSamples('carport')">Carport</button>
@@ -905,15 +905,7 @@
 					gap:10px;">
 					</div>
 				</section>
-				<!-- <div class="examples" style="margin-left: 10%; width: 80%;">
-					<div>
-						<img src=""/>
-						<div style="padding: 0; flex-direction: column;">
-							<h4>Standard Shed</h4>
-							<p style="margin-top: -1rem">25m² Surface area, more than a meter from any other development, and no connections to mains services.</p>
-						</div>
-					</div>
-				</div> -->
+				
 			</form>
 
 			<form id="shed" class="tab-form border p-3 rounded bg-light d-none" name="Shed Exemption Check" style="text-align: center;"></form>
@@ -1033,12 +1025,150 @@
 							question: "How far is it located from the lot boundary (m)?",
 							type: "numeric",
 							check: (id, elem, v) => {
-								
+								var zoned = readBool(2);
+								if (zoned === true && v < 5 || zoned === false && v < 9)
+									show(elem);
+								else
+									hide(elem);
+								return zoned === true && v >= 5 || zoned === false && v >= 9;
 							}
 						},
 					],
 					patio: [],
-					carport: [],
+					carport: [
+						//{
+						//	section: "https://legislation.nsw.gov.au/view/html/inforce/current/epi-2008-0572#sec.2.19",
+						//	sanitised: "Section 2.19 of the SEPP (2008)",
+						//	question: "Is the carport on a heritage item, draft heritage item, or foreshore area?",
+						//	type: "yes/no",
+						//	errormsg: "Carports cannot be built on heritage or foreshore areas"
+						//},
+						{
+							section: "https://legislation.nsw.gov.au/view/html/inforce/current/epi-2008-0572#sec.2.20",
+							subsection: "1a",
+							sanitised: "Section 2.20 (1)(a) of the SEPP (2008)",
+							question: "Is the carport classified under the Building Code of Australia as class 7a?",
+							type: "yes/no",
+							errormsg: "Carports <strong>must not</strong> be classified as Class 7a"
+						},
+						{ // reimplement later
+							section: "https://legislation.nsw.gov.au/view/html/inforce/current/epi-2008-0572#sec.2.20",
+							subsection: "1b",
+							sanitised: "Section 2.20 (1)(b) of the SEPP (2008)",
+							question: "What is the floor area of the carport (m²)?",
+							type: "numeric",
+							errormsg: "Floor area exceeds maximum allowed for your lot and zone"
+						},
+						{
+							section: "https://legislation.nsw.gov.au/view/html/inforce/current/epi-2008-0572#sec.2.20",
+							subsection: "1c",
+							sanitised: "Section 2.20 (1)(c) of the SEPP (2008)",
+							question: "What is the height of the carport above ground level (m)",
+							type: "numeric",
+							errormsg: "Carport <strong>must not exceed 3m</strong> in height or the roof gutter line if attached to a single-storey dwelling" 
+							// max: 3m
+						},
+												{
+							section: "https://legislation.nsw.gov.au/view/html/inforce/current/epi-2008-0572#sec.2.20",
+							subsection: "1c",
+							sanitised: "Section 2.20 (1)(c) of the SEPP (2008)",
+							question: "Is the carport attached to a single-storey dwelling?",
+							type: "yes/no", // no
+							errormsg: "The carport <strong>must not</strong> exceed the roof gutter if attached to an existing single storey dwelling"
+						}, // should be a subsection of 1c
+						{
+							section: "https://legislation.nsw.gov.au/view/html/inforce/current/epi-2008-0572#sec.2.20",
+							subsection: "1d",
+							sanitised: "Section 2.20 (1)(d) of the SEPP (2008)",
+							question: "Is the carport located at least 1m behind the building line of any road frontage?",
+							type: "yes/no", // yes
+							errormsg: "Carport <strong>must</strong> be located at least 1m behind the building line of any road frontage"
+
+						},
+						{
+							section: "https://legislation.nsw.gov.au/view/html/inforce/current/epi-2008-0572#sec.2.20",
+							subsection: "1e",
+							sanitised: "Section 2.20 (1)(e) of the SEPP (2008)",
+							question: "What is the distance from the carport to the nearest lot boundary?",
+							type: "lotBoundary", // custom type to handle numeric + zone 
+							errormsg: "Distance from lot boundary <strong>must be 5m</strong> for RU1, RU2, RU3, RU4, R6 or R5 zones, <strong>or 900mm</strong> for other zones"
+						},
+						{
+							section: "https://legislation.nsw.gov.au/view/html/inforce/current/epi-2008-0572#sec.2.20",
+							subsection: "1g",
+							sanitised: "Section 2.20 (1)(g) of the SEPP (2008)",
+							question: "If your carport is made of metal components, are they constructed of low reflective and factory pre-coloured materials?",
+							type: "yes/no", // yes
+							errormsg: "Metal components <strong>must</strong> be low reflective and factory pre-coloured materials"
+						},
+						{
+							section: "https://legislation.nsw.gov.au/view/html/inforce/current/epi-2008-0572#sec.2.20",
+							subsection: "1h",
+							sanitised: "Section 2.20 (1)(h) of the SEPP (2008)",
+							question: "Does the construction involve a new driveway or gutter crossing? If so, has consent been obtained from relevant road authority?",
+							type: "yes/no", // no
+							errormsg: "You <strong>can not</strong> construct a new driveway or gutter crossing without consent from relevant road authority under Roads Act 1993"
+						},
+						{
+							section: "https://legislation.nsw.gov.au/view/html/inforce/current/epi-2008-0572#sec.2.20",
+							subsection: "1i",
+							sanitised: "Section 2.20 (1)(i) of the SEPP (2008)",
+							question: "Will the carport be constructred or installed so that roofwater is disposed of into the existing stormwater drainage system?",
+							type: "yes/no", // yes
+							errormsg: "Roofwater <strong>must</strong> be directed into the existing stormwater drainage system"
+						},
+						{
+							section: "https://legislation.nsw.gov.au/view/html/inforce/current/epi-2008-0572#sec.2.20",
+							subsection: "1e",
+							sanitised: "Section 2.20 (1)(e) of the SEPP (2008)",
+							question: "If connected to a fascia, does the connection comply with a professional engineer's specifications?",
+							type: "yes/no", // yes
+							errormsg: "Carport <strong>must</strong> follow professional engineer's specifications when connected to a fascia"
+						},
+						{
+							section: "https://legislation.nsw.gov.au/view/html/inforce/current/epi-2008-0572#sec.2.20",
+							subsection: "1l",
+							sanitised: "Section 2.20 (1)(l) of the SEPP (2008)",
+							question: "If the carport is on bushfire-prone land and less than 5m from a dwelling, is it made of non-combustible material?",
+							type: "yes/no", // yes
+							errormsg: "Carport <strong>must</strong> use non-combustible materials when on bushfire-prone land within 5m from a dwelling"
+						},
+						{
+							section: "https://legislation.nsw.gov.au/view/html/inforce/current/epi-2008-0572#sec.2.20",
+							subsection: "1m",
+							sanitised: "Section 2.20 (1)(m) of the SEPP (2008)",
+							question: "If the carport is in a heritage conservation area, is it located in the rear yard?",
+							type: "yes/no", // yes
+							errormsg: "Carport installed on or in heritage item or a draft heritage item <strong>must</strong> be located in the rear yard"
+						},
+						{
+							section: "https://legislation.nsw.gov.au/view/html/inforce/current/epi-2008-0572#sec.2.20",
+							subsection: "1n",
+							sanitised: "Section 2.20 (1)(n) of the SEPP (2008)",
+							question: "Will the carport break access, packing, or loading/unloading on the lot?",
+							type: "yes/no", // no
+							errormsg: "Carport <strong>must not</strong> reduce vehicular access to, parking, or loading/unloading on the lot"
+						}, 
+						{
+							section: "https://legislation.nsw.gov.au/view/html/inforce/current/epi-2008-0572#sec.2.20",
+							subsection: "2",
+							sanitised: "Section 2.20 (2) of the SEPP (2008)",
+							question: "What is the distance between the roof of the development from each lot boundary?",
+							type: "numeric", // > 500m // could be a yes/no question
+							errormsg: "The roof <strong>must be at least 500m</strong> from each lot boundary"
+						},
+						{
+							section: "https://legislation.nsw.gov.au/view/html/inforce/current/epi-2008-0572#sec.2.20",
+							subsection: "3",
+							sanitised: "Section 2.20 (3) of the SEPP (2008)",
+							question: "How many development?",
+							type: "dwelling", // 1 if applied
+							options: [
+								{label: "There is a dwelling on the lot", value: "dwelling", errormsg: "Only one carport development is allowed per lot with a dwelling" },
+								{label: "No dwelling: per lot or per occupation, whichever is greater", value: "no_dwelling", errormsg: "Only one carport development is allowed per lot or per occupation" },
+								{label: "N/A", value:"n/a"}]
+						}
+  					],
 					retaining_wall: [],
 				}
 
@@ -1056,6 +1186,36 @@
 						case "yes/no":
 							options += `<label><input type="radio" name="${String(rule.id)}" value="Yes">Yes</label><br>
 								<label><input type="radio" name="${String(rule.id)}" value="No">No</label><br>`;
+							break;
+						case "lotBoundary":
+							options += `
+							<label for "lot-distance" class="d-block" > Distance (m):</label>
+							<input type="number" name="lotBoundary" min="0" step="1" class="d-block" >
+							<label for "zones" class="d-block">Zone: 
+								<select name="zones" id="zones" class="d-block">
+									<option value="RU1">RU1</option>
+									<option value="RU2">RU2</option>
+									<option value="RU3">RU3</option>
+									<option value="RU4">RU4</option>
+									<option value="RU6">RU6</option>
+									<option value="R5">R5</option>
+									<option value="other">Other</option>
+								</select>
+							</label>`;
+							break;
+						// corresponding errormsg not shown
+						case "dwelling":
+							options += `<label for="dev-no" class="d-block">Number of development(s):</label>
+										<input type="number" name="dev-no" min="0" step="1" class="d-block">
+										<label for="scenario" class="d-block">Select scenario for this lot:</label>`;
+
+							let select = `<select name="` + rule.subsection + `" class="d-block">`;
+							rule.options.forEach(opt => {
+								select += `<option value="` + opt.value + `">` + opt.label + `</option>`;
+							});
+							select += `</select><br>`;
+
+							options += select;
 							break;
 					}
 					elem.classList.add("question");
@@ -1106,7 +1266,6 @@
 										good &= SEPP[str][key].check(SEPP[str][key].id, elem, readBool(SEPP[str][key].id));
 									else if (SEPP[str][key].type === "numeric")
 										good &= SEPP[str][key].check(SEPP[str][key].id, elem, readNumeric(SEPP[str][key].id));
-									console.log(good, key);
 								}
 							});
 							console.log(good ? "Success" : "Failure");
