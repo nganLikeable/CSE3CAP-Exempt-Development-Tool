@@ -1259,6 +1259,19 @@
 								return v >= 1;
 							}
 
+						},
+						{
+							id: 8,
+							section: "https://legislation.nsw.gov.au/view/html/inforce/current/epi-2008-0572#sec.2.30",
+							subsection: "",
+							sanitised: "Section 2.30 of the SEPP (2008)",
+							question: "Distance to the nearest natural waterbody (m)?",
+							type: "numeric",
+							errormsg: "Must be at least 40 m from a natural waterbody.",
+							check: (id, elem, v) => {
+								if (v < 40) show(elem); else hide(elem);
+								return v >= 40;
+							} 
 						}
 					],
 				}
