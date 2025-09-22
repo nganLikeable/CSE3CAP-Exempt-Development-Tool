@@ -868,6 +868,11 @@
 					margin-bottom: -5px;
 				}
 
+				.question input[type="number"] {
+					min-width: 20%;
+					max-width: 100%;
+				}
+
 				.question-section {
 					color: red;
 					margin-top: 10px;
@@ -944,16 +949,18 @@
 				function show(elem)
 				{
 					elem.style.display = "block";
-					elem.style.opacity = 1;
+					// requestAnimationFrame(() => {
+						elem.style.opacity = 1;
+					// });
 				}
 
 				function hide(elem)
 				{
 					elem.style.opacity = 0;
-					elem.style.display = "none";
-					// elem.addEventListener("transitionend", function handler() {
-						// elem.removeEventListener("transitionend", handler);
-					// });
+					elem.addEventListener("transitionend", function handler() {
+						elem.style.display = "none";
+						elem.removeEventListener("transitionend", handler);
+					});
 				}
 
 				function readBool(id)
