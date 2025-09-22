@@ -961,6 +961,12 @@
 					return selected ? selected.value : null;
 				}
 
+				function readDropdownPerma(id)
+				{
+					const selected = document.getElementById(String(id) + "dd");
+					return selected && selected.selectedIndex !== 0 ? selected.value : null;
+				}
+
 				var SEPP = {
 					shed: [
 						{
@@ -1200,7 +1206,7 @@
 							}
 						},
 						{
-							id: 16,
+							id: 17,
 							section: "https://legislation.nsw.gov.au/view/html/inforce/current/epi-2008-0572#sec.2.18",
 							sanitised: "Section 2.18 1n of the SEPP (2008)",
 							question: "If it is a cabana, is it connected to a water supply or sewerage service? Leave blank if it isn't a cabana.",
@@ -1215,7 +1221,7 @@
 							}
 						},
 						{
-							id: 17,
+							id: 18,
 							section: "https://legislation.nsw.gov.au/view/html/inforce/current/epi-2008-0572#sec.2.18",
 							sanitised: "Section 2.18 2a of the SEPP (2008)",
 							question: "How many developments are already on the lot?",
@@ -1443,6 +1449,52 @@
 					}
 				}
 
+				function setClipboard(str)
+				{
+					if (!navigator.clipboard)
+					{
+						const textarea = document.createElement("textarea");
+						textarea.value = str;
+						document.body.appendChild(textarea);
+						textarea.select();
+						try
+						{
+							document.execCommand("copy");
+							alert("Copied to clipboard!");
+						}
+						catch (err)
+						{ console.error("Fallback: Could not copy text", err); }
+						document.body.removeChild(textarea);
+						return;
+					}
+
+					navigator.clipboard.writeText(str).then(() => {
+						alert("Copied to clipboard!");
+					}).catch(err => {
+						console.error("Could not copy text: ", err);
+					});
+				}
+
+				function getLink(str)
+				{
+					const urlParams = new URLSearchParams();
+					Object.keys(SEPP[str]).forEach(key => {
+						let res;
+						if (SEPP[str][key].type === "yes/no")
+							res = readBool(SEPP[str][key].id),
+							res = res === true ? "t" : res === false ? "f" : null;
+						else if (SEPP[str][key].type === "numeric")
+							res = readNumeric(SEPP[str][key].id);
+						else if (SEPP[str][key].type === "dropdown")
+							res = readDropdownPerma(SEPP[str][key].id);
+						if (res !== null)
+							urlParams.append(String(SEPP[str][key].id + 1).trim(), String(res).trim());
+					});
+					const subUrl = urlParams.toString();
+					const baseUrl = window.location.origin + window.location.pathname;
+					return (subUrl ? baseUrl + "?" + subUrl : baseUrl) + window.location.hash;
+				}
+
 				function loadSection(str)
 				{
 					str = String(str).substring(1);
@@ -1471,6 +1523,7 @@
 						check.type = "button";
 						check.textContent = "Check";
 						check.id = "questionnaireCheck";
+						check.style.margin = "5px";
 						check.onclick = () => {
 							// let offset = Math.max(...Array.from(document.getElementsByClassName("navbar")).map(h => h.offsetHeight));
 							// window.scrollTo({top: selectedForm.getBoundingClientRect().top + window.scrollY - offset + 30, behavior: "smooth"});
@@ -1506,6 +1559,12 @@
 								hide(resultFail),
 								hide(resultUnfinished);
 						};
+						const permalink = document.createElement("button");
+						permalink.type = "button";
+						permalink.id = "questionnairePermalink";
+						permalink.style.margin = "5px";
+						permalink.innerHTML = `<span title="Copies a permanent link to this completed form.">Copy Perma-link</span>`;
+						permalink.onclick = () => setClipboard(getLink(str));
 						const results = document.createElement("div");
 						results.style.display = "flex";
 						results.style.justifyContent = "horizontal";
@@ -1532,6 +1591,7 @@
 						resultUnfinished.innerText = "⚠ Please finish the unanswered questions ⚠";
 						selectedForm.appendChild(notes);
 						selectedForm.appendChild(check);
+						selectedForm.appendChild(permalink);
 						results.appendChild(resultPass);
 						results.appendChild(resultFail);
 						results.appendChild(resultUnfinished);
@@ -1549,6 +1609,28 @@
 				});
 
 				loadSection(window.location.hash);
+				const params = new URLSearchParams(window.location.search);
+				if (selectedForm)
+				{
+					const rules = SEPP[String(window.location.hash).substring(1)];
+					params.forEach((value, key) => {
+						const id = Number(key) - 1;
+						const rule = Object.entries(rules).find(([_, value]) => value.id === id)[1];
+						if (rule.type === "numeric")
+							document.getElementById(String(id) + "num").value = Number(value);
+						else if (rule.type === "yes/no")
+						{
+							const selected = document.querySelectorAll(`input[id="${id + "yn"}"]`);
+							selected.forEach(radio => {
+								radio.checked = (radio.value === (value === "t" ? "Yes" : "No"));
+								const event = new Event("change", { bubbles: true });
+            					radio.dispatchEvent(event);
+							});
+						}
+						else if (rule.type === "dropdown")
+							document.getElementById(String(id) + "dd").value = value;
+					});
+				}
 			</script>
 
 		</section>
