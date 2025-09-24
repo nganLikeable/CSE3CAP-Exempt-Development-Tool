@@ -754,6 +754,7 @@
 					border-color: #002a3a;
 					border-width: 0;
 					border-style: solid;
+					flex-direction: column;
 				}
 
 				.tile img {
@@ -764,6 +765,7 @@
 					height: 100%;
 					object-fit: cover;
 					z-index: 1;
+					opacity: 0.7;
 				}
 
 				.tile span {
@@ -859,18 +861,25 @@
 					opacity: 0;
 					transition: opacity 0.5s ease;
 				}
+
+				.subtitle {
+					font-size: 1rem;
+					display:block;
+				}
 			</style>
 
 			<div style="display: flex;">
 				<h2 class="tile">
 					<img src="shed.png"/>
 					<a href="#shed"></a>
-					<span>Shed</span>
+					<span>Sheds</span>
+					<span class="subtitle">Cabanas, cubby houses, ferneries, garden sheds, gazebos and greenhouses</span>
 				</h2>
 				<h2 class="tile" style="margin-left: 2%;">
 					<img src="verandah.png"/>
 					<a href="#patio"></a>
-					<span>Verandah/Patio</span>
+					<span>Patios</span>
+					<span class="subtitle"> Balconies, decks, patios, pergolas, terraces and verandahs</span>
 				</h2>
 			</div>
 			<div style="display: flex; margin-top: 1%;">
@@ -882,7 +891,8 @@
 				<h2 class="tile" style="margin-left: 2%;">
 					<img src="retaining_wall.png"/>
 					<a href="#retaining_wall"></a>
-					<span>Retaining Wall</span>
+					<span>Retaining Walls</span>
+					<span class="subtitle">Earthworks, retaining walls and structural support</span>
 				</h2>
 			</div>
 
