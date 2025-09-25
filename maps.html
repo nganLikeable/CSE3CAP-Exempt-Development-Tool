@@ -21,11 +21,12 @@
     .bad{background:#fdecea;color:#8a130c;border-color:#f5c6c3}
     .note{color:#666;font-size:12px;text-align:center;margin-top:8px}
   </style>
+
 </head>
 <body>
 
-<a href="index.html#sample-box" class="back">← Back</a>
-<h1>Drop a pin anywhere in Albury</h1>
+<a href="index.html#sample-box"  class="back">← Back</a>
+<h1>Map of Albury </h1>
 
 <div class="toolbar">
   <label><input type="checkbox" id="toggle-heritage" checked> Heritage</label>
@@ -35,8 +36,10 @@
   <span id="chips"></span>
 </div>
 
+
+
 <div id="map"></div>
-<div class="note">Demo polygons only for stakeholder preview. Real council/NSW GIS can be connected later.</div>
+<div class="note">Demo map only for stakeholder preview.</div>
 
 <!-- Demo GeoJSON polygons (replace with real datasets later) -->
 <script>
@@ -97,7 +100,7 @@ map.on('click', e=>{
   evaluate(e.latlng);
   marker.on('dragend',ev=>evaluate(ev.target.getLatLng()));
 });
-// pre-fill
+
 evaluate(map.getCenter());
 </script>
 </body>
