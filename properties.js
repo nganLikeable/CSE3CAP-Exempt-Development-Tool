@@ -13,6 +13,8 @@ window.PROPERTIES = [
     heritageListed: false,
     cornerLot: false,
     floodAffected: false,
+    lat:-36.07027144220084,
+    lang: 146.89406564090746,
     slopeRise_m: 0.5,
     proposal: {
       type: "shed",
@@ -31,6 +33,8 @@ window.PROPERTIES = [
     heritageListed: false,
     cornerLot: false,
     floodAffected: false,
+    lat:-36.08016870788892,
+    lang:146.9491484121937,
     slopeRise_m: 0.3,
     proposal: {
       type: "verandah", // “Patio 4x5m attached to rear” ≈ verandah/pergola
@@ -49,6 +53,8 @@ window.PROPERTIES = [
     heritageListed: true,
     cornerLot: false,
     floodAffected: false,
+    lat:-36.09694814456092,
+    lang:146.91519086801426,
     slopeRise_m: 0.2,
     proposal: {
       type: "shed", // “near fence”
@@ -121,6 +127,8 @@ window.PROPERTIES = [
     heritageListed: false,
     cornerLot: false,
     floodAffected: false,
+    lat: -36.04582042891129,
+    lang:  146.83418912568408,
     slopeRise_m: 1.0,
     proposal: {
       type: "shed", // Shed 9x7m farm use
@@ -139,6 +147,8 @@ window.PROPERTIES = [
     heritageListed: false,
     cornerLot: false,
     floodAffected: false,
+    lat: -36.06469985566356,
+    lang: 146.94689115266854,
     slopeRise_m: 0.2,
     proposal: {
       type: "carport", // Carport 3x5m front
@@ -157,6 +167,8 @@ window.PROPERTIES = [
     heritageListed: false,
     cornerLot: false,
     floodAffected: false,
+    lat: -36.07675547490079,
+    lang: 146.95383981219356,
     slopeRise_m: 2.0,
     proposal: {
       type: "shed", // Detached shed 12x6m
@@ -193,6 +205,8 @@ window.PROPERTIES = [
     heritageListed: false,
     cornerLot: false,
     floodAffected: false,
+    lat: -36.05029419323562,
+    lang:  147.01839321219234,
     slopeRise_m: 0.2,
     proposal: {
       type: "verandah", // Patio 5x5m rear corner
@@ -229,6 +243,8 @@ window.PROPERTIES = [
     heritageListed: false,
     cornerLot: false,
     floodAffected: false,
+    lat: -36.071261801810984, 
+    lang: 146.91403244102943,
     slopeRise_m: 0.3,
     proposal: {
       type: "shed", // Shed 4x4m rear
@@ -247,6 +263,8 @@ window.PROPERTIES = [
     heritageListed: true,
     cornerLot: false,
     floodAffected: false,
+    lat: -36.073928796029186, 
+    lang:  146.89606291219346,
     slopeRise_m: 0.2,
     proposal: {
       type: "carport", // Carport 3x6m side
