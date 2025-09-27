@@ -96,10 +96,39 @@
   </style>
 
 </head>
-<body>
+<body class="sidebar-open">
 
+<div id="sidebar">
+    <div class="hdr">
+      <span>Layers</span>
+      <a id="backLink" href="property.html">← Back</a>
+    </div>
+    <div class="body">
+     
+      <div class="muted">Use the search box on the map to find an address, or click anywhere to drop a pin.</div>
 
-<a href="property.html?id=001" class="back">← Back</a>
+      
+      <div class="sec open" id="sec-planning">
+        <h4><span>Planning overlays</span><span class="caret">▶</span></h4>
+        <div class="content">
+          <label><input type="checkbox" id="tHeritage" checked> Heritage Areas</label><br>
+          <label><input type="checkbox" id="tBushfire" checked> Bushfire-prone</label><br>
+          <label><input type="checkbox" id="tFlood" checked> Flood Zones</label><br>
+          <label><input type="checkbox" id="tSlope" checked> Steep Slope</label><br>
+        </div>
+      </div>
+
+      
+      <div class="sec" id="sec-basemaps">
+        <h4><span>Base maps</span><span class="caret">▶</span></h4>
+        <div class="content" id="basemapRadios">
+        </div>
+      </div>
+
+      <div class="muted">Demo layers only. Replace with council/NSW GIS services later.</div>
+    </div>
+  </div>
+<!-- <a href="property.html?id=001" class="back">← Back</a>
 <h1>Map of Albury </h1>
 
 <div class="toolbar">
@@ -115,7 +144,7 @@
 <div id="map"></div>
 <div class="note">Demo map only for stakeholder preview.</div>
 
-<!-- Demo GeoJSON polygons (replace with real datasets later) -->
+
 <script>
 const HERITAGE_AREAS = {"type":"FeatureCollection","features":[
   {"type":"Feature","properties":{"name":"Heritage Precinct A"},"geometry":{"type":"Polygon","coordinates":[
@@ -176,6 +205,6 @@ map.on('click', e=>{
 });
 
 evaluate(map.getCenter());
-</script>
+</script> -->
 </body>
 </html>
