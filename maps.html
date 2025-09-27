@@ -125,7 +125,6 @@
         </div>
       </div>
 
-      <div class="muted">Demo layers only. Replace with council/NSW GIS services later.</div>
     </div>
   </div>
 
@@ -136,6 +135,74 @@
 
   
   <div id="map"></div>
+
+<script>
+const HERITAGE_AREAS = {
+  "type":"FeatureCollection",
+  "features":[
+    {
+      "type":"Feature",
+      "properties":{"name":"Heritage Precinct A"},
+      "geometry":{
+        "type":"Polygon",
+        "coordinates":[[
+          [146.9080,-36.0860],[146.9185,-36.0860],[146.9185,-36.0790],[146.9080,-36.0790],[146.9080,-36.0860]
+        ]]
+      }
+    }
+  ]
+};
+
+const BUSHFIRE_ZONES = {   
+  "type":"FeatureCollection",
+  "features":[
+    {
+      "type":"Feature",
+      "properties":{"cat":"BFZ"},
+      "geometry":{
+        "type":"Polygon",
+        "coordinates":[[
+          [146.9250,-36.0950],[146.9450,-36.0950],[146.9450,-36.0800],[146.9250,-36.0800],[146.9250,-36.0950]
+        ]]
+      }
+    }
+  ]
+};
+
+const FLOOD_ZONES = {
+  "type":"FeatureCollection",
+  "features":[
+    {
+      "type":"Feature",
+      "properties":{"cat":"Floodway"},
+      "geometry":{
+        "type":"Polygon",
+        "coordinates":[[
+          [146.9100,-36.0950],[146.9300,-36.0950],[146.9300,-36.0850],[146.9100,-36.0850],[146.9100,-36.0950]
+        ]]
+      }
+    }
+  ]
+};
+
+const STEEP_SLOPE = {
+  "type":"FeatureCollection",
+  "features":[
+    {
+      "type":"Feature",
+      "properties":{"slope":">15°"},
+      "geometry":{
+        "type":"Polygon",
+        "coordinates":[[
+          [146.9000,-36.0800],[146.9100,-36.0800],[146.9100,-36.0725],[146.9000,-36.0725],[146.9000,-36.0800]
+        ]]
+      }
+    }
+  ]
+};
+</script>
+
+
 
 <!-- <a href="property.html?id=001" class="back">← Back</a>
 <h1>Map of Albury </h1>
