@@ -89,7 +89,7 @@
   <div id="sidebar">
     <div class="hdr">
       <span>Layers</span>
-      <a id="backLink" href="property.html">← Back</a>
+      <a href="index.html">← Back</a>
     </div>
     <div class="body">
 
@@ -206,9 +206,6 @@ const STEEP_SLOPE = {
     (function () {
       const params = new URLSearchParams(location.search);
       const id = params.get('id');
-
-      const back = document.getElementById('backLink');
-      back.href = id ? `property.html?id=${encodeURIComponent(id)}` : 'property.html';
     })();
 
     const sidebar = document.getElementById('sidebar');
