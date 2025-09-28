@@ -13,99 +13,85 @@
   <link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css" />
   <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
 
+  
   <script src="https://unpkg.com/@turf/turf@6.5.0/turf.min.js"></script>
 
-    <style>
+   <style>
     :root {
-      --sidebar-w: 290px;
-      --panel-bg: #ffffff;
-      --panel-bd: #e5e5e5;
+      --panel-w: 320px; --bg:#fff; --bd:#e6e8eb; --ink:#1f2937; --muted:#6b7280; --link:#0b72e7;
+      --ok-bg:#eaf7ea; --ok-bd:#bfe5bf; --ok-ink:#145a32;
+      --bad-bg:#fdecec; --bad-bd:#f3c0bf; --bad-ink:#8a1c13;
     }
-    html, body { height: 100%; margin: 0; }
+    * { box-sizing: border-box; }
+    html, body { height: 100%; margin: 0; background:#fafafa; color:var(--ink);
+      font:14px/1.45 system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif; }
     #map { position: absolute; inset: 0; }
 
-    
     #sidebar {
-      position: absolute; top: 0; left: 0; bottom: 0;
-      width: var(--sidebar-w);
-      background: var(--panel-bg);
-      border-right: 1px solid var(--panel-bd);
-      box-shadow: 2px 0 8px rgba(0,0,0,.06);
-      z-index: 1000;
-      transform: translateX(0);
-      transition: transform .28s ease;
-      display: flex; flex-direction: column;
+      position: absolute; inset: 16px auto 16px 16px; width: var(--panel-w);
+      background: var(--bg); border:1px solid var(--bd); border-radius:12px;
+      box-shadow:0 10px 30px rgba(2,6,23,.08); z-index:1000;
+      transform: translateX(0); transition: transform .28s ease;
+      display:flex; flex-direction:column;
     }
-    #sidebar.collapsed { transform: translateX(calc(-1 * var(--sidebar-w))); }
+    #sidebar.collapsed { transform: translateX(calc(-1 * (var(--panel-w) + 16px))); }
+    .hdr { display:flex; align-items:center; justify-content:space-between;
+      padding:12px 14px; border-bottom:1px solid var(--bd); font-weight:600; }
+    .hdr a { color:var(--link); text-decoration:none; font-weight:600; }
+    .body { padding:12px 14px; overflow:auto; max-height:calc(100vh - 32px - 48px); }
+    .muted { color:var(--muted); font-size:12px; margin:4px 0 10px; }
 
-    #sidebar .hdr {
-      display: flex; align-items: center; justify-content: space-between;
-      padding: 12px 12px; border-bottom: 1px solid var(--panel-bd);
-      font: 600 16px system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
-    }
-    #sidebar .hdr a { color:#0077cc; text-decoration:none; font-weight:600; }
-    #sidebar .body { padding: 10px 12px; overflow: auto; }
+    .sec { background:#fff; border:1px solid var(--bd); border-radius:10px; margin-bottom:12px; overflow:hidden; }
+    .sec h4 { margin:0; padding:10px 12px; display:flex; align-items:center; justify-content:space-between;
+      cursor:pointer; font-weight:600; font-size:13px; background:#f8fafc; }
+    .caret { transition: transform .2s ease; }
+    .sec .content { display:none; padding:10px 12px; }
+    .sec.open .content { display:block; }
+    .sec.open .caret { transform: rotate(90deg); }
+    .checklist label { display:block; margin:6px 0; }
+
+    #searchForm { display:flex; gap:8px; align-items:center; }
+    #searchInput { flex:1; padding:10px 12px; border:1px solid var(--bd); border-radius:8px; font-size:14px; }
+    #searchBtn { padding:10px 14px; border:1px solid var(--bd); background:#fff; border-radius:8px; cursor:pointer; }
+    #searchBtn:hover { background:#f4f6f8; }
+    .field-note { color:var(--muted); font-size:12px; margin-top:8px; }
 
     #burger {
-      position: absolute; top: 12px; left: 12px; z-index: 1100;
-      background: var(--panel-bg); border: 1px solid var(--panel-bd);
-      border-radius: 8px; padding: 6px 10px; cursor: pointer;
-      box-shadow: 0 2px 8px rgba(0,0,0,.05);
-      font: 600 14px system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+      position:absolute; top:16px; left:16px; z-index:1100;
+      padding:8px 12px; background:#fff; border:1px solid var(--bd); border-radius:10px;
+      box-shadow:0 6px 18px rgba(2,6,23,.08); cursor:pointer; font-weight:600;
     }
 
-    
     .chips {
-      position: absolute; top: 12px; right: 12px; z-index: 1100;
-      background: var(--panel-bg); border: 1px solid var(--panel-bd);
-      border-radius: 10px; padding: 8px 10px;
-      box-shadow: 0 2px 10px rgba(0,0,0,.05);
-      display: flex; gap: 6px; flex-wrap: wrap; align-items: center; max-width: 50vw;
-      font: 13px/1.2 system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+      position:absolute; top:16px; right:16px; z-index:1100;
+      display:flex; gap:6px; flex-wrap:wrap; align-items:center;
+      background:#fff; border:1px solid var(--bd); border-radius:10px;
+      padding:8px 10px; box-shadow:0 6px 18px rgba(2,6,23,.08);
     }
-    .chip { padding: 3px 10px; border-radius: 999px; border: 1px solid; white-space: nowrap; }
-    .ok  { background:#eaf7ea; color:#1b5e20; border-color:#b6e3b6; }
-    .bad { background:#fdecea; color:#8a130c; border-color:#f5c6c3; }
+    .chip { padding:4px 10px; border-radius:999px; border:1px solid; white-space:nowrap; font-size:12px; }
+    .ok  { background:var(--ok-bg);  border-color:var(--ok-bd);  color:var(--ok-ink); }
+    .bad { background:var(--bad-bg); border-color:var(--bad-bd); color:var(--bad-ink); }
 
     .note {
-      position: absolute; bottom: 12px; left: 12px; z-index: 1100;
-      background: var(--panel-bg); border: 1px solid var(--panel-bd);
-      border-radius: 8px; padding: 6px 10px; color:#666;
-      font: 12px system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+      position:absolute; left:16px; bottom:16px; z-index:1100;
+      background:#fff; border:1px solid var(--bd); border-radius:10px;
+      padding:8px 10px; color:var(--muted); font-size:12px; box-shadow:0 6px 18px rgba(2,6,23,.08);
     }
 
-    
-    .sidebar-open .leaflet-left { left: calc(var(--sidebar-w) + 12px) !important; }
-    .leaflet-top.leaflet-left { margin-top: 52px; } 
-    @media (max-width: 640px){
-      .chips { max-width: 78vw; }
-    }
-
-    
-    .sec { border-bottom: 1px solid var(--panel-bd); }
-    .sec h4 {
-      margin: 0; padding: 10px 6px; cursor: pointer; user-select: none;
-      font: 600 14px system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
-      display:flex; align-items:center; justify-content:space-between;
-    }
-    .sec .content { padding: 8px 6px 12px; display: none; }
-    .sec.open .content { display: block; }
-    .muted { color:#666; font-size:12px; margin:6px 0 0 6px; }
-    .sec h4 .caret { transition: transform .2s ease; }
-    .sec.open h4 .caret { transform: rotate(90deg); }
+    .sidebar-open .leaflet-left { left: calc(var(--panel-w) + 32px) !important; }
+    .leaflet-top.leaflet-left { margin-top: 60px; }
+    @media (max-width: 720px) { :root { --panel-w: 280px; } .chips { max-width: 76vw; } }
   </style>
-
 </head>
 <body class="sidebar-open">
 
-<div id="sidebar">
+  
+  <div id="sidebar">
     <div class="hdr">
       <span>Layers</span>
       <a id="backLink" href="property.html">← Back</a>
     </div>
     <div class="body">
-     
-      <div class="muted">Use the search box on the map to find an address, or click anywhere to drop a pin.</div>
 
       
       <div class="sec open" id="sec-planning">
@@ -119,24 +105,38 @@
       </div>
 
       
-      <div class="sec" id="sec-basemaps">
-        <h4><span>Base maps</span><span class="caret">▶</span></h4>
-        <div class="content" id="basemapRadios">
+      <div class="sec open" id="sec-search">
+        <h4><span>Search</span><span class="caret">▶</span></h4>
+        <div class="content">
+          <form id="searchForm">
+            <input id="searchInput" type="text" placeholder="Search address…">
+            <button id="searchBtn" type="submit">Search</button>
+          </form>
+          <div id="searchHelp" class="muted"></div>
         </div>
       </div>
 
+      
+      <div class="sec" id="sec-basemaps">
+        <h4><span>Base maps</span><span class="caret">▶</span></h4>
+        <div class="content" id="basemapRadios">
+          
+        </div>
+      </div>
+
+      
     </div>
   </div>
 
+  
   <button id="burger">☰ Layers</button>
 
-  
   <div class="chips" id="chips"></div>
 
-  
-  <div id="map"></div>
+   <div id="map"></div>
 
-<script>
+  
+  <script>
 const HERITAGE_AREAS = {
   "type":"FeatureCollection",
   "features":[
@@ -202,20 +202,25 @@ const STEEP_SLOPE = {
 };
 </script>
 
-<script>
-    (function syncBack(){
-      const id = new URLSearchParams(location.search).get('id');
+  <script>
+    (function () {
+      const params = new URLSearchParams(location.search);
+      const id = params.get('id');
+
       const back = document.getElementById('backLink');
       back.href = id ? `property.html?id=${encodeURIComponent(id)}` : 'property.html';
     })();
 
     const sidebar = document.getElementById('sidebar');
-    const burger  = document.getElementById('burger');
-    function toggleSidebar(){
+    const burger = document.getElementById('burger');
+
+    function toggleSidebar() {
       sidebar.classList.toggle('collapsed');
       document.body.classList.toggle('sidebar-open');
-      setTimeout(() => map.invalidateSize(), 300); 
+
+      setTimeout(() => map.invalidateSize(), 280);
     }
+
     burger.addEventListener('click', toggleSidebar);
 
     document.querySelectorAll('.sec h4').forEach(h => {
@@ -223,45 +228,198 @@ const STEEP_SLOPE = {
     });
 
     const basemaps = {
-      "OpenStreetMap": L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom:19 }),
-      "Satellite":     L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', { maxZoom:19 }),
-      "Topographic":   L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', { maxZoom:17 })
+      "OpenStreetMap": L.tileLayer(
+        'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+        { maxZoom: 19 }
+      ),
+      "Satellite": L.tileLayer(
+        'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+        { maxZoom: 19 }
+      ),
+      "Topographic": L.tileLayer(
+        'https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png',
+        { maxZoom: 17 }
+      )
     };
 
-     const map = L.map('map', {
+    const map = L.map('map', {
       center: [-36.08, 146.92],
       zoom: 13,
-      layers: [basemaps["OpenStreetMap"]],
-      zoomControl: true
+      layers: [basemaps["OpenStreetMap"]]
     });
 
-    const geocoder = L.Control.geocoder({ defaultMarkGeocode: false})
-      .on('markgeocode', (e) => {
-        const c = e.geocode.center;
-        placeOrMoveMarker(c);
-        map.setView(c, 16);
-      } )
-      .addTo(map);
+    const baseWrap = document.getElementById('basemapRadios');
 
-    const heritageLayer = L.geoJSON(HERITAGE_AREAS, { style:{ color:'#8e44ad', weight:2, fillOpacity:.2 }});
-    const bushfireLayer = L.geoJSON(BUSHFIRE_ZONES, { style:{ color:'#e67e22', weight:2, fillOpacity:.2 }});
-    const floodLayer    = L.geoJSON(FLOOD_ZONES,    { style:{ color:'#2980b9',  weight:2, fillOpacity:.2 }});
-    const slopeLayer    = L.geoJSON(STEEP_SLOPE,    { style:{ color:'#27ae60',  weight:2, fillOpacity:.2 }});
+    Object.keys(basemaps).forEach((name, i) => {
+      const radioId = 'bm_' + i;
 
-    heritageLayer.addTo(map);
-    bushfireLayer.addTo(map);
-    floodLayer.addTo(map);
-    slopeLayer.addTo(map);
+      baseWrap.insertAdjacentHTML(
+        'beforeend',
+        `<label style="display:block; margin: 6px 0;">
+          <input type="radio" name="bm" id="${radioId}" ${i === 0 ? 'checked' : ''}>
+          ${name}
+        </label>`
+      );
 
-    document.getElementById('tHeritage').onchange = e => e.target.checked ? heritageLayer.addTo(map) : map.removeLayer(heritageLayer);
-    document.getElementById('tBushfire').onchange = e => e.target.checked ? bushfireLayer.addTo(map) : map.removeLayer(bushfireLayer);
-    document.getElementById('tFlood').onchange    = e => e.target.checked ? floodLayer.addTo(map)    : map.removeLayer(floodLayer);
-    document.getElementById('tSlope').onchange    = e => e.target.checked ? slopeLayer.addTo(map)    : map.removeLayer(slopeLayer);
+      document
+        .getElementById(radioId)
+        .addEventListener('change', e => {
+          if (!e.target.checked) return;
+          Object.values(basemaps).forEach(l => map.removeLayer(l));
+          basemaps[name].addTo(map);
+        });
+    });
 
+    const heritageLayer = L.geoJSON(HERITAGE_AREAS, {
+      style: { color: '#7e3ab5', weight: 2, fillOpacity: .18 }
+    }).addTo(map);
 
+    const bushfireLayer = L.geoJSON(BUSHFIRE_ZONES, {
+      style: { color: '#e57f22', weight: 2, fillOpacity: .18 }
+    }).addTo(map);
 
+    const floodLayer = L.geoJSON(FLOOD_ZONES, {
+      style: { color: '#2d81db', weight: 2, fillOpacity: .18 }
+    }).addTo(map);
+
+    const slopeLayer = L.geoJSON(STEEP_SLOPE, {
+      style: { color: '#2e9d5b', weight: 2, fillOpacity: .18 }
+    }).addTo(map);
+
+    document.getElementById('tHeritage').onchange = e =>
+      e.target.checked ? heritageLayer.addTo(map) : map.removeLayer(heritageLayer);
+
+    document.getElementById('tBushfire').onchange = e =>
+      e.target.checked ? bushfireLayer.addTo(map) : map.removeLayer(bushfireLayer);
+
+    document.getElementById('tFlood').onchange = e =>
+      e.target.checked ? floodLayer.addTo(map) : map.removeLayer(floodLayer);
+
+    document.getElementById('tSlope').onchange = e =>
+      e.target.checked ? slopeLayer.addTo(map) : map.removeLayer(slopeLayer);
+
+    function updateChips(ctx) {
+      const el = document.getElementById('chips');
+      const pill = (name, inside) =>
+        `<span class="chip ${inside ? 'bad' : 'ok'}">
+           ${name}: ${inside ? 'Inside' : 'Outside'}
+         </span>`;
+
+      el.innerHTML =
+        pill('Heritage', ctx.h) +
+        pill('Bushfire', ctx.b) +
+        pill('Flood', ctx.f) +
+        pill('Slope', ctx.s);
+    }
+
+    function contains(fc, pt) {
+      return fc && fc.features && fc.features.some(f => turf.booleanPointInPolygon(pt, f)) || false;
+    }
+
+    let marker = null;
+
+    function evaluate(latlng) {
+      const pt = turf.point([latlng.lng, latlng.lat]);
+
+      const ctx = {
+        h: contains(HERITAGE_AREAS, pt),
+        b: contains(BUSHFIRE_ZONES, pt),
+        f: contains(FLOOD_ZONES, pt),
+        s: contains(STEEP_SLOPE, pt)
+      };
+
+      heritageLayer.setStyle({ color: '#7e3ab5', weight: 2, fillOpacity: ctx.h ? .35 : .18 });
+      bushfireLayer.setStyle({ color: '#e57f22', weight: 2, fillOpacity: ctx.b ? .35 : .18 });
+      floodLayer.setStyle   ({ color: '#2d81db', weight: 2, fillOpacity: ctx.f ? .35 : .18 });
+      slopeLayer.setStyle   ({ color: '#2e9d5b', weight: 2, fillOpacity: ctx.s ? .35 : .18 });
+
+      updateChips(ctx);
+    }
+
+    function placeOrMoveMarker(latlng) {
+      if (marker) {
+        marker.setLatLng(latlng);
+      } else {
+        marker = L.marker(latlng, { draggable: true }).addTo(map);
+        marker.on('dragend', ev => evaluate(ev.target.getLatLng()));
+      }
+      evaluate(latlng);
+    }
+
+    map.on('click', e => placeOrMoveMarker(e.latlng));
+
+    const geocodeSvc = L.Control.Geocoder.nominatim({
+      geocodingQueryParams: { countrycodes: 'au', addressdetails: 1, limit: 5 }
+    });
+
+    const searchForm  = document.getElementById('searchForm');
+    const searchInput = document.getElementById('searchInput');
+    const searchHelp  = document.getElementById('searchHelp');
+
+    async function geocodeNominatim(q) {
+      const query = /albury/i.test(q) ? q : `${q}, Albury NSW`;
+      const url = `https://nominatim.openstreetmap.org/search?format=jsonv2&countrycodes=au&limit=1&q=${encodeURIComponent(query)}&accept-language=en`;
+      const r = await fetch(url, { method: 'GET' });
+      if (!r.ok) throw new Error('Nominatim HTTP ' + r.status);
+      const data = await r.json();
+      if (Array.isArray(data) && data[0]) {
+        return L.latLng(parseFloat(data[0].lat), parseFloat(data[0].lon));
+     }
+    return null;
+  }
+
+  async function geocodePhoton(q) {
+    const query = /albury/i.test(q) ? q : `${q}, Albury NSW`;
+    const url = `https://photon.komoot.io/api/?q=${encodeURIComponent(query)}&lang=en&limit=1`;
+    const r = await fetch(url, { method: 'GET' });
+    if (!r.ok) throw new Error('Photon HTTP ' + r.status);
+    const data = await r.json();
+    if (data && data.features && data.features[0]) {
+      const [lon, lat] = data.features[0].geometry.coordinates;
+      return L.latLng(lat, lon);
+    }
+    return null;
+  }
+
+  async function doSearch(q) {
+    searchHelp.textContent = 'Searching…';
+    try {
+      return (await geocodeNominatim(q)) || (await geocodePhoton(q));
+    } catch (_) {
+    
+      try {
+        return await geocodePhoton(q);
+      } catch {
+        return null;
+      }
+    }
+  }
+
+  searchForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const q = (searchInput.value || '').trim();
+    if (!q) {
+      searchHelp.textContent = 'Enter an address to search.';
+      return;
+    }
+
+    const center = await doSearch(q);
+
+    if (center) {
+      placeOrMoveMarker(center);
+      map.setView(center, 16);
+      searchHelp.textContent = `Moved to: ${q}`;
+    } else {
+      searchHelp.textContent = 'No results. Try a fuller address like "535–557 Smollett St, Albury NSW".';
+    }
+  });
+
+    document.body.classList.add('sidebar-open');
+    updateChips({ h: false, b: false, f: false, s: false });
   </script>
-
-
 </body>
 </html>
+
+
+
+
