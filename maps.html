@@ -202,85 +202,41 @@ const STEEP_SLOPE = {
 };
 </script>
 
-
-
-<!-- <a href="property.html?id=001" class="back">← Back</a>
-<h1>Map of Albury </h1>
-
-<div class="toolbar">
-  <label><input type="checkbox" id="toggle-heritage" checked> Heritage</label>
-  <label><input type="checkbox" id="toggle-bushfire" checked> Bushfire-prone</label>
-  <label><input type="checkbox" id="toggle-flood" checked> Flood</label>
-  <label><input type="checkbox" id="toggle-slope" checked> Steep slope</label>
-  <span id="chips"></span>
-</div>
-
-
-
-<div id="map"></div>
-<div class="note">Demo map only for stakeholder preview.</div>
-
-
 <script>
-const HERITAGE_AREAS = {"type":"FeatureCollection","features":[
-  {"type":"Feature","properties":{"name":"Heritage Precinct A"},"geometry":{"type":"Polygon","coordinates":[
-    [[146.9080,-36.0860],[146.9185,-36.0860],[146.9185,-36.0790],[146.9080,-36.0790],[146.9080,-36.0860]]
-  ]}}
-]};
-const BUSHFIRE_ZONES = {"type":"FeatureCollection","features":[
-  {"type":"Feature","properties":{"cat":"BFZ"},"geometry":{"type":"Polygon","coordinates":[
-    [[146.9250,-36.0950],[146.9450,-36.0950],[146.9450,-36.0800],[146.9250,-36.0800],[146.9250,-36.0950]]
-  ]}}
-]};
-const FLOOD_ZONES = {"type":"FeatureCollection","features":[
-  {"type":"Feature","properties":{"cat":"Floodway"},"geometry":{"type":"Polygon","coordinates":[
-    [[146.9100,-36.0950],[146.9300,-36.0950],[146.9300,-36.0850],[146.9100,-36.0850],[146.9100,-36.0950]]
-  ]}}
-]};
-const STEEP_SLOPE = {"type":"FeatureCollection","features":[
-  {"type":"Feature","properties":{"slope":">15°"},"geometry":{"type":"Polygon","coordinates":[
-    [[146.9000,-36.0800],[146.9100,-36.0800],[146.9100,-36.0725],[146.9000,-36.0725],[146.9000,-36.0800]]
-  ]}}
-]};
-</script>
+    (function syncBack(){
+      const id = new URLSearchParams(location.search).get('id');
+      const back = document.getElementById('backLink');
+      back.href = id ? `property.html?id=${encodeURIComponent(id)}` : 'property.html';
+    })();
 
-<script>
-const map = L.map('map').setView([-36.08,146.92],13);
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19}).addTo(map);
+    const sidebar = document.getElementById('sidebar');
+    const burger  = document.getElementById('burger');
+    function toggleSidebar(){
+      sidebar.classList.toggle('collapsed');
+      document.body.classList.toggle('sidebar-open');
+      setTimeout(() => map.invalidateSize(), 300); 
+    }
+    burger.addEventListener('click', toggleSidebar);
 
-const heritageLayer = L.geoJSON(HERITAGE_AREAS,{style:{color:'#8e44ad',weight:2,fillOpacity:0.1}}).addTo(map);
-const bushfireLayer = L.geoJSON(BUSHFIRE_ZONES,{style:{color:'#d35400',weight:2,fillOpacity:0.1}}).addTo(map);
-const floodLayer    = L.geoJSON(FLOOD_ZONES,{style:{color:'#2980b9',weight:2,fillOpacity:0.1}}).addTo(map);
-const slopeLayer    = L.geoJSON(STEEP_SLOPE,{style:{color:'#27ae60',weight:2,fillOpacity:0.1}}).addTo(map);
+    document.querySelectorAll('.sec h4').forEach(h => {
+      h.addEventListener('click', () => h.parentElement.classList.toggle('open'));
+    });
 
-document.getElementById('toggle-heritage').onchange = e => e.target.checked ? heritageLayer.addTo(map) : map.removeLayer(heritageLayer);
-document.getElementById('toggle-bushfire').onchange = e => e.target.checked ? bushfireLayer.addTo(map) : map.removeLayer(bushfireLayer);
-document.getElementById('toggle-flood').onchange    = e => e.target.checked ? floodLayer.addTo(map)    : map.removeLayer(floodLayer);
-document.getElementById('toggle-slope').onchange    = e => e.target.checked ? slopeLayer.addTo(map)    : map.removeLayer(slopeLayer);
+    const basemaps = {
+      "OpenStreetMap": L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom:19 }),
+      "Satellite":     L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', { maxZoom:19 }),
+      "Topographic":   L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', { maxZoom:17 })
+    };
 
-let marker=null;
-function contains(fc, pt){ return fc.features?.some(f=>turf.booleanPointInPolygon(pt,f)) || false; }
-function chips(ctx){
-  const mk=(name,inside)=>`<span class="chip ${inside?'bad':'ok'}">${name}: ${inside?'Inside':'Outside'}</span>`;
-  document.getElementById('chips').innerHTML = mk('Heritage',ctx.h)+mk('Bushfire',ctx.b)+mk('Flood',ctx.f)+mk('Slope',ctx.s);
-}
-function evaluate(latlng){
-  const pt=turf.point([latlng.lng,latlng.lat]);
-  const ctx={h:contains(HERITAGE_AREAS,pt),b:contains(BUSHFIRE_ZONES,pt),f:contains(FLOOD_ZONES,pt),s:contains(STEEP_SLOPE,pt)};
-  heritageLayer.setStyle({color:'#8e44ad',weight:2,fillOpacity: ctx.h?0.25:0.1});
-  bushfireLayer.setStyle({color:'#d35400',weight:2,fillOpacity: ctx.b?0.25:0.1});
-  floodLayer.setStyle({color:'#2980b9',weight:2,fillOpacity: ctx.f?0.25:0.1});
-  slopeLayer.setStyle({color:'#27ae60',weight:2,fillOpacity: ctx.s?0.25:0.1});
-  chips(ctx);
-}
-map.on('click', e=>{
-  if(marker) map.removeLayer(marker);
-  marker=L.marker(e.latlng,{draggable:true}).addTo(map);
-  evaluate(e.latlng);
-  marker.on('dragend',ev=>evaluate(ev.target.getLatLng()));
-});
+     const map = L.map('map', {
+      center: [-36.08, 146.92],
+      zoom: 13,
+      layers: [basemaps["OpenStreetMap"]],
+      zoomControl: true
+    });
 
-evaluate(map.getCenter());
-</script> -->
+  </script>
+
+
 </body>
 </html>
