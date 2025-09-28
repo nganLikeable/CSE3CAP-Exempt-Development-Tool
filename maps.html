@@ -1,108 +1,422 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <title>Albury Development Map Check (Demo)</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="utf-8" />
+  <title>Albury Development Map Check</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-  <!-- Leaflet + Turf -->
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+  
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+  
+  <link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css" />
+  <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
+
+  
   <script src="https://unpkg.com/@turf/turf@6.5.0/turf.min.js"></script>
 
-  <style>
-    body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;margin:20px}
-    a.back{display:inline-block;margin-bottom:12px;text-decoration:none;color:#0077cc}
-    h1{font-size:22px;margin:6px 0 10px;text-align:center}
-    #map{height:440px;border-radius:12px;border:1px solid #eee}
-    .toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;justify-content:center;margin:10px 0 14px}
-    .chip{display:inline-block;padding:4px 10px;border-radius:999px;font-size:12px;margin:3px 6px 0 0;border:1px solid}
-    .ok{background:#eaf7ea;color:#1b5e20;border-color:#b6e3b6}
-    .bad{background:#fdecea;color:#8a130c;border-color:#f5c6c3}
-    .note{color:#666;font-size:12px;text-align:center;margin-top:8px}
+   <style>
+    :root {
+      --panel-w: 320px; --bg:#fff; --bd:#e6e8eb; --ink:#1f2937; --muted:#6b7280; --link:#0b72e7;
+      --ok-bg:#eaf7ea; --ok-bd:#bfe5bf; --ok-ink:#145a32;
+      --bad-bg:#fdecec; --bad-bd:#f3c0bf; --bad-ink:#8a1c13;
+    }
+    * { box-sizing: border-box; }
+    html, body { height: 100%; margin: 0; background:#fafafa; color:var(--ink);
+      font:14px/1.45 system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif; }
+    #map { position: absolute; inset: 0; }
+
+    #sidebar {
+      position: absolute; inset: 16px auto 16px 16px; width: var(--panel-w);
+      background: var(--bg); border:1px solid var(--bd); border-radius:12px;
+      box-shadow:0 10px 30px rgba(2,6,23,.08); z-index:1000;
+      transform: translateX(0); transition: transform .28s ease;
+      display:flex; flex-direction:column;
+    }
+    #sidebar.collapsed { transform: translateX(calc(-1 * (var(--panel-w) + 16px))); }
+    .hdr { display:flex; align-items:center; justify-content:space-between;
+      padding:12px 14px; border-bottom:1px solid var(--bd); font-weight:600; }
+    .hdr a { color:var(--link); text-decoration:none; font-weight:600; }
+    .body { padding:12px 14px; overflow:auto; max-height:calc(100vh - 32px - 48px); }
+    .muted { color:var(--muted); font-size:12px; margin:4px 0 10px; }
+
+    .sec { background:#fff; border:1px solid var(--bd); border-radius:10px; margin-bottom:12px; overflow:hidden; }
+    .sec h4 { margin:0; padding:10px 12px; display:flex; align-items:center; justify-content:space-between;
+      cursor:pointer; font-weight:600; font-size:13px; background:#f8fafc; }
+    .caret { transition: transform .2s ease; }
+    .sec .content { display:none; padding:10px 12px; }
+    .sec.open .content { display:block; }
+    .sec.open .caret { transform: rotate(90deg); }
+    .checklist label { display:block; margin:6px 0; }
+
+    #searchForm { display:flex; gap:8px; align-items:center; }
+    #searchInput { flex:1; padding:10px 12px; border:1px solid var(--bd); border-radius:8px; font-size:14px; }
+    #searchBtn { padding:10px 14px; border:1px solid var(--bd); background:#fff; border-radius:8px; cursor:pointer; }
+    #searchBtn:hover { background:#f4f6f8; }
+    .field-note { color:var(--muted); font-size:12px; margin-top:8px; }
+
+    #burger {
+      position:absolute; top:16px; left:16px; z-index:1100;
+      padding:8px 12px; background:#fff; border:1px solid var(--bd); border-radius:10px;
+      box-shadow:0 6px 18px rgba(2,6,23,.08); cursor:pointer; font-weight:600;
+    }
+
+    .chips {
+      position:absolute; top:16px; right:16px; z-index:1100;
+      display:flex; gap:6px; flex-wrap:wrap; align-items:center;
+      background:#fff; border:1px solid var(--bd); border-radius:10px;
+      padding:8px 10px; box-shadow:0 6px 18px rgba(2,6,23,.08);
+    }
+    .chip { padding:4px 10px; border-radius:999px; border:1px solid; white-space:nowrap; font-size:12px; }
+    .ok  { background:var(--ok-bg);  border-color:var(--ok-bd);  color:var(--ok-ink); }
+    .bad { background:var(--bad-bg); border-color:var(--bad-bd); color:var(--bad-ink); }
+
+    .note {
+      position:absolute; left:16px; bottom:16px; z-index:1100;
+      background:#fff; border:1px solid var(--bd); border-radius:10px;
+      padding:8px 10px; color:var(--muted); font-size:12px; box-shadow:0 6px 18px rgba(2,6,23,.08);
+    }
+
+    .sidebar-open .leaflet-left { left: calc(var(--panel-w) + 32px) !important; }
+    .leaflet-top.leaflet-left { margin-top: 60px; }
+    @media (max-width: 720px) { :root { --panel-w: 280px; } .chips { max-width: 76vw; } }
   </style>
-
 </head>
-<body>
+<body class="sidebar-open">
 
+  
+  <div id="sidebar">
+    <div class="hdr">
+      <span>Layers</span>
+      <a href="index.html">← Back</a>
+    </div>
+    <div class="body">
 
-<a href="property.html?id=001" class="back">← Back</a>
-<h1>Map of Albury </h1>
+      
+      <div class="sec open" id="sec-planning">
+        <h4><span>Planning overlays</span><span class="caret">▶</span></h4>
+        <div class="content">
+          <label><input type="checkbox" id="tHeritage" checked> Heritage Areas</label><br>
+          <label><input type="checkbox" id="tBushfire" checked> Bushfire-prone</label><br>
+          <label><input type="checkbox" id="tFlood" checked> Flood Zones</label><br>
+          <label><input type="checkbox" id="tSlope" checked> Steep Slope</label><br>
+        </div>
+      </div>
 
-<div class="toolbar">
-  <label><input type="checkbox" id="toggle-heritage" checked> Heritage</label>
-  <label><input type="checkbox" id="toggle-bushfire" checked> Bushfire-prone</label>
-  <label><input type="checkbox" id="toggle-flood" checked> Flood</label>
-  <label><input type="checkbox" id="toggle-slope" checked> Steep slope</label>
-  <span id="chips"></span>
-</div>
+      
+      <div class="sec open" id="sec-search">
+        <h4><span>Search</span><span class="caret">▶</span></h4>
+        <div class="content">
+          <form id="searchForm">
+            <input id="searchInput" type="text" placeholder="Search address…">
+            <button id="searchBtn" type="submit">Search</button>
+          </form>
+          <div id="searchHelp" class="muted"></div>
+        </div>
+      </div>
 
+      
+      <div class="sec" id="sec-basemaps">
+        <h4><span>Base maps</span><span class="caret">▶</span></h4>
+        <div class="content" id="basemapRadios">
+          
+        </div>
+      </div>
 
+      
+    </div>
+  </div>
 
-<div id="map"></div>
-<div class="note">Demo map only for stakeholder preview.</div>
+  
+  <button id="burger">☰ Layers</button>
 
-<!-- Demo GeoJSON polygons (replace with real datasets later) -->
-<script>
-const HERITAGE_AREAS = {"type":"FeatureCollection","features":[
-  {"type":"Feature","properties":{"name":"Heritage Precinct A"},"geometry":{"type":"Polygon","coordinates":[
-    [[146.9080,-36.0860],[146.9185,-36.0860],[146.9185,-36.0790],[146.9080,-36.0790],[146.9080,-36.0860]]
-  ]}}
-]};
-const BUSHFIRE_ZONES = {"type":"FeatureCollection","features":[
-  {"type":"Feature","properties":{"cat":"BFZ"},"geometry":{"type":"Polygon","coordinates":[
-    [[146.9250,-36.0950],[146.9450,-36.0950],[146.9450,-36.0800],[146.9250,-36.0800],[146.9250,-36.0950]]
-  ]}}
-]};
-const FLOOD_ZONES = {"type":"FeatureCollection","features":[
-  {"type":"Feature","properties":{"cat":"Floodway"},"geometry":{"type":"Polygon","coordinates":[
-    [[146.9100,-36.0950],[146.9300,-36.0950],[146.9300,-36.0850],[146.9100,-36.0850],[146.9100,-36.0950]]
-  ]}}
-]};
-const STEEP_SLOPE = {"type":"FeatureCollection","features":[
-  {"type":"Feature","properties":{"slope":">15°"},"geometry":{"type":"Polygon","coordinates":[
-    [[146.9000,-36.0800],[146.9100,-36.0800],[146.9100,-36.0725],[146.9000,-36.0725],[146.9000,-36.0800]]
-  ]}}
-]};
+  <div class="chips" id="chips"></div>
+
+   <div id="map"></div>
+
+  
+  <script>
+const HERITAGE_AREAS = {
+  "type":"FeatureCollection",
+  "features":[
+    {
+      "type":"Feature",
+      "properties":{"name":"Heritage Precinct A"},
+      "geometry":{
+        "type":"Polygon",
+        "coordinates":[[
+          [146.9080,-36.0860],[146.9185,-36.0860],[146.9185,-36.0790],[146.9080,-36.0790],[146.9080,-36.0860]
+        ]]
+      }
+    }
+  ]
+};
+
+const BUSHFIRE_ZONES = {   
+  "type":"FeatureCollection",
+  "features":[
+    {
+      "type":"Feature",
+      "properties":{"cat":"BFZ"},
+      "geometry":{
+        "type":"Polygon",
+        "coordinates":[[
+          [146.9250,-36.0950],[146.9450,-36.0950],[146.9450,-36.0800],[146.9250,-36.0800],[146.9250,-36.0950]
+        ]]
+      }
+    }
+  ]
+};
+
+const FLOOD_ZONES = {
+  "type":"FeatureCollection",
+  "features":[
+    {
+      "type":"Feature",
+      "properties":{"cat":"Floodway"},
+      "geometry":{
+        "type":"Polygon",
+        "coordinates":[[
+          [146.9100,-36.0950],[146.9300,-36.0950],[146.9300,-36.0850],[146.9100,-36.0850],[146.9100,-36.0950]
+        ]]
+      }
+    }
+  ]
+};
+
+const STEEP_SLOPE = {
+  "type":"FeatureCollection",
+  "features":[
+    {
+      "type":"Feature",
+      "properties":{"slope":">15°"},
+      "geometry":{
+        "type":"Polygon",
+        "coordinates":[[
+          [146.9000,-36.0800],[146.9100,-36.0800],[146.9100,-36.0725],[146.9000,-36.0725],[146.9000,-36.0800]
+        ]]
+      }
+    }
+  ]
+};
 </script>
 
-<script>
-const map = L.map('map').setView([-36.08,146.92],13);
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19}).addTo(map);
+  <script>
+    (function () {
+      const params = new URLSearchParams(location.search);
+      const id = params.get('id');
+    })();
 
-const heritageLayer = L.geoJSON(HERITAGE_AREAS,{style:{color:'#8e44ad',weight:2,fillOpacity:0.1}}).addTo(map);
-const bushfireLayer = L.geoJSON(BUSHFIRE_ZONES,{style:{color:'#d35400',weight:2,fillOpacity:0.1}}).addTo(map);
-const floodLayer    = L.geoJSON(FLOOD_ZONES,{style:{color:'#2980b9',weight:2,fillOpacity:0.1}}).addTo(map);
-const slopeLayer    = L.geoJSON(STEEP_SLOPE,{style:{color:'#27ae60',weight:2,fillOpacity:0.1}}).addTo(map);
+    const sidebar = document.getElementById('sidebar');
+    const burger = document.getElementById('burger');
 
-document.getElementById('toggle-heritage').onchange = e => e.target.checked ? heritageLayer.addTo(map) : map.removeLayer(heritageLayer);
-document.getElementById('toggle-bushfire').onchange = e => e.target.checked ? bushfireLayer.addTo(map) : map.removeLayer(bushfireLayer);
-document.getElementById('toggle-flood').onchange    = e => e.target.checked ? floodLayer.addTo(map)    : map.removeLayer(floodLayer);
-document.getElementById('toggle-slope').onchange    = e => e.target.checked ? slopeLayer.addTo(map)    : map.removeLayer(slopeLayer);
+    function toggleSidebar() {
+      sidebar.classList.toggle('collapsed');
+      document.body.classList.toggle('sidebar-open');
 
-let marker=null;
-function contains(fc, pt){ return fc.features?.some(f=>turf.booleanPointInPolygon(pt,f)) || false; }
-function chips(ctx){
-  const mk=(name,inside)=>`<span class="chip ${inside?'bad':'ok'}">${name}: ${inside?'Inside':'Outside'}</span>`;
-  document.getElementById('chips').innerHTML = mk('Heritage',ctx.h)+mk('Bushfire',ctx.b)+mk('Flood',ctx.f)+mk('Slope',ctx.s);
-}
-function evaluate(latlng){
-  const pt=turf.point([latlng.lng,latlng.lat]);
-  const ctx={h:contains(HERITAGE_AREAS,pt),b:contains(BUSHFIRE_ZONES,pt),f:contains(FLOOD_ZONES,pt),s:contains(STEEP_SLOPE,pt)};
-  heritageLayer.setStyle({color:'#8e44ad',weight:2,fillOpacity: ctx.h?0.25:0.1});
-  bushfireLayer.setStyle({color:'#d35400',weight:2,fillOpacity: ctx.b?0.25:0.1});
-  floodLayer.setStyle({color:'#2980b9',weight:2,fillOpacity: ctx.f?0.25:0.1});
-  slopeLayer.setStyle({color:'#27ae60',weight:2,fillOpacity: ctx.s?0.25:0.1});
-  chips(ctx);
-}
-map.on('click', e=>{
-  if(marker) map.removeLayer(marker);
-  marker=L.marker(e.latlng,{draggable:true}).addTo(map);
-  evaluate(e.latlng);
-  marker.on('dragend',ev=>evaluate(ev.target.getLatLng()));
-});
+      setTimeout(() => map.invalidateSize(), 280);
+    }
 
-evaluate(map.getCenter());
-</script>
+    burger.addEventListener('click', toggleSidebar);
+
+    document.querySelectorAll('.sec h4').forEach(h => {
+      h.addEventListener('click', () => h.parentElement.classList.toggle('open'));
+    });
+
+    const basemaps = {
+      "OpenStreetMap": L.tileLayer(
+        'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+        { maxZoom: 19 }
+      ),
+      "Satellite": L.tileLayer(
+        'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+        { maxZoom: 19 }
+      ),
+      "Topographic": L.tileLayer(
+        'https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png',
+        { maxZoom: 17 }
+      )
+    };
+
+    const map = L.map('map', {
+      center: [-36.08, 146.92],
+      zoom: 13,
+      layers: [basemaps["OpenStreetMap"]]
+    });
+
+    const baseWrap = document.getElementById('basemapRadios');
+
+    Object.keys(basemaps).forEach((name, i) => {
+      const radioId = 'bm_' + i;
+
+      baseWrap.insertAdjacentHTML(
+        'beforeend',
+        `<label style="display:block; margin: 6px 0;">
+          <input type="radio" name="bm" id="${radioId}" ${i === 0 ? 'checked' : ''}>
+          ${name}
+        </label>`
+      );
+
+      document
+        .getElementById(radioId)
+        .addEventListener('change', e => {
+          if (!e.target.checked) return;
+          Object.values(basemaps).forEach(l => map.removeLayer(l));
+          basemaps[name].addTo(map);
+        });
+    });
+
+    const heritageLayer = L.geoJSON(HERITAGE_AREAS, {
+      style: { color: '#7e3ab5', weight: 2, fillOpacity: .18 }
+    }).addTo(map);
+
+    const bushfireLayer = L.geoJSON(BUSHFIRE_ZONES, {
+      style: { color: '#e57f22', weight: 2, fillOpacity: .18 }
+    }).addTo(map);
+
+    const floodLayer = L.geoJSON(FLOOD_ZONES, {
+      style: { color: '#2d81db', weight: 2, fillOpacity: .18 }
+    }).addTo(map);
+
+    const slopeLayer = L.geoJSON(STEEP_SLOPE, {
+      style: { color: '#2e9d5b', weight: 2, fillOpacity: .18 }
+    }).addTo(map);
+
+    document.getElementById('tHeritage').onchange = e =>
+      e.target.checked ? heritageLayer.addTo(map) : map.removeLayer(heritageLayer);
+
+    document.getElementById('tBushfire').onchange = e =>
+      e.target.checked ? bushfireLayer.addTo(map) : map.removeLayer(bushfireLayer);
+
+    document.getElementById('tFlood').onchange = e =>
+      e.target.checked ? floodLayer.addTo(map) : map.removeLayer(floodLayer);
+
+    document.getElementById('tSlope').onchange = e =>
+      e.target.checked ? slopeLayer.addTo(map) : map.removeLayer(slopeLayer);
+
+    function updateChips(ctx) {
+      const el = document.getElementById('chips');
+      const pill = (name, inside) =>
+        `<span class="chip ${inside ? 'bad' : 'ok'}">
+           ${name}: ${inside ? 'Inside' : 'Outside'}
+         </span>`;
+
+      el.innerHTML =
+        pill('Heritage', ctx.h) +
+        pill('Bushfire', ctx.b) +
+        pill('Flood', ctx.f) +
+        pill('Slope', ctx.s);
+    }
+
+    function contains(fc, pt) {
+      return fc && fc.features && fc.features.some(f => turf.booleanPointInPolygon(pt, f)) || false;
+    }
+
+    let marker = null;
+
+    function evaluate(latlng) {
+      const pt = turf.point([latlng.lng, latlng.lat]);
+
+      const ctx = {
+        h: contains(HERITAGE_AREAS, pt),
+        b: contains(BUSHFIRE_ZONES, pt),
+        f: contains(FLOOD_ZONES, pt),
+        s: contains(STEEP_SLOPE, pt)
+      };
+
+      heritageLayer.setStyle({ color: '#7e3ab5', weight: 2, fillOpacity: ctx.h ? .35 : .18 });
+      bushfireLayer.setStyle({ color: '#e57f22', weight: 2, fillOpacity: ctx.b ? .35 : .18 });
+      floodLayer.setStyle   ({ color: '#2d81db', weight: 2, fillOpacity: ctx.f ? .35 : .18 });
+      slopeLayer.setStyle   ({ color: '#2e9d5b', weight: 2, fillOpacity: ctx.s ? .35 : .18 });
+
+      updateChips(ctx);
+    }
+
+    function placeOrMoveMarker(latlng) {
+      if (marker) {
+        marker.setLatLng(latlng);
+      } else {
+        marker = L.marker(latlng, { draggable: true }).addTo(map);
+        marker.on('dragend', ev => evaluate(ev.target.getLatLng()));
+      }
+      evaluate(latlng);
+    }
+
+    map.on('click', e => placeOrMoveMarker(e.latlng));
+
+    const geocodeSvc = L.Control.Geocoder.nominatim({
+      geocodingQueryParams: { countrycodes: 'au', addressdetails: 1, limit: 5 }
+    });
+
+    const searchForm  = document.getElementById('searchForm');
+    const searchInput = document.getElementById('searchInput');
+    const searchHelp  = document.getElementById('searchHelp');
+
+    async function geocodeNominatim(q) {
+      const query = /albury/i.test(q) ? q : `${q}, Albury NSW`;
+      const url = `https://nominatim.openstreetmap.org/search?format=jsonv2&countrycodes=au&limit=1&q=${encodeURIComponent(query)}&accept-language=en`;
+      const r = await fetch(url, { method: 'GET' });
+      if (!r.ok) throw new Error('Nominatim HTTP ' + r.status);
+      const data = await r.json();
+      if (Array.isArray(data) && data[0]) {
+        return L.latLng(parseFloat(data[0].lat), parseFloat(data[0].lon));
+     }
+    return null;
+  }
+
+  async function geocodePhoton(q) {
+    const query = /albury/i.test(q) ? q : `${q}, Albury NSW`;
+    const url = `https://photon.komoot.io/api/?q=${encodeURIComponent(query)}&lang=en&limit=1`;
+    const r = await fetch(url, { method: 'GET' });
+    if (!r.ok) throw new Error('Photon HTTP ' + r.status);
+    const data = await r.json();
+    if (data && data.features && data.features[0]) {
+      const [lon, lat] = data.features[0].geometry.coordinates;
+      return L.latLng(lat, lon);
+    }
+    return null;
+  }
+
+  async function doSearch(q) {
+    searchHelp.textContent = 'Searching…';
+    try {
+      return (await geocodeNominatim(q)) || (await geocodePhoton(q));
+    } catch (_) {
+    
+      try {
+        return await geocodePhoton(q);
+      } catch {
+        return null;
+      }
+    }
+  }
+
+  searchForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const q = (searchInput.value || '').trim();
+    if (!q) {
+      searchHelp.textContent = 'Enter an address to search.';
+      return;
+    }
+
+    const center = await doSearch(q);
+
+    if (center) {
+      placeOrMoveMarker(center);
+      map.setView(center, 16);
+      searchHelp.textContent = `Moved to: ${q}`;
+    } else {
+      searchHelp.textContent = 'No results. Try a fuller address like "535–557 Smollett St, Albury NSW".';
+    }
+  });
+
+    document.body.classList.add('sidebar-open');
+    updateChips({ h: false, b: false, f: false, s: false });
+  </script>
 </body>
 </html>
+
+
+
+
