@@ -235,6 +235,31 @@ const STEEP_SLOPE = {
       zoomControl: true
     });
 
+    const geocoder = L.Control.geocoder({ defaultMarkGeocode: false})
+      .on('markgeocode', (e) => {
+        const c = e.geocode.center;
+        placeOrMoveMarker(c);
+        map.setView(c, 16);
+      } )
+      .addTo(map);
+
+    const heritageLayer = L.geoJSON(HERITAGE_AREAS, { style:{ color:'#8e44ad', weight:2, fillOpacity:.2 }});
+    const bushfireLayer = L.geoJSON(BUSHFIRE_ZONES, { style:{ color:'#e67e22', weight:2, fillOpacity:.2 }});
+    const floodLayer    = L.geoJSON(FLOOD_ZONES,    { style:{ color:'#2980b9',  weight:2, fillOpacity:.2 }});
+    const slopeLayer    = L.geoJSON(STEEP_SLOPE,    { style:{ color:'#27ae60',  weight:2, fillOpacity:.2 }});
+
+    heritageLayer.addTo(map);
+    bushfireLayer.addTo(map);
+    floodLayer.addTo(map);
+    slopeLayer.addTo(map);
+
+    document.getElementById('tHeritage').onchange = e => e.target.checked ? heritageLayer.addTo(map) : map.removeLayer(heritageLayer);
+    document.getElementById('tBushfire').onchange = e => e.target.checked ? bushfireLayer.addTo(map) : map.removeLayer(bushfireLayer);
+    document.getElementById('tFlood').onchange    = e => e.target.checked ? floodLayer.addTo(map)    : map.removeLayer(floodLayer);
+    document.getElementById('tSlope').onchange    = e => e.target.checked ? slopeLayer.addTo(map)    : map.removeLayer(slopeLayer);
+
+
+
   </script>
 
 
