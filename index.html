@@ -973,6 +973,9 @@
 					requestAnimationFrame(() => {
 						elem.style.opacity = 1;
 					});
+					setTimeout(() => {
+						elem.style.display = "block";
+					}, 500);
 				}
 
 				function hide(elem) {

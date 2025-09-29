@@ -8,7 +8,7 @@
 			"type": "chrome",
 			"request": "launch",
 			"name": "Open Webpage",
-			"file": "${file}",
+			"file": "index.html",
 			"runtimeArgs": [
 				"--incognito",
 			]
