@@ -1058,7 +1058,7 @@
 									show(elem);
 								else
 									hide(elem);
-								return bool === false;
+								return bool === null ? 1 : bool === false ? 4 : 2;
 							}
 
 						},
@@ -1068,8 +1068,24 @@
 							subsection: "2.11b",
 							sanitised: "Section 2.11 (b) of the SEPP (2008)",
 							question: "Is this a replacement of an existing deck?",
-							type: "deckReplacement", // if yes, height <=1
-							errormsg: "The replacement deck <strong>must not </strong> be higher than <strong>1m</strong> above ground level"
+							type: "yes/no", 
+						},
+						{
+							id: 51.1,
+							section: "https://legislation.nsw.gov.au/view/html/inforce/current/epi-2008-0572#sec.2.11",
+							subsection: "2.11b",
+							sanitised: "Section 2.11 (b) of the SEPP (2008)",
+							question: "Is this a replacement of an existing deck?",
+							type: "numeric", // if yes, height <=1
+							errormsg: "The replacement deck <strong>must not </strong> be higher than <strong>1m</strong> above ground level",
+							check: (id, elem, v) => {
+								var replacementDeck = readBool(51);
+								if (replacementDeck==true && v > 1 ) 
+									show(elem);
+								else 
+									hide (elem)
+								return v === null ? 1 : (!replacementDeck || v <=1)? 4 : 2;
+							}
 						},
 						{
 							id: 52,
@@ -1078,48 +1094,125 @@
 							sanitised: "Section 2.12 (1)b of the SEPP (2008)",
 							question: "Does the development have any area of less than 25m²?",
 							type: "yes/no", // no
-							errormsg: "The development <strong>must not</strong> have an area of  less than 25m²",
+							errormsg: "The development <strong>must not</strong> have an area of less than 25m²",
 							check: (id, elem, bool) => {
 								if (bool === true)
 									show(elem);
 								else
 									hide(elem);
-								return bool === false;
+								return bool === null ? 1 : bool ===false ? 4 : 2;
 							}
 						}, 
-						// unimplemented : c
+						{
+							id: 53.1,
+							section: "https://legislation.nsw.gov.au/view/html/inforce/current/epi-2008-0572#sec.2.12",
+							subsection: "2.12 (1)c",
+							sanitised: "Section 2.12 (1)c of the SEPP (2008)",
+							question: "What is the size of the lot (m)?",
+							type: "numeric"
+						},
+						{
+							id: 53.2,
+							section: "https://legislation.nsw.gov.au/view/html/inforce/current/epi-2008-0572#sec.2.12",
+							subsection: "2.12 (1)c",
+							sanitised: "Section 2.12 (1)c of the SEPP (2008)",
+							question: "What is the area of the dwelling (m²)?",
+							type: "numeric"
+						},
+
 						{
 							id: 53,
 							section: "https://legislation.nsw.gov.au/view/html/inforce/current/epi-2008-0572#sec.2.12",
 							subsection: "2.12 (1)c",
 							sanitised: "Section 2.12 (1)c of the SEPP (2008)",
-							type: null,
+							question: "What is the total floor area of all structures on the lot (m²)?",
+							type: 'numeric',
+							errormsg: "The total floor area of all structures exceeds the allowed limit for your lot",
+							check: (id, elem, v) => {
+								const lotSize = readNumeric(53.1);
+								const dwellingArea = readNumeric(53.2);
+								let maxAllowed;
+
+								if (lotSize > 300)
+									maxAllowed = dwellingArea*0.15;
+								else 
+									maxAllowed = 25;
+								if (v > maxAllowed) 
+									show(elem);
+								else 
+									hide(elem)
+								return v === null ? 1 : v <= maxAllowed ? 4 : 2;
+							}
+						},
+						{
+							id: 54.1,
+							section: "https://legislation.nsw.gov.au/view/html/inforce/current/epi-2008-0572#sec.2.12",
+							subsection: "2.12 (1)d",
+							sanitised: "Section 2.12 (1)d of the SEPP (2008)",
+							question: "Does it have an enclosing wall higher?",
+							type: "yes/no"
 						},
 						{
 							id: 54,
 							section: "https://legislation.nsw.gov.au/view/html/inforce/current/epi-2008-0572#sec.2.12",
 							subsection: "2.12 (1)d",
 							sanitised: "Section 2.12 (1)d of the SEPP (2008)",
-							question: "Does it have an enclosing wall higher than 1.4m?",
-							type: "yes/no", // no
+							question: "What is the height of the enclosing wall (m)? Select 0 if N/A",
+							type: "numeric", // <= 1.4
 							errormsg: "The development <strong>must not</strong> have an an enclosing wall of more than 1.4m",
-							check: (id, elem, bool) => {
-								if (bool === true)
+							check: (id, elem, v) => {
+								var hasEnclosingWall = readBool(54.1);
+								if (hasEnclosingWall === true && v > 1.4)
 									show(elem);
 								else
 									hide(elem);
-								return bool === false;
+								return v === null ? 1 : !hasEnclosingWall || v <= 1.4 ? 4 : 2;
 							}
-
 						},
 						{							
-							id: 55,
+							id: 55.1,
 							section: "https://legislation.nsw.gov.au/view/html/inforce/current/epi-2008-0572#sec.2.12",
 							subsection: "2.12 (1)e",
 							sanitised: "Section 2.12 (1)e of the SEPP (2008)",
-							type: "farmPremise",
-							errormsg: ""
+							question: "Is the development carried out in connection with farm experience premises or farm gate premises?",
+							type: "yes/no",	
 						},
+
+						{							
+							id: 55.2,
+							section: "https://legislation.nsw.gov.au/view/html/inforce/current/epi-2008-0572#sec.2.12",
+							subsection: "2.12 (1)e",
+							sanitised: "Section 2.12 1.e.(i) of the SEPP (2008)",
+							question: "How far is the development from the nearest road (m)?",
+							type: "numeric",
+							errormsg: "If carried out in connection with farm premises, it <strong>must be</strong> more than 50m from a road",
+							check: (id, elem, v) => {
+								var hasFarm = readBool(55.1)
+								if (hasFarm && v <= 50) 
+									show(elem)
+								else 
+									hide(elem)
+								return v === null ? 1 : !hasFarm || (hasFarm && v > 50) ? 4 : 2;
+							}
+						},
+						{							
+							id: 55.3,
+							section: "https://legislation.nsw.gov.au/view/html/inforce/current/epi-2008-0572#sec.2.12",
+							subsection: "2.12 (1)e",
+							sanitised: "Section 2.12 1.e.(ii) of the SEPP (2008)",
+							question: "Is the developement located behind the building line of a road frontage?",
+							type: "yes/no", // yes
+							errormsg: "If not related to farm premises, it <strong>must be</strong> located behind the building line of a road frontage",
+							check: (id, elem, bool) => {
+								var hasFarm = readBool(55.1)
+								if (!hasFarm && bool===false) 
+									show(elem)
+								else 
+									hide(elem)
+								return bool === null ? 1 : hasFarm || (!hasFarm && bool ===true) ? 4 : 2;
+							}
+						},
+
 						{
 							id: 56,
 							section: "https://legislation.nsw.gov.au/view/html/inforce/current/epi-2008-0572#sec.2.12",
