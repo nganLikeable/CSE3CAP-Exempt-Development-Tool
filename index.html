@@ -1404,7 +1404,7 @@
 							section: "https://legislation.nsw.gov.au/view/html/inforce/current/epi-2008-0572#sec.2.12",
 							subsection: "2.12 (1)e",
 							sanitised: "Section 2.12 1.e.(ii) of the SEPP (2008)",
-							question: "Is the developement located behind the building line of a road frontage?",
+							question: "Is the development located behind the building line of a road frontage?",
 							type: "yes/no", // yes
 							errormsg: "If not related to farm premises, it <strong>must be</strong> located behind the building line of a road frontage",
 							check: (id, elem, bool) => {
@@ -1416,22 +1416,39 @@
 								return bool === null ? 1 : hasFarm || (!hasFarm && bool ===true) ? 4 : 2;
 							}
 						},
-
+						{
+							id: 100,
+							section: "https://legislation.nsw.gov.au/view/html/inforce/current/epi-2008-0572#sec.2.12",
+							sanitised: "Section 2.12 1f of the SEPP (2008)",
+							question: "What zone is your development in?",
+							type: "dropdown",
+							options: [
+								"RU1", "RU2", "RU3", "RU4", "RU6", "R5", "Other"
+							],
+						},
 						{
 							id: 56,
 							section: "https://legislation.nsw.gov.au/view/html/inforce/current/epi-2008-0572#sec.2.12",
 							subsection: "1f",
 							sanitised: "Section 2.20 (1)f of the SEPP (2008)",
-							question: "What is the distance from the development to the nearest lot boundary?",
-							type: "lotBoundary", // custom type to handle numeric + zone 
-							errormsg: "Distance from lot boundary <strong>must be 5m</strong> for RU1, RU2, RU3, RU4, R6 or R5 zones, <strong>or 900mm</strong> for other zones"
+							question: "What is the distance from the development to the nearest lot boundary (m)?",
+							type: "numeric",
+							errormsg: "Distance from lot boundary <strong>must be 5m</strong> for RU1, RU2, RU3, RU4, R6 or R5 zones, <strong>or 900mm</strong> for other zones",
+							check: (id, elem, v) => {
+								var zoned = readDropdown(100) !== "Other";
+								if ((zoned === true && v < 5 ) || (zoned === false && v < 0.009))
+									show(elem)
+								else 
+									hide (elem)
+								return v === null ? 1 : (zoned === true & v >=5 || zoned === false && v >= 0.009 )
+							}
 						},
 						{
 							id: 57,
 							section: "https://legislation.nsw.gov.au/view/html/inforce/current/epi-2008-0572#sec.2.12",
 							subsection: "1h",
 							sanitised: "Section 2.12 (1)(h) of the SEPP (2008)",
-							question: "If your development is made of metal components, are they constructed of low reflective and factory pre-coloured materials?",
+							question: "Are all metal components low reflective, and factory pre-coloured?",
 							type: "yes/no", // yes
 							errormsg: "Metal components <strong>must</strong> be low reflective and factory pre-coloured materials",
 							check: (id, elem, bool) => {
@@ -1439,44 +1456,112 @@
 									show(elem);
 								else
 									hide(elem);
-								return bool === false;
+								return bool === null ? 1 : bool === true ? 4 : 2;
 							}
 
 						},						
 						{
-							// incomplete i
 							id: 58,
 							section: "https://legislation.nsw.gov.au/view/html/inforce/current/epi-2008-0572#sec.2.12",
 							subsection: "1i",
 							sanitised: "Section 2.12 (1)(i) of the SEPP (2008)",
 							question: "What is the floor height above ground level (m)? ",
 							type: "numeric", // <=1m
-							errormsg: "The development <strong>must</strong> have a floor height not more than 1m above ground level"
+							errormsg: "The development <strong>must</strong> have a floor height not more than 1m above ground level",
+							check: (id, elem, v) => {
+								if (v > 1) 
+									show(elem);
+								else 
+									hide(elem);
+								return v === null ? 1 : v <=1 ? 4 : 2;
+							}
 						},
 						{
-							// incomplete j
-							id: 59,
+							id: 59.1,
+							section: "https://legislation.nsw.gov.au/view/html/inforce/current/epi-2008-0572#sec.2.12",
+							subsection: "1i,j",
+							sanitised: "Section 2.12 (1)(i),(j) of the SEPP (2008)",
+							question: "Is the development a roofed structure? If so, what kind? ",
+							type: "dropdown",
+							options: [
+									"Roofed structure",
+									"Roofed structure attached to a dwelling",
+									"Not a roofed structure"
+							]
+						},
+						{
+							id: 59.2,
+							section: "https://legislation.nsw.gov.au/view/html/inforce/current/epi-2008-0572#sec.2.12",
+							subsection: "1i1",
+							sanitised: "Section 2.12 (1)(i1) of the SEPP (2008)",
+							question: "Does the roof overhang the structure by more than 600mm on each side? ",
+							type: "yes/no", 
+							errormsg: "If the development has a roof, the roof <strong>must not</strong> overhang the structure by more than 600mm on each side",
+							check: (id, elem, bool) => {
+								var hasRoof = readDropdown(59.1) === "Roofed structure";
+								if (hasRoof && bool === true) 
+									show(elem)
+								else 
+									hide(elem)
+									return bool === null ? 1 : (!hasRoof || (hasRoof && bool === false)) ? 4 : 2;
+							}
+						},
+						{
+							id: 59.3,
 							section: "https://legislation.nsw.gov.au/view/html/inforce/current/epi-2008-0572#sec.2.12",
 							subsection: "1j",
-							sanitised: "Section 2.12 (1)(i) of the SEPP (2008)",
-							question: "What is the floor height above ground level (m)? ",
-							type: "numeric", // <=1m
-							errormsg: "The development <strong>must</strong> have a floor height not more than 1m above ground level",
+							sanitised: "Section 2.12 (1)(j) of the SEPP (2008)",
+							question: "Does the development extend above the roof gutter line of the dwelling?",
+							type: "yes/no", 
+							errormsg: "If the development has a roof attached to a dwelling, it <strong>must not</strong> extend the roof gutter line of the dwelling",
+							check: (id, elem, bool) => {
+								var hasRoofDwelling = readDropdown(59.1) === "Roofed structure attached to a dwelling";
+								if (hasRoofDwelling && bool === true) 
+									show(elem)
+								else 
+									hide(elem)
+									return bool === null ? 1 : (!hasRoofDwelling || (hasRoofDwelling && bool === false)) ? 4 : 2;
+							}
+						},
+						{
+							id: 59.4,
+							section: "https://legislation.nsw.gov.au/view/html/inforce/current/epi-2008-0572#sec.2.12",
+							subsection: "1j1",
+							sanitised: "Section 2.12 (1)(j1) of the SEPP (2008)",
+							question: "What is the distance at its highest point with the ground level (m)?",
+							type: "numeric",
+							errormsg: "The development <strong>must not</strong> be higher than 3m at its highest point above existing ground level",
+							check: (id, elem, v) => {
+								if (v > 3) 
+									show(elem)
+								else 
+									hide(elem)
+								return bool === null ? 1 : v <=3 ? 4 : 2;
+							}
+						},
+						{
+							id: 60.1,
+							section: "https://legislation.nsw.gov.au/view/html/inforce/current/epi-2008-0572#sec.2.12",
+							subsection: "k",
+							sanitised: "Section 2.12 (1)(k) of the SEPP (2008)",
+							question: "Is it connected to a fascia?",
+							type: "yes/no", 
 						},
 						{
 							id: 60,
 							section: "https://legislation.nsw.gov.au/view/html/inforce/current/epi-2008-0572#sec.2.12",
 							subsection: "k",
 							sanitised: "Section 2.12 (1)(k) of the SEPP (2008)",
-							question: "If connected to a fascia, does the connection comply with a professional engineer's specifications?<br> (Choose <strong>No</strong> if not applied)",
+							question: "If connected to a fascia, does the connection comply with a professional engineer's specifications?<br> (Choose <strong>No</strong> if not applied).",
 							type: "yes/no", // yes
-							errormsg: "Carport <strong>must</strong> follow professional engineer's specifications when connected to a fascia",
+							errormsg: "The development <strong>must</strong> follow professional engineer's specifications when connected to a fascia",
 							check: (id, elem, bool) => {
-								if (bool === true)
+								var connectedFascia = readBool(60.1);
+								if (connectedFascia && bool === false)
 									show(elem);
 								else
 									hide(elem);
-								return bool === false;
+    							return bool === null ? 1 : !connectedFascia || (connectedFascia && bool === true) ? 4 : 2;
 							}
 						},
 						{
@@ -1492,7 +1577,7 @@
 									show(elem);
 								else
 									hide(elem);
-								return bool === false;
+								return bool === null ? 1 : bool === true ? 4 : 2;
 								}
 						},
 						{
@@ -1500,32 +1585,40 @@
 							section: "https://legislation.nsw.gov.au/view/html/inforce/current/epi-2008-0572#sec.2.12",
 							subsection: "1m",
 							sanitised: "Section 2.12 (1)(m) of the SEPP (2008)",
-							question: "Will it interfere with the funcitoning of existing drainage fixures/flowpaths?",
-							type: "yes/no", // yes
-							errormsg: "Roofwater <strong>must</strong> be directed into the existing stormwater drainage system",
-							check: (id, elem, bool) => {
-								if (bool === true)
-									show(elem);
-								else
-									hide(elem);
-								return bool === false;
-								}
-						},
-						{
-							id: 65,
-							section: "https://legislation.nsw.gov.au/view/html/inforce/current/epi-2008-0572#sec.2.12",
-							subsection: "1l",
-							sanitised: "Section 2.12 (1)(n) of the SEPP (2008)",
-							question: "If the development is on bushfire-prone land and less than 5m from a dwelling, is it made of non-combustible material?",
-							type: "yes/no", // yes
-							errormsg: "Carport <strong>must</strong> use non-combustible materials when on bushfire-prone land within <strong>5m</strong> from a dwelling",
+							question: "Will it interfere with the functioning of existing drainage fixures/flowpaths?",
+							type: "yes/no", // no
+							errormsg: "The development <strong>must not</strong> interfere with the functioning of existing drainage fixtures or flow paths",
 							check: (id, elem, bool) => {
 								if (bool === false)
 									show(elem);
 								else
 									hide(elem);
-								return bool === false;
+								return bool === null ? 1 : bool === false ? 4 : 2;
 								}
+						},
+						{
+							id: 65.1,
+							section: "https://legislation.nsw.gov.au/view/html/inforce/current/epi-2008-0572#sec.2.18",
+							sanitised: "Section 2.12 1n of the SEPP (2008)",
+							question: "Is your development built in a bush fire prone area?",
+							type: "yes/no",
+						},
+						{
+							id: 65,
+							section: "https://legislation.nsw.gov.au/view/html/inforce/current/epi-2008-0572#sec.2.12",
+							subsection: "1n",
+							sanitised: "Section 2.12 (1)(n) of the SEPP (2008)",
+							question: "Is the plan less than 5m from a dwelling or built from combustible material?",
+							type: "yes/no",							
+							errormsg: "The development <strong>must</strong> use non-combustible materials when on bushfire-prone land within <strong>5m</strong> from a dwelling",
+							check: (id, elem, bool) => {
+								var fireprone = readBool(65.1);
+								if (bool === true && fireprone === true)
+									show(elem);
+								else
+									hide(elem);
+								return bool === null ? 1 : (bool === false || fireprone === false) ? 4 : 2;
+							}, 
 						},
 						{
 							id: 66,
@@ -1540,7 +1633,7 @@
 									show(elem);
 								else
 									hide(elem);
-								return bool === false;
+								return bool === null ? 1 : bool === true ? 4 : 2;
 								}
 						},
 						{
@@ -1556,7 +1649,7 @@
 									show(elem);
 								else
 									hide(elem);
-								return bool === false;
+								return bool === null ? 1 : bool === false ? 4 : 2;
 								}
 						},
 						// (3) not considered yet
@@ -1710,7 +1803,7 @@
 							section: "https://legislation.nsw.gov.au/view/html/inforce/current/epi-2008-0572#sec.2.12",
 							subsection: "1k",
 							sanitised: "Section 2.12 (1)(k) of the SEPP (2008)",
-							question: "Will it interfere with the funcitoning of existing drainage fixures/flowpaths?",
+							question: "Will it interfere with the functioning of existing drainage fixures/flowpaths?",
 							type: "yes/no", // yes
 							errormsg: "Roofwater <strong>must</strong> be directed into the existing stormwater drainage system",
 
