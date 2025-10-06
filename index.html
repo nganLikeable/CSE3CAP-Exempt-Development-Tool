@@ -755,6 +755,7 @@
 					border-color: #002a3a;
 					border-width: 0;
 					border-style: solid;
+					flex-direction: column;
 				}
 
 				.tile img {
@@ -765,6 +766,7 @@
 					height: 100%;
 					object-fit: cover;
 					z-index: 1;
+					opacity: 0.7;
 				}
 
 				.tile span {
@@ -910,19 +912,25 @@
                 .btn-map {
 					font-family:inherit; 
 				}
-								
+							
+				.subtitle {
+					font-size: 1rem;
+					display:block;
+				}	
 			</style>
 
 			<div style="display: flex;">
 				<h2 class="tile">
 					<img src="shed.png"/>
 					<a href="#shed"></a>
-					<span>Shed</span>
+					<span>Sheds</span>
+					<span class="subtitle">Cabanas, cubby houses, ferneries, garden sheds, gazebos and greenhouses</span>
 				</h2>
 				<h2 class="tile" style="margin-left: 2%;">
 					<img src="verandah.png"/>
 					<a href="#patio"></a>
-					<span>Verandah</span>
+					<span>Patios</span>
+					<span class="subtitle"> Balconies, decks, patios, pergolas, terraces and verandahs</span>
 				</h2>
 			</div>
 			<div style="display: flex; margin-top: 1%;">
@@ -934,7 +942,8 @@
 				<h2 class="tile" style="margin-left: 2%;">
 					<img src="retaining_wall.png"/>
 					<a href="#retaining_wall"></a>
-					<span>Retaining Wall</span>
+					<span>Retaining Walls</span>
+					<span class="subtitle">Earthworks, retaining walls and structural support</span>
 				</h2>
 			</div>
 
@@ -1301,7 +1310,394 @@
 							}
 						},
 					],
-					patio: [],
+					patio: [
+						{
+							id: 0,
+							section: "https://legislation.nsw.gov.au/view/html/inforce/current/epi-2008-0572#sec.2.11",
+							subsection: "2.11a",
+							sanitised: "Section 2.11 (a) of the SEPP (2008)",
+							question: "Is the construction or installation on a <strong>heritage site, draft heritage site, or an foreshore area?</strong>",
+							type: "yes/no", // no
+							errormsg: "Structure <strong>cannot</strong> be constructed or installed on a heritage item or on land in a foreshore area",
+							check: (id, elem, bool) => {
+								if (bool === true)
+									show(elem);
+								else
+									hide(elem);
+								return bool === null ? 1 : bool === false ? 4 : 2;
+							}
+
+						},
+						{
+							id: 1,
+							section: "https://legislation.nsw.gov.au/view/html/inforce/current/epi-2008-0572#sec.2.11",
+							sanitised: "Section 2.11 (b) of the SEPP (2008)",
+							question: "Is this a replacement of an existing deck?",
+							type: "yes/no", 
+						},
+						{
+							id: 2,
+							section: "https://legislation.nsw.gov.au/view/html/inforce/current/epi-2008-0572#sec.2.11",
+							sanitised: "Section 2.11 (b) of the SEPP (2008)",
+							question: "Is this a replacement of an existing deck?",
+							type: "numeric", // if yes, height <=1
+							errormsg: "The replacement deck <strong>must not </strong> be higher than <strong>1m</strong> above ground level",
+							check: (id, elem, v) => {
+								var replacementDeck = readBool(1);
+								if (replacementDeck === true && v > 1) 
+									show(elem);
+								else 
+									hide (elem)
+								return v === null ? 1 : (!replacementDeck || v <= 1) ? 4 : 2;
+							}
+						},
+						{
+							id: 3,
+							section: "https://legislation.nsw.gov.au/view/html/inforce/current/epi-2008-0572#sec.2.12",
+							sanitised: "Section 2.12 1b of the SEPP (2008)",
+							question: "Does the development have any area of less than 25m²?",
+							type: "yes/no", // no
+							errormsg: "The development <strong>must not</strong> have an area of less than 25m²",
+							check: (id, elem, bool) => {
+								if (bool === true)
+									show(elem);
+								else
+									hide(elem);
+								return bool === null ? 1 : bool === false ? 4 : 2;
+							}
+						}, 
+						{
+							id: 4,
+							section: "https://legislation.nsw.gov.au/view/html/inforce/current/epi-2008-0572#sec.2.12",
+							sanitised: "Section 2.12 1c of the SEPP (2008)",
+							question: "What is the size of the lot (m)?",
+							type: "numeric"
+						},
+						{
+							id: 5,
+							section: "https://legislation.nsw.gov.au/view/html/inforce/current/epi-2008-0572#sec.2.12",
+							sanitised: "Section 2.12 1c of the SEPP (2008)",
+							question: "What is the area of the dwelling (m²)?",
+							type: "numeric"
+						},
+
+						{
+							id: 6,
+							section: "https://legislation.nsw.gov.au/view/html/inforce/current/epi-2008-0572#sec.2.12",
+							sanitised: "Section 2.12 1c of the SEPP (2008)",
+							question: "What is the total floor area of all structures on the lot (m²)?",
+							type: "numeric",
+							errormsg: "The total floor area of all structures exceeds the allowed limit for your lot",
+							check: (id, elem, v) => {
+								const lotSize = readNumeric(4);
+								const dwellingArea = readNumeric(5);
+								let maxAllowed;
+
+								if (lotSize > 300)
+									maxAllowed = dwellingArea*0.15;
+								else 
+									maxAllowed = 25;
+								if (v > maxAllowed) 
+									show(elem);
+								else 
+									hide(elem)
+								return lotSize === null || dwellingArea === null || v === null ? 1 : v <= maxAllowed ? 4 : 2;
+							}
+						},
+						{
+							id: 7,
+							section: "https://legislation.nsw.gov.au/view/html/inforce/current/epi-2008-0572#sec.2.12",
+							sanitised: "Section 2.12 1d of the SEPP (2008)",
+							question: "Does it have an enclosing wall higher?",
+							type: "yes/no"
+						},
+						{
+							id: 8,
+							section: "https://legislation.nsw.gov.au/view/html/inforce/current/epi-2008-0572#sec.2.12",
+							sanitised: "Section 2.12 1d of the SEPP (2008)",
+							question: "What is the height of the enclosing wall (m)? Select 0 if N/A",
+							type: "numeric", // <= 1.4
+							errormsg: "The development <strong>must not</strong> have an an enclosing wall of more than 1.4m",
+							check: (id, elem, v) => {
+								var hasEnclosingWall = readBool(7);
+								if (hasEnclosingWall === true && v > 1.4)
+									show(elem);
+								else
+									hide(elem);
+								return hasEnclosingWall === null || v === null ? 1 : !hasEnclosingWall || v <= 1.4 ? 4 : 2;
+							}
+						},
+						{							
+							id: 9,
+							section: "https://legislation.nsw.gov.au/view/html/inforce/current/epi-2008-0572#sec.2.12",
+							subsection: "2.12 (1)e",
+							sanitised: "Section 2.12 (1)e of the SEPP (2008)",
+							question: "Is the development carried out in connection with farm experience premises or farm gate premises?",
+							type: "yes/no",	
+						},
+
+						{							
+							id: 10,
+							section: "https://legislation.nsw.gov.au/view/html/inforce/current/epi-2008-0572#sec.2.12",
+							sanitised: "Section 2.12 1e.(i) of the SEPP (2008)",
+							question: "How far is the development from the nearest road (m)?",
+							type: "numeric",
+							errormsg: "If carried out in connection with farm premises, it <strong>must be</strong> more than 50m from a road",
+							check: (id, elem, v) => {
+								var hasFarm = readBool(9)
+								if (hasFarm && v <= 50) 
+									show(elem)
+								else 
+									hide(elem)
+								return hasFarm === null || v === null ? 1 : !hasFarm || (hasFarm && v > 50) ? 4 : 2;
+							}
+						},
+						{							
+							id: 11,
+							section: "https://legislation.nsw.gov.au/view/html/inforce/current/epi-2008-0572#sec.2.12",
+							sanitised: "Section 2.12 1e.(ii) of the SEPP (2008)",
+							question: "Is the development located behind the building line of a road frontage?",
+							type: "yes/no", // yes
+							errormsg: "If not related to farm premises, it <strong>must be</strong> located behind the building line of a road frontage",
+							check: (id, elem, bool) => {
+								var hasFarm = readBool(9)
+								if (!hasFarm && bool === false) 
+									show(elem)
+								else 
+									hide(elem)
+								return hasFarm === null || bool === null ? 1 : hasFarm || (!hasFarm && bool === true) ? 4 : 2;
+							}
+						},
+						{
+							id: 12,
+							section: "https://legislation.nsw.gov.au/view/html/inforce/current/epi-2008-0572#sec.2.12",
+							sanitised: "Section 2.12 1f of the SEPP (2008)",
+							question: "What zone is your development in?",
+							type: "dropdown",
+							options: [
+								"RU1", "RU2", "RU3", "RU4", "RU6", "R5", "Other"
+							],
+						},
+						{
+							id: 13,
+							section: "https://legislation.nsw.gov.au/view/html/inforce/current/epi-2008-0572#sec.2.12",
+							sanitised: "Section 2.20 1f of the SEPP (2008)",
+							question: "What is the distance from the development to the nearest lot boundary (m)?",
+							type: "numeric",
+							errormsg: "Distance from lot boundary <strong>must be 5m</strong> for RU1, RU2, RU3, RU4, R6 or R5 zones, <strong>or 90cm</strong> for other zones",
+							check: (id, elem, v) => {
+								var zoned = readDropdown(12) !== "Other";
+								if ((zoned === true && v < 5) || (zoned === false && v < 0.9))
+									show(elem)
+								else 
+									hide (elem)
+								return zoned === null || v === null ? 1 : (zoned === true & v >= 5 || zoned === false && v >= 0.9)
+							}
+						},
+						{
+							id: 14,
+							section: "https://legislation.nsw.gov.au/view/html/inforce/current/epi-2008-0572#sec.2.12",
+							sanitised: "Section 2.12 1h of the SEPP (2008)",
+							question: "Are all metal components low reflective, and factory pre-coloured?",
+							type: "yes/no", // yes
+							errormsg: "Metal components <strong>must</strong> be low reflective and factory pre-coloured materials",
+							check: (id, elem, bool) => {
+								var farmBuilding = readBool(28);
+								if (farmBuilding === false && bool === false)
+									show(elem);
+								else
+									hide(elem);
+								return farmBuilding === null || bool === null ? 1 : bool === true || farmBuilding === true ? 4 : 2;
+							}
+						},						
+						{
+							id: 15,
+							section: "https://legislation.nsw.gov.au/view/html/inforce/current/epi-2008-0572#sec.2.12",
+							sanitised: "Section 2.12 1i of the SEPP (2008)",
+							question: "What is the floor height above ground level (m)? ",
+							type: "numeric", // <=1m
+							errormsg: "The development <strong>must</strong> have a floor height not more than 1m above ground level",
+							check: (id, elem, v) => {
+								if (v > 1) 
+									show(elem);
+								else 
+									hide(elem);
+								return v === null ? 1 : v <= 1 ? 4 : 2;
+							}
+						},
+						{
+							id: 16,
+							section: "https://legislation.nsw.gov.au/view/html/inforce/current/epi-2008-0572#sec.2.12",
+							sanitised: "Section 2.12 1i,j of the SEPP (2008)",
+							question: "Is the development a roofed structure? If so, what kind? ",
+							type: "dropdown",
+							options: [
+									"Roofed structure",
+									"Roofed structure attached to a dwelling",
+									"Not a roofed structure"
+							]
+						},
+						{
+							id: 17,
+							section: "https://legislation.nsw.gov.au/view/html/inforce/current/epi-2008-0572#sec.2.12",
+							sanitised: "Section 2.12 1i1 of the SEPP (2008)",
+							question: "Does the roof overhang the structure by more than 60cm on each side? ",
+							type: "yes/no", 
+							errormsg: "If the development has a roof, the roof <strong>must not</strong> overhang the structure by more than 60cm on each side",
+							check: (id, elem, bool) => {
+								var hasRoof = readDropdown(16) === "Roofed structure";
+								if (hasRoof && bool === true) 
+									show(elem)
+								else 
+									hide(elem)
+									return hasRoof === null || bool === null ? 1 : (!hasRoof || (hasRoof && bool === false)) ? 4 : 2;
+							}
+						},
+						{
+							id: 18,
+							section: "https://legislation.nsw.gov.au/view/html/inforce/current/epi-2008-0572#sec.2.12",
+							sanitised: "Section 2.12 1j of the SEPP (2008)",
+							question: "Does the development extend above the roof gutter line of the dwelling?",
+							type: "yes/no", 
+							errormsg: "If the development has a roof attached to a dwelling, it <strong>must not</strong> extend the roof gutter line of the dwelling",
+							check: (id, elem, bool) => {
+								var hasRoofDwelling = readDropdown(16) === "Roofed structure attached to a dwelling";
+								if (hasRoofDwelling && bool === true) 
+									show(elem)
+								else 
+									hide(elem)
+									return hasRoofDwelling === null || bool === null ? 1 : (!hasRoofDwelling || (hasRoofDwelling && bool === false)) ? 4 : 2;
+							}
+						},
+						{
+							id: 19,
+							section: "https://legislation.nsw.gov.au/view/html/inforce/current/epi-2008-0572#sec.2.12",
+							sanitised: "Section 2.12 1j1 of the SEPP (2008)",
+							question: "What is the distance at its highest point with the ground level (m)?",
+							type: "numeric",
+							errormsg: "The development <strong>must not</strong> be higher than 3m at its highest point above existing ground level",
+							check: (id, elem, v) => {
+								if (v > 3) 
+									show(elem)
+								else 
+									hide(elem)
+								return bool === null ? 1 : v <= 3 ? 4 : 2;
+							}
+						},
+						{
+							id: 20,
+							section: "https://legislation.nsw.gov.au/view/html/inforce/current/epi-2008-0572#sec.2.12",
+							sanitised: "Section 2.12 1k of the SEPP (2008)",
+							question: "Is it connected to a fascia?",
+							type: "yes/no", 
+						},
+						{
+							id: 21,
+							section: "https://legislation.nsw.gov.au/view/html/inforce/current/epi-2008-0572#sec.2.12",
+							sanitised: "Section 2.12 1k of the SEPP (2008)",
+							question: "If connected to a fascia, does the connection comply with a professional engineer's specifications?<br> (Choose <strong>No</strong> if not applied).",
+							type: "yes/no", // yes
+							errormsg: "The development <strong>must</strong> follow professional engineer's specifications when connected to a fascia",
+							check: (id, elem, bool) => {
+								var connectedFascia = readBool(20);
+								if (connectedFascia && bool === false)
+									show(elem);
+								else
+									hide(elem);
+    							return connectedFascia === null || bool === null ? 1 : !connectedFascia || (connectedFascia && bool === true) ? 4 : 2;
+							}
+						},
+						{
+							id: 22,
+							section: "https://legislation.nsw.gov.au/view/html/inforce/current/epi-2008-0572#sec.2.12",
+							sanitised: "Section 2.12 1l of the SEPP (2008)",
+							question: "Will the development be constructred or installed so that roofwater is disposed of into the existing stormwater drainage system?",
+							type: "yes/no", // yes
+							errormsg: "Roofwater <strong>must</strong> be directed into the existing stormwater drainage system",
+							check: (id, elem, bool) => {
+								if (bool === false)
+									show(elem);
+								else
+									hide(elem);
+								return bool === null ? 1 : bool === true ? 4 : 2;
+							}
+						},
+						{
+							id: 23,
+							section: "https://legislation.nsw.gov.au/view/html/inforce/current/epi-2008-0572#sec.2.12",
+							sanitised: "Section 2.12 1m of the SEPP (2008)",
+							question: "Will it interfere with the functioning of existing drainage fixures/flowpaths?",
+							type: "yes/no", // no
+							errormsg: "The development <strong>must not</strong> interfere with the functioning of existing drainage fixtures or flow paths",
+							check: (id, elem, bool) => {
+								if (bool === false)
+									show(elem);
+								else
+									hide(elem);
+								return bool === null ? 1 : bool === false ? 4 : 2;
+								}
+						},
+						{
+							id: 24,
+							section: "https://legislation.nsw.gov.au/view/html/inforce/current/epi-2008-0572#sec.2.18",
+							sanitised: "Section 2.12 1n of the SEPP (2008)",
+							question: "Is your development built in a bush fire prone area?",
+							type: "yes/no",
+						},
+						{
+							id: 25,
+							section: "https://legislation.nsw.gov.au/view/html/inforce/current/epi-2008-0572#sec.2.12",
+							sanitised: "Section 2.12 1n of the SEPP (2008)",
+							question: "Is the plan less than 5m from a dwelling or built from combustible material?",
+							type: "yes/no",							
+							errormsg: "The development <strong>must</strong> use non-combustible materials when on bushfire-prone land within <strong>5m</strong> from a dwelling",
+							check: (id, elem, bool) => {
+								var fireprone = readBool(24);
+								if (bool === true && fireprone === true)
+									show(elem);
+								else
+									hide(elem);
+								return fireprone === null || bool === null ? 1 : (bool === false || fireprone === false) ? 4 : 2;
+							}, 
+						},
+						{
+							id: 26,
+							section: "https://legislation.nsw.gov.au/view/html/inforce/current/epi-2008-0572#sec.2.12",
+							sanitised: "Section 2.12 2a of the SEPP (2008)",
+							question: "Are equivalent or improved quality materials used in the development?",
+							type: "yes/no", // yes
+							errormsg: "The development <strong>must</strong> use equivalent or improved quality materials",
+							check: (id, elem, bool) => {
+								if (bool === false)
+									show(elem);
+								else
+									hide(elem);
+								return bool === null ? 1 : bool === true ? 4 : 2;
+							}
+						},
+						{
+							id: 27,
+							section: "https://legislation.nsw.gov.au/view/html/inforce/current/epi-2008-0572#sec.2.12",
+							sanitised: "Section 2.12 2b of the SEPP (2008)",
+							question: "Does the development change the size or height of the existing deck?",
+							type: "yes/no", // no
+							errormsg: "The development <strong>must not</strong> change the measurements of the existing deck",
+							check: (id, elem, bool) => {
+								if (bool === true)
+									show(elem);
+								else
+									hide(elem);
+								return bool === null ? 1 : bool === false ? 4 : 2;
+							}
+						},
+						{
+							id: 28,
+							section: "https://legislation.nsw.gov.au/view/html/inforce/current/epi-2008-0572#sec.2.12",
+							sanitised: "Section 2.12 3a of the SEPP (2008)",
+							question: "Is the balcony connected to a building intended for the purposes of farm stay accommodation, farm gate premises or farm experience premises?",
+							type: "yes/no",
+						},
+					],
 					carport: [
 						{
 							id: 0,
@@ -1597,174 +1993,219 @@
   					],
 					retaining_wall: [
 						{
-							id: 1,
+							id: 0,
 							section: "https://legislation.nsw.gov.au/view/html/inforce/current/epi-2008-0572#sec.2.29",
-							subsection: "15",
 							sanitised: "Section 2.29 of the SEPP (2008)",
 							question: "Is the site a heritage/draft heritage/off-shore area or an environmentally sensitive area?",
 							type: "yes/no",
-							errormsg: "Retaining walls on heritage/draft heritage/off-shore or environmentally sensitive areas are not exempt.",
+							errormsg: "Retaining walls on heritage/draft heritage/off-shore or environmentally sensitive areas are not exempt",
 							check: (id, elem, v) => {
-								if (v) show(elem); else hide(elem);
-								return !v;
+								if (v === true)
+									show(elem);
+								else
+									hide(elem);
+								return v === null ? 1 : v === true ? 2 : 4;
+							}
+						},
+						{
+							id: 1,
+							section: "https://legislation.nsw.gov.au/view/html/inforce/current/epi-2008-0572#sec.2.30",
+							sanitised: "Section 2.30 1a of the SEPP (2008)",
+							question: "Maximum cut or fill depth relative to existing ground level (m)?",
+							type: "numeric",
+							errormsg: "Cut or fill cannot exceed 6m",
+							check: (id, elem, v) => {
+								if (v > 6)
+									show(elem);
+								else
+									hide(elem);
+								return v === null ? 1 : v <= 6 ? 4 : 2;
 							}
 						},
 						{
 							id: 2,
-							section: "info",
-							subsection: "",
-							sanitised: "context",
-							question: "Is your site in a Rural or Conservation zone?",
-							type: "yes/no",
-							errormsg: "",
-							check: (id, elem, v) => { hide(elem); return true; }
-
+							section: "https://legislation.nsw.gov.au/view/html/inforce/current/epi-2008-0572#sec.2.30",
+							sanitised: "Section 2.30 1b of the SEPP (2008)",
+							question: "How far is the wall from any lot boundary (m)?",
+							type: "numeric",
+							errormsg: "Distance from the lot boundary must be at least 1m",
+							check: (id, elem, v) => {
+								if (v < 1)
+									show(elem);
+								else
+									hide(elem);
+								return v === null ? 1: v >= 1 ? 4 : 2;
+							}
 						},
 						{
 							id: 3,
 							section: "https://legislation.nsw.gov.au/view/html/inforce/current/epi-2008-0572#sec.2.30",
-							subsection: "",
-							sanitised: "Section 2.30 of the SEPP (2008)",
-							question: "Maximum cut or fill depth relative to existing ground level (m)?",
-							type: "numeric",
-							errormsg: "Cut or fill cannot exceed 6 m.",
-							check: (id, elem, v) => {
-								if (v > 6) show(elem); else hide(elem);
-								return v <= 6;
-							}
+							sanitised: "Section 2.30 1c of the SEPP (2008)",
+							question: "Is it being constructed or installed in a heritage or draft heritage conservation area?",
+							type: "yes/no",
 						},
 						{
 							id: 4,
 							section: "https://legislation.nsw.gov.au/view/html/inforce/current/epi-2008-0572#sec.2.30",
-							subsection: "",
-							sanitised: "Section 2.30 of the SEPP (2008)",
-							question: "How far is the wall from any lot boundary (m)?",
+							sanitised: "Section 2.30 1c of the SEPP (2008)",
+							question: "Is it located in the 'rear yard'?",
 							type: "numeric",
-							errormsg: "Distance from the lot boundary must be at least 1 m.",
-							check: (id, elem, v) => {
-								if (v < 1) show(elem); else hide(elem);
-								return v >= 1;
+							errormsg: "Developments built on a heritage conservation area need to be built in the rear yard",
+							check: (id, elem, bool) => {
+								var conservation = readBool(3);
+								if (conservation === true && bool === false)
+									show(elem);
+								else
+									hide(elem);
+								return conservation === null || bool === null ? 1 : conservation === false || conservation === true && bool === true ? 4 : 2;
 							}
 						},
 						{
 							id: 5,
 							section: "https://legislation.nsw.gov.au/view/html/inforce/current/epi-2008-0572#sec.2.30",
-							subsection: "",
-							sanitised: "Section 2.30 of the SEPP (2008)",
-							question: "If the wall is a structural support: total height from base to top (m)?",
+							sanitised: "Section 2.30 1d of the SEPP (2008)",
+							question: "Distance to the nearest natural waterbody (m)?",
 							type: "numeric",
-							errormsg: "Structural retaining walls cannot exceed 6 m in height.",
+							errormsg: "Must be at least 40m from a natural waterbody",
 							check: (id, elem, v) => {
-								if (v > 6) show(elem); else hide(elem);
-								return v <= 6;
-							}
+								if (v < 40)
+									show(elem);
+								else
+									hide(elem);
+								return v === null ? 1 : v >= 40 ? 4 : 2;
+							} 
 						},
 						{
 							id: 6,
 							section: "https://legislation.nsw.gov.au/view/html/inforce/current/epi-2008-0572#sec.2.30",
-							subsection: "",
-							sanitised: "Section 2.30 of the SEPP (2008)",
-							question: "Horizontal distance to any other retaining wall or structural support (m)?",
-							type: "numeric",
-							errormsg: "Must be at least 2 m from other retaining walls or supports.",
-							check: (id, elem, v) => {
-								if (v < 2) show(elem); else hide(elem);
-								return v >= 2;
+							sanitised: "Section 2.30 1e of the SEPP (2008)",
+							question: "Will it redirect surface/ground water or cause sediment to affect neighbours?",
+							type: "yes/no",
+							errormsg: "Water must not be redirected and sediment must not impact adjoining property",
+							check: (id, elem, bool) => {
+								if (bool === true)
+									show(elem);
+								else
+									hide(elem);
+								return bool === null ? 1 : bool === false ? 4 : 2;
 							}
 						},
 						{
 							id: 7,
 							section: "https://legislation.nsw.gov.au/view/html/inforce/current/epi-2008-0572#sec.2.30",
-							subsection: "",
-							sanitised: "Section 2.30 of the SEPP (2008)",
-							question: "Distance to any easement, sewer main, or water main (m)?",
-							type: "numeric",
-							errormsg: "Must be at least 1 m from easements and mains.",
-							check: (id, elem, v) => {
-								if (v < 1) show(elem); else hide(elem);
-								return v >= 1;
-							}
-
+							sanitised: "Section 2.30 1f of the SEPP (2008)",
+							question: "Is it a retaining wall or structural support for excavation or fill, or a combination of both?",
+							type: "yes/no",
 						},
 						{
 							id: 8,
 							section: "https://legislation.nsw.gov.au/view/html/inforce/current/epi-2008-0572#sec.2.30",
-							subsection: "",
-							sanitised: "Section 2.30 of the SEPP (2008)",
-							question: "Distance to the nearest natural waterbody (m)?",
+							sanitised: "Section 2.30 1f1 of the SEPP (2008)",
+							question: "How far is it from the base of the development to its uppermost portion (m)?",
 							type: "numeric",
-							errormsg: "Must be at least 40 m from a natural waterbody.",
+							errormsg: "Retaining wall or structural support developments cannot be taller than 6m",
 							check: (id, elem, v) => {
-								if (v < 40) show(elem); else hide(elem);
-								return v >= 40;
-							} 
+								var wall = readBool(7);
+								if (wall === true && v > 6)
+									show(elem);
+								else
+									hide(elem);
+								return wall === null || v === null ? 1 : wall === false || wall === true && v <= 6 ? 4 : 2;
+							}
 						},
 						{
 							id: 9,
 							section: "https://legislation.nsw.gov.au/view/html/inforce/current/epi-2008-0572#sec.2.30",
-							subsection: "",
-							sanitised: "Section 2.30 of the SEPP (2008)",
-							question: "Will it redirect surface/ground water or cause sediment to affect neighbours?",
+							sanitised: "Section 2.30 1f2 of the SEPP (2008)",
+							question: "Is it at least 2 meters horizontally from other retainer walls or structural supports?",
 							type: "yes/no",
-							errormsg: "Water must not be redirected and sediment must not impact adjoining property.",
-							check: (id, elem, v) => {
-								if (v) show(elem); else hide(elem);
-								return !v;
+							errormsg: "Retaining wall or structural support developments cannot be within 2 meters of other developments of this type",
+							check: (id, elem, bool) => {
+								var wall = readBool(7);
+								if (wall === true && bool === false)
+									show(elem);
+								else
+									hide(elem);
+								return wall === null || bool === null ? 1 : wall === false || wall === true && bool === true ? 4 : 2;
 							}
 						},
 						{
 							id: 10,
 							section: "https://legislation.nsw.gov.au/view/html/inforce/current/epi-2008-0572#sec.2.30",
-							subsection: "",
-							sanitised: "Section 2.30 of the SEPP (2008)",
-							question: "If imported fill is used, is it clean VENM and free of demolition waste?",
+							sanitised: "Section 2.30 1f3 of the SEPP (2008)",
+							question: "Is it at least 1 meter from easements, sewer mains, and water mains?",
 							type: "yes/no",
-							errormsg: "Imported fill must be VENM and free of demolition waste.",
-							check: (id, elem, v) => {
-								if (v) show(elem); else hide(elem);
-								return !v;
+							errormsg: "Retaining wall or structural support developments must be at least 1 meter from easements, sewer mains, and water mains",
+							check: (id, elem, bool) => {
+								var wall = readBool(7);
+								if (wall === true && bool === false)
+									show(elem);
+								else
+									hide(elem);
+								return wall === null || bool === null ? 1 : wall === false || wall === true && bool === true ? 4 : 2;
 							}
 						},
 						{
 							id: 11,
 							section: "https://legislation.nsw.gov.au/view/html/inforce/current/epi-2008-0572#sec.2.30",
-							sucsection: "",
-							sanitised: "Section 2.30 of the SEPP (2008)",
-							question: "Percent of the lot occupied by fill deeper than 1.5 m",
-							type: "numeric",
-							errormsg: "If fill depth > 1.5 m, it cannot occupy more than 25% of the lot.",
-							check: (id, elem, v) => {
-								if (v > 25) show(elem); else hide(elem);
-								return v <= 25;
+							sanitised: "Section 2.30 1f4 of the SEPP (2008)",
+							question: "Does it have adequate drainage lines connected to the existing stormwater drainage system for the site?",
+							type: "yes/no",
+							errormsg: "Retaining wall or structural support developments must be properly connected to existing drainage systems",
+							check: (id, elem, bool) => {
+								var wall = readBool(7);
+								if (wall === true && bool === false)
+									show(elem);
+								else
+									hide(elem);
+								return wall === null || bool === null ? 1 : wall === false || wall === true && bool === true ? 4 : 2;
 							}
 						},
 						{
 							id: 12,
 							section: "https://legislation.nsw.gov.au/view/html/inforce/current/epi-2008-0572#sec.2.30",
-							subsection: "",
-							sanitised: "Section 2.30 of the SEPP (2008)",
-							question: "If you answered ‘Yes’ to Rural or Conservation zone earlier: total fill volume (m³)?",
-							type: "numeric",
-							errormsg: "In Rural or Conservation zones, total fill cannot exceed 100 m³.",
-							check: (id, elem, v) => {
-								const rural = readBool(2); 
-								if (rural && v > 100) { show(elem); return false; }
-								hide(elem); return true;
+							sanitised: "Section 2.30 1g of the SEPP (2008)",
+							question: "If the fill is more than 15cm deep, does it occupy more than 25% of the area of the lot? (Leave blank if it's not a fill)",
+							type: "yes/no",
+							errormsg: "Cannot fill more than a quarter of the lot area",
+							check: (id, elem, bool) => {
+								if (bool === true)
+									show(elem);
+								else
+									hide(elem);
+								return bool === null || bool === false ? 4 : 2;
 							}
 						},
 						{
 							id: 13,
 							section: "https://legislation.nsw.gov.au/view/html/inforce/current/epi-2008-0572#sec.2.30",
-							subsection: "",
-							sanitised: "Section 2.30 of the SEPP (2008)",
-							question: "If in a heritage conservation area, is the wall located in the rear yard?",
+							sanitised: "Section 2.30 1h of the SEPP (2008)",
+							question: "If a fill is imported to the site, are the materials free of building and other demolition waste, and only contain virgin excavated natural material (VENM) as defined in Part 3 of Schedule 1 to the <a href=\"https://legislation.nsw.gov.au/view/html/inforce/current/act-1997-156\">Protection of the Environment Operations Act 1997</a>? (Leave blank if it's not a fill)",
 							type: "yes/no",
-							errormsg: "In heritage conservation areas, the wall must be located in the rear yard.",
-							check: (id, elem, v) => {
-								if (!v) show(elem); else hide(elem);
-								return v;
+							errormsg: "The fill must use VENM materials",
+							check: (id, elem, bool) => {
+								if (bool === false)
+									show(elem);
+								else
+									hide(elem);
+								return bool === null || bool === true ? 4 : 2;
 							}
-						}
+						},
+						{
+							id: 14,
+							section: "https://legislation.nsw.gov.au/view/html/inforce/current/epi-2008-0572#sec.2.30",
+							sanitised: "Section 2.30 1i of the SEPP (2008)",
+							question: "If the land is in a rural or conservation zone, is it a fill of more than 100 cubic metres on each lot? (Leave blank if it's not applicable)",
+							type: "yes/no",
+							errormsg: "The fill cannot modify more than 100 cubic metres of land",
+							check: (id, elem, bool) => {
+								if (bool === true)
+									show(elem);
+								else
+									hide(elem);
+								return bool === null || bool === false ? 4 : 2;
+							}
+						},
 					],
 				}
 
