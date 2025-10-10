@@ -361,7 +361,7 @@ var SEPP = {
 			section: "https://legislation.nsw.gov.au/view/html/inforce/current/epi-2008-0572#sec.2.11",
 			sanitised: "Section 2.11 (b) of the SEPP (2008)",
 			question: "Is this a replacement of an existing deck?",
-			type: "numeric", // if yes, height <=1
+			type: "yes/no",
 			errormsg: "The replacement deck <strong>must not </strong> be higher than <strong>1m</strong> above ground level",
 			check: (id, elem, v) => {
 				var replacementDeck = readBool(1);
@@ -392,14 +392,18 @@ var SEPP = {
 			section: "https://legislation.nsw.gov.au/view/html/inforce/current/epi-2008-0572#sec.2.12",
 			sanitised: "Section 2.12 1c of the SEPP (2008)",
 			question: "What is the size of the lot (m)?",
-			type: "numeric"
+			type: "numeric",
+			minimum: 0,
+			maximum: 100000,
 		},
 		{
 			id: 5,
 			section: "https://legislation.nsw.gov.au/view/html/inforce/current/epi-2008-0572#sec.2.12",
 			sanitised: "Section 2.12 1c of the SEPP (2008)",
 			question: "What is the area of the dwelling (m²)?",
-			type: "numeric"
+			type: "numeric",
+			minimum: 0,
+			maximum: 10000,
 		},
 
 		{
@@ -408,6 +412,8 @@ var SEPP = {
 			sanitised: "Section 2.12 1c of the SEPP (2008)",
 			question: "What is the total floor area of all structures on the lot (m²)?",
 			type: "numeric",
+			minimum: 0,
+			maximum: 100000,
 			errormsg: "The total floor area of all structures exceeds the allowed limit for your lot",
 			check: (id, elem, v) => {
 				const lotSize = readNumeric(4);
@@ -436,8 +442,10 @@ var SEPP = {
 			id: 8,
 			section: "https://legislation.nsw.gov.au/view/html/inforce/current/epi-2008-0572#sec.2.12",
 			sanitised: "Section 2.12 1d of the SEPP (2008)",
-			question: "What is the height of the enclosing wall (m)? Select 0 if N/A",
-			type: "numeric", // <= 1.4
+			question: "What is the height of the enclosing wall (m)? (Leave empty if not applicable)",
+			type: "numeric",
+			minimum: 0,
+			maximum: 10,
 			errormsg: "The development <strong>must not</strong> have an an enclosing wall of more than 1.4m",
 			check: (id, elem, v) => {
 				var hasEnclosingWall = readBool(7);
@@ -445,7 +453,7 @@ var SEPP = {
 					show(elem);
 				else
 					hide(elem);
-				return hasEnclosingWall === null || v === null ? 1 : !hasEnclosingWall || v <= 1.4 ? 4 : 2;
+				return hasEnclosingWall === null ? 1 : v === null || !hasEnclosingWall || v <= 1.4 ? 4 : 2;
 			}
 		},
 		{							
@@ -456,13 +464,14 @@ var SEPP = {
 			question: "Is the development carried out in connection with farm experience premises or farm gate premises?",
 			type: "yes/no",	
 		},
-
 		{							
 			id: 10,
 			section: "https://legislation.nsw.gov.au/view/html/inforce/current/epi-2008-0572#sec.2.12",
 			sanitised: "Section 2.12 1e.(i) of the SEPP (2008)",
 			question: "How far is the development from the nearest road (m)?",
 			type: "numeric",
+			minimum: 0,
+			maximum: 1000,
 			errormsg: "If carried out in connection with farm premises, it <strong>must be</strong> more than 50m from a road",
 			check: (id, elem, v) => {
 				var hasFarm = readBool(9)
@@ -505,6 +514,8 @@ var SEPP = {
 			sanitised: "Section 2.20 1f of the SEPP (2008)",
 			question: "What is the distance from the development to the nearest lot boundary (m)?",
 			type: "numeric",
+			minimum: 0,
+			maximum: 10000,
 			errormsg: "Distance from lot boundary <strong>must be 5m</strong> for RU1, RU2, RU3, RU4, R6 or R5 zones, <strong>or 90cm</strong> for other zones",
 			check: (id, elem, v) => {
 				var zoned = readDropdown(12) !== "Other";
@@ -537,6 +548,8 @@ var SEPP = {
 			sanitised: "Section 2.12 1i of the SEPP (2008)",
 			question: "What is the floor height above ground level (m)? ",
 			type: "numeric", // <=1m
+			minimum: 0,
+			maximum: 100,
 			errormsg: "The development <strong>must</strong> have a floor height not more than 1m above ground level",
 			check: (id, elem, v) => {
 				if (v > 1) 
@@ -596,6 +609,8 @@ var SEPP = {
 			sanitised: "Section 2.12 1j1 of the SEPP (2008)",
 			question: "What is the distance at its highest point with the ground level (m)?",
 			type: "numeric",
+			minimum: 0,
+			maximum: 100,
 			errormsg: "The development <strong>must not</strong> be higher than 3m at its highest point above existing ground level",
 			check: (id, elem, v) => {
 				if (v > 3) 
@@ -1034,6 +1049,8 @@ var SEPP = {
 			sanitised: "Section 2.30 1a of the SEPP (2008)",
 			question: "Maximum cut or fill depth relative to existing ground level (m)?",
 			type: "numeric",
+			minimum: 0,
+			maximum: 100,
 			errormsg: "Cut or fill cannot exceed 6m",
 			check: (id, elem, v) => {
 				if (v > 6)
@@ -1049,6 +1066,8 @@ var SEPP = {
 			sanitised: "Section 2.30 1b of the SEPP (2008)",
 			question: "How far is the wall from any lot boundary (m)?",
 			type: "numeric",
+			minimum: 0,
+			maximum: 10000,
 			errormsg: "Distance from the lot boundary must be at least 1m",
 			check: (id, elem, v) => {
 				if (v < 1)
@@ -1070,7 +1089,7 @@ var SEPP = {
 			section: "https://legislation.nsw.gov.au/view/html/inforce/current/epi-2008-0572#sec.2.30",
 			sanitised: "Section 2.30 1c of the SEPP (2008)",
 			question: "Is it located in the 'rear yard'?",
-			type: "numeric",
+			type: "yes/no",
 			errormsg: "Developments built on a heritage conservation area need to be built in the rear yard",
 			check: (id, elem, bool) => {
 				var conservation = readBool(3);
@@ -1087,6 +1106,8 @@ var SEPP = {
 			sanitised: "Section 2.30 1d of the SEPP (2008)",
 			question: "Distance to the nearest natural waterbody (m)?",
 			type: "numeric",
+			minimum: 0,
+			maximum: 10000,
 			errormsg: "Must be at least 40m from a natural waterbody",
 			check: (id, elem, v) => {
 				if (v < 40)
@@ -1124,6 +1145,8 @@ var SEPP = {
 			sanitised: "Section 2.30 1f1 of the SEPP (2008)",
 			question: "How far is it from the base of the development to its uppermost portion (m)?",
 			type: "numeric",
+			minimum: 0,
+			maximum: 100,
 			errormsg: "Retaining wall or structural support developments cannot be taller than 6m",
 			check: (id, elem, v) => {
 				var wall = readBool(7);
