@@ -527,7 +527,7 @@ var SEPP = {
       errormsg:
         "If carried out in connection with farm premises, it <strong>must be</strong> more than 50m from a road",
       check: (id, elem, v) => {
-        var hasFarm = readBool(9);
+        var hasFarm = readBool(8);
         if (hasFarm && v <= 50) show(elem);
         else hide(elem);
         return hasFarm === null || v === null
@@ -548,7 +548,7 @@ var SEPP = {
       errormsg:
         "If not related to farm premises, it <strong>must be</strong> located behind the building line of a road frontage",
       check: (id, elem, bool) => {
-        var hasFarm = readBool(9);
+        var hasFarm = readBool(8);
         if (!hasFarm && bool === false) show(elem);
         else hide(elem);
         return hasFarm === null || bool === null
@@ -586,7 +586,9 @@ var SEPP = {
         else hide(elem);
         return zoned === null || v === null
           ? 1
-          : (zoned === true) & (v >= 5) || (zoned === false && v >= 0.9);
+          : (zoned === true && v >= 5) || (zoned === false && v >= 0.9)
+          ? 4
+          : 2;
       },
     },
     {
@@ -600,7 +602,7 @@ var SEPP = {
       errormsg:
         "Metal components <strong>must</strong> be low reflective and factory pre-coloured materials",
       check: (id, elem, bool) => {
-        var farmBuilding = readBool(28);
+        var farmBuilding = readBool(8);
         if (farmBuilding === false && bool === false) show(elem);
         else hide(elem);
         return farmBuilding === null || bool === null
@@ -698,7 +700,7 @@ var SEPP = {
       check: (id, elem, v) => {
         if (v > 3) show(elem);
         else hide(elem);
-        return bool === null ? 1 : v <= 3 ? 4 : 2;
+        return v === null ? 1 : v <= 3 ? 4 : 2;
       },
     },
     {
@@ -720,7 +722,7 @@ var SEPP = {
       errormsg:
         "The development <strong>must</strong> follow professional engineer's specifications when connected to a fascia",
       check: (id, elem, bool) => {
-        var connectedFascia = readBool(20);
+        var connectedFascia = readBool(19);
         if (connectedFascia && bool === false) show(elem);
         else hide(elem);
         return connectedFascia === null || bool === null
@@ -781,7 +783,7 @@ var SEPP = {
       errormsg:
         "The development <strong>must</strong> use non-combustible materials when on bushfire-prone land within <strong>5m</strong> from a dwelling",
       check: (id, elem, bool) => {
-        var fireprone = readBool(24);
+        var fireprone = readBool(23);
         if (bool === true && fireprone === true) show(elem);
         else hide(elem);
         return fireprone === null || bool === null
@@ -823,15 +825,15 @@ var SEPP = {
         return bool === null ? 1 : bool === false ? 4 : 2;
       },
     },
-    {
-      id: 27,
-      section:
-        "https://legislation.nsw.gov.au/view/html/inforce/current/epi-2008-0572#sec.2.12",
-      sanitised: "Section 2.12 3a of the SEPP (2008)",
-      question:
-        "Is the balcony connected to a building intended for the purposes of farm stay accommodation, farm gate premises or farm experience premises?",
-      type: "yes/no",
-    },
+    // {
+    //   id: 27,
+    //   section:
+    //     "https://legislation.nsw.gov.au/view/html/inforce/current/epi-2008-0572#sec.2.12",
+    //   sanitised: "Section 2.12 3a of the SEPP (2008)",
+    //   question:
+    //     "Is the balcony connected to a building intended for the purposes of farm stay accommodation, farm gate premises or farm experience premises?",
+    //   type: "yes/no",
+    // },
   ],
   carport: [
     {
@@ -972,7 +974,7 @@ var SEPP = {
       check: (id, elem, bool) => {
         if (bool === false) show(elem);
         else hide(elem);
-        return v === null ? 1 : v === true ? 4 : 2;
+        return bool === null ? 1 : bool === true ? 4 : 2;
       },
     },
     {
@@ -1572,43 +1574,77 @@ function loadSection(str) {
       // window.scrollTo({top: selectedForm.getBoundingClientRect().top + window.scrollY - offset + 30, behavior: "smooth"});
       let good = 0;
       let unknown = [];
+
       Object.keys(SEPP[str]).forEach((key) => {
-        if (SEPP[str][key].check) {
-          const elem = document.getElementById(String(SEPP[str][key].id) + "e");
+        const question = SEPP[str][key];
+        const questionNumber = Number(key) + 1;
+
+        // Check if question has a check function
+        if (question.check) {
+          const elem = document.getElementById(String(question.id) + "e");
           let res;
-          if (SEPP[str][key].type === "yes/no")
-            res = SEPP[str][key].check(
-              SEPP[str][key].id,
-              elem,
-              readBool(SEPP[str][key].id)
-            );
-          else if (SEPP[str][key].type === "numeric")
-            res = SEPP[str][key].check(
-              SEPP[str][key].id,
-              elem,
-              readNumeric(SEPP[str][key].id)
-            );
-          else if (SEPP[str][key].type === "dropdown")
-            res = SEPP[str][key].check(
-              SEPP[str][key].id,
-              elem,
-              readDropdown(SEPP[str][key].id)
-            );
-          if (res === 1) unknown.push(Number(key) + 1);
+
+          if (question.type === "yes/no") {
+            const answer = readBool(question.id);
+            res = question.check(question.id, elem, answer);
+          } else if (question.type === "numeric") {
+            const answer = readNumeric(question.id);
+            res = question.check(question.id, elem, answer);
+          } else if (question.type === "dropdown") {
+            const answer = readDropdownPerma(question.id); // Use readDropdownPerma for better validation
+            res = question.check(question.id, elem, answer);
+          }
+
+          if (res === 1) unknown.push(questionNumber);
           good |= res;
+        } else {
+          // For questions without check functions, validate if they're answered
+          let isAnswered = false;
+
+          if (question.type === "yes/no") {
+            isAnswered = readBool(question.id) !== null;
+          } else if (question.type === "numeric") {
+            isAnswered = readNumeric(question.id) !== null;
+          } else if (question.type === "dropdown") {
+            isAnswered = readDropdownPerma(question.id) !== null;
+          }
+
+          if (!isAnswered) {
+            unknown.push(questionNumber);
+            good |= 1; // Mark as having unanswered questions
+          } else {
+            good |= 4; // Mark as having valid answers
+          }
         }
       });
-      if (good & 2) hide(resultPass), show(resultFail), hide(resultUnfinished);
-      else if (good & 1)
-        hide(resultPass),
-          hide(resultFail),
-          (resultUnfinished.innerText =
-            "⚠ Please finish the unanswered questions ⚠\n(" +
-            unknown.join(", ") +
-            ")"),
-          show(resultUnfinished);
-      else if (good & 4)
-        show(resultPass), hide(resultFail), hide(resultUnfinished);
+
+      // Display results based on validation
+      if (good & 2) {
+        // Has validation failures
+        hide(resultPass);
+        show(resultFail);
+        hide(resultUnfinished);
+      } else if (good & 1) {
+        // Has unanswered questions
+        hide(resultPass);
+        hide(resultFail);
+        resultUnfinished.innerText =
+          "⚠ Please finish the unanswered questions ⚠\n(" +
+          unknown.join(", ") +
+          ")";
+        show(resultUnfinished);
+      } else if (good & 4) {
+        // All questions answered and valid
+        show(resultPass);
+        hide(resultFail);
+        hide(resultUnfinished);
+      } else {
+        // Fallback case
+        hide(resultPass);
+        hide(resultFail);
+        resultUnfinished.innerText = "⚠ Please answer all questions ⚠";
+        show(resultUnfinished);
+      }
     };
     const permalink = document.createElement("button");
     permalink.type = "button";
