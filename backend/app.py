@@ -62,5 +62,44 @@ def init_app(app):
     app.teardown_appcontext(close_db)
     app.cli.add_command(init_db_command)
 
+def get_all_submissions():
+    db = get_db()
+    c = db.cursor() # create cursor obj to execute sql queries 
+    
+    # select all submissions - READ only
+    c.execute('''SELECT TABLE IF NOT EXISTS submissions (
+        id INTEGER PRIMARY KEY AUTOINCREMENT, 
+        timestamp TEXT NOT NULL,
+        dev_type TEXT NOT NULL,
+        property_address TEXT NOT NULL,
+        answers_json TEXT NOT NULL,
+        reference_no TEXT NOT NULL
+)
+              ''')
+    
+    # select all submissions ordered by newest first
+    c.execute('''SELECT id, timestamp, dev_type, property_address, answers_json, reference_no 
+              FROM submissions
+              ORDER BY timestamp DESC''')
+    
+    # get all matching rows returned by queries
+    submissions = c.fetchall() 
+    
+    # convert list of tuples from sqlite into a list of dictionaries 
+    result = []
+    
+    for s in submissions: 
+        result.append({
+            # extract using row factory
+            'id': s['id'],
+            'timestamp': s['timestamp'],
+            'dev_type': s['dev_type'],
+            'property_address': s['property_address'],
+            'answers_json': json.loads(s['answers_json']) if s['answers_json'] else {}, # convert answers json string to python lst
+            'reference_no': s['reference_no']
+        })
+    
+    return result
+    
 init_app(app)
 
