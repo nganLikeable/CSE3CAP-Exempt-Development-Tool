@@ -453,6 +453,22 @@ var SEPP = {
         const lotSize = readNumeric(4);
         const dwellingArea = readNumeric(5);
         let maxAllowed;
+    {
+      id: 6,
+      section:
+        "https://legislation.nsw.gov.au/view/html/inforce/current/epi-2008-0572#sec.2.12",
+      sanitised: "Section 2.12 1c of the SEPP (2008)",
+      question:
+        "What is the total floor area of all structures on the lot (m²)?",
+      type: "numeric",
+      minimum: 0,
+      maximum: 100000,
+      errormsg:
+        "The total floor area of all structures exceeds the allowed limit for your lot",
+      check: (id, elem, v) => {
+        const lotSize = readNumeric(4);
+        const dwellingArea = readNumeric(5);
+        let maxAllowed;
 
         if (lotSize > 300) maxAllowed = dwellingArea * 0.15;
         else maxAllowed = 25;
@@ -1678,3 +1694,27 @@ if (selectedForm) {
       document.getElementById(String(id) + "dd").value = value;
   });
 }
+
+// Scroll up button
+// ref: https://www.w3schools.com/howto/howto_js_scroll_to_top.asp
+let myBtn = document.getElementById("scrollUpBtn");
+
+// when user scrolls down 20px from the top of the document, show the button
+window.onscroll = function () {
+  scrollFunction();
+};
+
+function scrollFunction() {
+  if (document.body.scrollTop > 20 || document.documentElement.scrollTop > 20) {
+    myBtn.style.display = "block";
+  } else {
+    myBtn.style.display = "none";
+  }
+}
+
+// when clicked, scroll to the top
+function topFunction() {
+  document.body.scrollTop = 0; // for safari
+  document.documentElement.scrollTop = 0; // for other browsers
+}
+
