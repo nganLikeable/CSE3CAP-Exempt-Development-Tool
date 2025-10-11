@@ -360,7 +360,7 @@ var SEPP = {
 			id: 2,
 			section: "https://legislation.nsw.gov.au/view/html/inforce/current/epi-2008-0572#sec.2.11",
 			sanitised: "Section 2.11 (b) of the SEPP (2008)",
-			question: "Is this a replacement of an existing deck?",
+			question: "What is the height of the deck above ground level?",
 			type: "yes/no",
 			errormsg: "The replacement deck <strong>must not </strong> be higher than <strong>1m</strong> above ground level",
 			check: (id, elem, v) => {
