@@ -970,7 +970,7 @@ var SEPP = {
       errormsg:
         "Carport <strong>must</strong> be located <b>at least 1m behind</b> the building line of any road frontage",
       check: (id, elem, bool) => {
-        if (v === false) show(elem);
+        if (bool === false) show(elem);
         else hide(elem);
         return v === null ? 1 : v === true ? 4 : 2;
       },
