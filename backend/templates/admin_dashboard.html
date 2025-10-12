@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Exemption Check Admin Dashboard</title>
+  </head>
+  <body>
+    <div class="container">
+      <h1>Exemption Check Admin Dashboard</h1>
+
+      <div class="stats">
+        <div class="stat-card">
+          <div class="stat-number">{{ stats.total_submissions }}</div>
+          <div class="stat-label">Total submissions</div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-number">{{ stats.exempt_count }}</div>
+          <div class="stat-label">Exempt</div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-number">{{ stats.not_exempt_count }}</div>
+          <div class="stat-label">Not Exempt</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number">{{ stats.incomplete_count }}</div>
+          <div class="stat-label">Incomplete</div>
+        </div>
+      </div>
+
+      <div class="dev_types">
+        <h2>Development types breakdown</h2>
+
+        {% for dev_type, count in stats.dev_types.items() %}
+        <div class="dev-type-item">
+          <strong>{{ dev_type }}:</strong> {{ count }} submissions
+        </div>
+        {% endfor %}
+      </div>
+
+      <div class="links">
+        <a href="/">Main Form</a>
+        <a href="/logs-viewer">Detailed logs</a>
+        <a href="/logs">JSON API</a>
+      </div>
+    </div>
+  </body>
+</html>

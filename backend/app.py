@@ -65,19 +65,8 @@ def init_app(app):
 def get_all_submissions():
     db = get_db()
     c = db.cursor() # create cursor obj to execute sql queries 
-    
-    # select all submissions - READ only
-    c.execute('''SELECT TABLE IF NOT EXISTS submissions (
-        id INTEGER PRIMARY KEY AUTOINCREMENT, 
-        timestamp TEXT NOT NULL,
-        dev_type TEXT NOT NULL,
-        property_address TEXT NOT NULL,
-        answers_json TEXT NOT NULL,
-        reference_no TEXT NOT NULL
-)
-              ''')
-    
-    # select all submissions ordered by newest first
+        
+    # select all submissions ordered by newest first - READ only
     c.execute('''SELECT id, timestamp, dev_type, property_address, answers_json, reference_no 
               FROM submissions
               ORDER BY timestamp DESC''')
@@ -101,5 +90,35 @@ def get_all_submissions():
     
     return result
     
-init_app(app)
+# Routes
 
+# main route
+@app.route('/')
+def home():
+    return send_from_directory('../frontend', 'index.html')
+
+# admin-dahsboard 
+@app.route('/admin')
+def admin():
+    try: 
+        submissions = get_all_submissions();
+        
+        stats = {
+            'total_submissions': len(submissions),            
+            'exempt_count': len([s for s in submissions if s.get('answers_json', {}).get('exemption_status') == 'exempt']),
+            'not_exempt_count': len([s for s in submissions if s.get('answers_json', {}).get('exemption_status') == 'not_exempt']),
+            'incomplete_count': len([s for s in submissions if s.get('answers_json', {}).get('exemption_status') == 'incomplete']),
+            'dev_types': {}  # will store count by development type
+        }
+        
+        # calculate submissions per dev type
+        for s in submissions:
+            dev_type = staticmethod.get('dev_type', 'Unknown')
+            stats['dev_types'][dev_type] = stats['dev_types'].get(dev_type, 0) + 1 # running count
+        return render_template('admin_dashboard.html', stats=stats)
+    except Exception as e:
+        return f'Error loading dashboard: {str(e)}, 500'
+
+init_app(app)
+if __name__ == '__main__':
+    app.run(debug=True, port=3002)
