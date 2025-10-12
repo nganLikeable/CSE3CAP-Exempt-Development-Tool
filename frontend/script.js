@@ -1574,6 +1574,10 @@ function loadSection(str) {
       // window.scrollTo({top: selectedForm.getBoundingClientRect().top + window.scrollY - offset + 30, behavior: "smooth"});
       let good = 0;
       let unknown = [];
+      // collect all answers for logging
+
+      let allAnswers = {};
+      // let referenceNumbers = []
 
       Object.keys(SEPP[str]).forEach((key) => {
         const question = SEPP[str][key];
@@ -1599,7 +1603,7 @@ function loadSection(str) {
           good |= res;
         } else {
           // For questions without check functions, validate if they're answered
-          let isAnswered = false;
+          let isAnswered = ans !== null;
 
           if (question.type === "yes/no") {
             isAnswered = readBool(question.id) !== null;
@@ -1616,7 +1620,24 @@ function loadSection(str) {
             good |= 4; // Mark as having valid answers
           }
         }
+
+        let ans = null;
+        if (question.type === "yes/no") {
+          ans = readBool(question.id);
+          allAnswers[`q${questionNumber}`] =
+            ans === true ? "yes" : ans === false ? "no" : null;
+        } else if (question.type === "numeric") {
+          ans = readNumeric(question.id);
+          allAnswers[`q${questionNumber}`] = ans;
+        } else if (question.type === "dropdown") {
+          ans = readDropdownPerma(question.id);
+          allAnswers[`q${questionNumber}`] = ans;
+        }
       });
+
+      // determine exemption status
+      let exemptionStatus = "";
+      let shouldLogSubmission = false;
 
       // Display results based on validation
       if (good & 2) {
@@ -1624,6 +1645,8 @@ function loadSection(str) {
         hide(resultPass);
         show(resultFail);
         hide(resultUnfinished);
+        exemptionStatus = "not_exempt";
+        shouldLogSubmission = true;
       } else if (good & 1) {
         // Has unanswered questions
         hide(resultPass);
@@ -1633,17 +1656,50 @@ function loadSection(str) {
           unknown.join(", ") +
           ")";
         show(resultUnfinished);
+        exemptionStatus = "incomplete";
       } else if (good & 4) {
         // All questions answered and valid
         show(resultPass);
         hide(resultFail);
         hide(resultUnfinished);
+        exemptionStatus = "exempt";
+        shouldLogSubmission = true;
       } else {
         // Fallback case
         hide(resultPass);
         hide(resultFail);
         resultUnfinished.innerText = "⚠ Please answer all questions ⚠";
         show(resultUnfinished);
+        exemptionStatus = "incomplete";
+      }
+      // log submission if complete
+      if (shouldLogSubmission) {
+        allAnswers["exemption_status"] = exemptionStatus;
+        allAnswers["completion_time"] = new Date().toISOString();
+        allAnswers["development_type"] = devType;
+
+        const propertyAddress = "To be implemented";
+
+        // debug logging
+        console.log("Data to be logged: ", {
+          developmentType: devType,
+          propertyAddress: propertyAddress,
+          formAnswers: allAnswers,
+          exemptionResult: exemptionStatus,
+        });
+
+        submitLog(
+          devType,
+          propertyAddress,
+          allAnswers,
+          referenceNumbers.join("; ")
+        )
+          .then(() => {
+            console.log("Exemption check logged successfully");
+          })
+          .catch((error) => {
+            console.error("Failed to log exemption check:", error);
+          });
       }
     };
     const permalink = document.createElement("button");
@@ -1735,4 +1791,33 @@ function scrollFunction() {
 function topFunction() {
   document.body.scrollTop = 0; // for safari
   document.documentElement.scrollTop = 0; // for other browsers
+}
+
+async function submitLog(devType, propertyAddress, answers) {
+  try {
+    const payload = {
+      development_type: devType,
+      propertyAddress: propertyAddress,
+      answers: answers,
+    };
+
+    // send POST request to flask
+    const res = await fetch("/submit", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+
+    if (!res.ok) {
+      throw new Error(`HTTP error! status: ${res.status}`);
+    }
+
+    // parse response from Flask
+    const data = await res.json();
+    console.log("Log stored: ", data);
+    return data;
+  } catch (e) {
+    console.error("Failed to submit log: ", e);
+    throw e;
+  }
 }
