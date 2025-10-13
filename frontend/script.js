@@ -1671,12 +1671,7 @@ function loadSection(str) {
           exemptionResult: exemptionStatus,
         });
 
-        submitLog(
-          devType,
-          propertyAddress,
-          allAnswers,
-          referenceNumbers.join("; ")
-        )
+        submitLog(devType, propertyAddress, allAnswers)
           .then(() => {
             console.log("Exemption check logged successfully");
           })

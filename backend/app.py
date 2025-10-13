@@ -114,7 +114,7 @@ def serve_frontend_files(filename):
 @app.route('/admin')
 def admin():
     try: 
-        submissions = get_all_submissions();
+        submissions = get_all_submissions()
         
         stats = {
             'total_submissions': len(submissions),            
