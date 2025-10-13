@@ -11,8 +11,9 @@ app = Flask(
     __name__,
     instance_path=os.path.join(os.path.dirname(__file__), 'instance'),
     template_folder=os.path.join(os.path.dirname(__file__), 'templates'),
-    static_folder=os.path.join(os.path.dirname(__file__), '../frontend')
-)
+    static_folder=os.path.join(os.path.dirname(__file__), '../frontend'))
+
+# backend app instance
 
 # Configure the database
 app.config['DATABASE'] = os.path.join(app.instance_path, 'logs.db')
@@ -130,7 +131,7 @@ def admin():
         return render_template('admin_dashboard.html', stats=stats)
     except Exception as e:
         return f'Error loading dashboard: {str(e)}', 500
-
+    
 # display all logs as json
 @app.route('/logs-viewer')
 def log_viewer():
@@ -150,7 +151,7 @@ def submit_log():
         
         # validate all required fields are not null
         if not development_type or not property_address or not answers:
-            return jsonify({"error: Development type or property address or answers is missing."}), 400
+            return jsonify({"error": "Development type or property address or answers is missing."}), 400
         # jsonify: convert python dicts and objs into json response objs
         
         # convert python obj into json string
@@ -176,5 +177,9 @@ def submit_log():
         })
     except Exception as e:
         return jsonify({'error': f'Failed to store log: {str(e)}'}), 500
-        
+
+
 init_app(app)
+    
+if __name__ == "__main__":
+    app.run(debug=True)
