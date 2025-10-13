@@ -1574,53 +1574,17 @@ function loadSection(str) {
       // window.scrollTo({top: selectedForm.getBoundingClientRect().top + window.scrollY - offset + 30, behavior: "smooth"});
       let good = 0;
       let unknown = [];
-      // collect all answers for logging
-
       let allAnswers = {};
-      // let referenceNumbers = []
+      let referenceNumbers = [];
+
+      // reformat dev type to uppercase
+      const devType = str.charAt(0).toUpperCase() + str.slice(1);
 
       Object.keys(SEPP[str]).forEach((key) => {
         const question = SEPP[str][key];
         const questionNumber = Number(key) + 1;
 
-        // Check if question has a check function
-        if (question.check) {
-          const elem = document.getElementById(String(question.id) + "e");
-          let res;
-
-          if (question.type === "yes/no") {
-            const answer = readBool(question.id);
-            res = question.check(question.id, elem, answer);
-          } else if (question.type === "numeric") {
-            const answer = readNumeric(question.id);
-            res = question.check(question.id, elem, answer);
-          } else if (question.type === "dropdown") {
-            const answer = readDropdownPerma(question.id); // Use readDropdownPerma for better validation
-            res = question.check(question.id, elem, answer);
-          }
-
-          if (res === 1) unknown.push(questionNumber);
-          good |= res;
-        } else {
-          // For questions without check functions, validate if they're answered
-          let isAnswered = ans !== null;
-
-          if (question.type === "yes/no") {
-            isAnswered = readBool(question.id) !== null;
-          } else if (question.type === "numeric") {
-            isAnswered = readNumeric(question.id) !== null;
-          } else if (question.type === "dropdown") {
-            isAnswered = readDropdownPerma(question.id) !== null;
-          }
-
-          if (!isAnswered) {
-            unknown.push(questionNumber);
-            good |= 1; // Mark as having unanswered questions
-          } else {
-            good |= 4; // Mark as having valid answers
-          }
-        }
-
+        // collect ans before using
         let ans = null;
         if (question.type === "yes/no") {
           ans = readBool(question.id);
@@ -1632,6 +1596,25 @@ function loadSection(str) {
         } else if (question.type === "dropdown") {
           ans = readDropdownPerma(question.id);
           allAnswers[`q${questionNumber}`] = ans;
+        }
+
+        // Check if question has a check function
+        if (question.check) {
+          const elem = document.getElementById(String(question.id) + "e");
+          let res = question.check(question.id, elem, ans);
+
+          if (res === 1) unknown.push(questionNumber);
+          good |= res;
+        } else {
+          // For questions without check functions, validate if they're answered
+          let isAnswered = ans !== null;
+
+          if (!isAnswered) {
+            unknown.push(questionNumber);
+            good |= 1; // Mark as having unanswered questions
+          } else {
+            good |= 4; // Mark as having valid answers
+          }
         }
       });
 
@@ -1732,6 +1715,8 @@ function loadSection(str) {
     resultUnfinished.style.fontWeight = "bold";
     resultUnfinished.style.position = "absolute";
     resultUnfinished.innerText = "⚠ Please finish the unanswered questions ⚠";
+
+    // append elements to DOM
     selectedForm.appendChild(notes);
     selectedForm.appendChild(check);
     selectedForm.appendChild(permalink);
@@ -1770,34 +1755,11 @@ if (selectedForm) {
   });
 }
 
-// Scroll up button
-// ref: https://www.w3schools.com/howto/howto_js_scroll_to_top.asp
-let myBtn = document.getElementById("scrollUpBtn");
-
-// when user scrolls down 20px from the top of the document, show the button
-window.onscroll = function () {
-  scrollFunction();
-};
-
-function scrollFunction() {
-  if (document.body.scrollTop > 20 || document.documentElement.scrollTop > 20) {
-    myBtn.style.display = "block";
-  } else {
-    myBtn.style.display = "none";
-  }
-}
-
-// when clicked, scroll to the top
-function topFunction() {
-  document.body.scrollTop = 0; // for safari
-  document.documentElement.scrollTop = 0; // for other browsers
-}
-
 async function submitLog(devType, propertyAddress, answers) {
   try {
     const payload = {
       development_type: devType,
-      propertyAddress: propertyAddress,
+      property_address: propertyAddress,
       answers: answers,
     };
 
@@ -1820,4 +1782,27 @@ async function submitLog(devType, propertyAddress, answers) {
     console.error("Failed to submit log: ", e);
     throw e;
   }
+}
+
+// Scroll up button
+// ref: https://www.w3schools.com/howto/howto_js_scroll_to_top.asp
+let myBtn = document.getElementById("scrollUpBtn");
+
+// when user scrolls down 20px from the top of the document, show the button
+window.onscroll = function () {
+  scrollFunction();
+};
+
+function scrollFunction() {
+  if (document.body.scrollTop > 20 || document.documentElement.scrollTop > 20) {
+    myBtn.style.display = "block";
+  } else {
+    myBtn.style.display = "none";
+  }
+}
+
+// when clicked, scroll to the top
+function topFunction() {
+  document.body.scrollTop = 0; // for safari
+  document.documentElement.scrollTop = 0; // for other browsers
 }

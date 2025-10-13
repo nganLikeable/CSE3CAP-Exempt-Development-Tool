@@ -7,7 +7,12 @@ import click
 import os 
 
 # initialize a flask instance 
-app = Flask(__name__, instance_path=os.path.join(os.path.dirname(__file__), 'instance'))
+app = Flask(
+    __name__,
+    instance_path=os.path.join(os.path.dirname(__file__), 'instance'),
+    template_folder=os.path.join(os.path.dirname(__file__), 'templates'),
+    static_folder=os.path.join(os.path.dirname(__file__), '../frontend')
+)
 
 # Configure the database
 app.config['DATABASE'] = os.path.join(app.instance_path, 'logs.db')
@@ -67,7 +72,7 @@ def get_all_submissions():
     c = db.cursor() # create cursor obj to execute sql queries 
         
     # select all submissions ordered by newest first - READ only
-    c.execute('''SELECT id, timestamp, dev_type, property_address, answers_json, reference_no 
+    c.execute('''SELECT id, timestamp, development_type, property_address, answers_json 
               FROM submissions
               ORDER BY timestamp DESC''')
     
@@ -82,10 +87,9 @@ def get_all_submissions():
             # extract using row factory
             'id': s['id'],
             'timestamp': s['timestamp'],
-            'dev_type': s['dev_type'],
+            'development_type': s['development_type'],
             'property_address': s['property_address'],
             'answers_json': json.loads(s['answers_json']) if s['answers_json'] else {}, # convert answers json string to python lst
-            'reference_no': s['reference_no']
         })
     
     return result
@@ -95,8 +99,16 @@ def get_all_submissions():
 # main route
 @app.route('/')
 def home():
-    return send_from_directory('../frontend', 'index.html')
+    return send_from_directory(app.static_folder, 'index.html')
 
+# serve frontend static files 
+@app.route('/<path:filename>')
+def serve_frontend_files(filename):
+    try:
+        return send_from_directory(app.static_folder, filename)
+    except FileNotFoundError:
+        return "File not found", 404
+    
 # admin-dahsboard 
 @app.route('/admin')
 def admin():
@@ -113,12 +125,56 @@ def admin():
         
         # calculate submissions per dev type
         for s in submissions:
-            dev_type = staticmethod.get('dev_type', 'Unknown')
+            dev_type = s.get('development_type', 'Unknown')
             stats['dev_types'][dev_type] = stats['dev_types'].get(dev_type, 0) + 1 # running count
         return render_template('admin_dashboard.html', stats=stats)
     except Exception as e:
-        return f'Error loading dashboard: {str(e)}, 500'
+        return f'Error loading dashboard: {str(e)}', 500
 
+# display all logs as json
+@app.route('/logs-viewer')
+def log_viewer():
+    return render_template('logs.html')
+
+# api endpoint to receive and store form submissions
+@app.route('/submit', methods=['POST'])
+def submit_log():
+    try:
+        # only accept json data 
+        data = request.get_json()
+        # extract info 
+        development_type = data.get('development_type', '')
+        property_address = data.get('property_address', '')
+        answers = data.get('answers', {})
+        submission_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        
+        # validate all required fields are not null
+        if not development_type or not property_address or not answers:
+            return jsonify({"error: Development type or property address or answers is missing."}), 400
+        # jsonify: convert python dicts and objs into json response objs
+        
+        # convert python obj into json string
+        answers_json = json.dumps(answers)
+        
+        # insert new submission into db
+        # conn = sqlite3.connect('/instance/logs.db')
+        db = get_db()
+        c = db.cursor() 
+        
+        c.execute('''
+            INSERT INTO submissions (development_type, property_address, answers_json, timestamp ) VALUES (?, ?, ?, ?)''', (development_type, property_address, answers_json, submission_time))
+        # use ? as parameters placeholders to bind data to query => avoid SQL injection
+        
+        submission_id = c.lastrowid # generated value for autoincrement id col
+        db.commit()
+        # db.close()
+        
+        return jsonify({
+            'message': 'Log stored successfully',
+            'submission_id': submission_id,
+            'timestamp': submission_time
+        })
+    except Exception as e:
+        return jsonify({'error': f'Failed to store log: {str(e)}'}), 500
+        
 init_app(app)
-if __name__ == '__main__':
-    app.run(debug=True, port=3002)
