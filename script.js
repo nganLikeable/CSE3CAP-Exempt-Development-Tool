@@ -47,7 +47,7 @@ var SEPP = {
       type: "yes/no",
       errormsg:
         "New developments <b>cannot</b> be built on any of the aformentioned sites",
-      check: (id, elem, bool) => {
+      check: (elem, bool) => {
         if (bool === true) show(elem);
         else hide(elem);
         return bool === null ? 1 : bool === false ? 4 : 2;
@@ -63,7 +63,7 @@ var SEPP = {
       errormsg:
         "It <b>cannot</b> replace a pre-existing development higher than one meter above ground level",
       type: "yes/no",
-      check: (id, elem, bool) => {
+      check: (elem, bool) => {
         if (bool === true) show(elem);
         else hide(elem);
         return bool === null ? 1 : bool === false ? 4 : 2;
@@ -89,7 +89,7 @@ var SEPP = {
       maximum: 10000,
       errormsg:
         "The <b>maximum</b> floor area is 50m for zones RU1, RU2, RU3, RU4, RU6, and R5, and 20m for others",
-      check: (id, elem, v) => {
+      check: (elem, v) => {
         var zoned = readDropdown(2) !== "Other";
         if ((zoned === true && v > 50) || (zoned === false && v > 20))
           show(elem);
@@ -113,7 +113,7 @@ var SEPP = {
       type: "numeric",
       minimum: -10,
       maximum: 100,
-      check: (id, elem, v) => {
+      check: (elem, v) => {
         if (v > 3) show(elem);
         else hide(elem);
         return v === null ? 1 : v <= 3 ? 4 : 2;
@@ -130,7 +130,7 @@ var SEPP = {
       maximum: 200,
       errormsg:
         "The <b>minimum</b> distance is 5m for zones RU1, RU2, RU3, RU4, RU6, and R5, and 9m for others",
-      check: (id, elem, v) => {
+      check: (elem, v) => {
         var zoned = readDropdown(2) !== "Other";
         if (
           v !== null &&
@@ -154,7 +154,7 @@ var SEPP = {
       type: "yes/no",
       error:
         "The development <b>must</b> be <b>behind</b> if its not build in one of the following zones: RU1, RU2, RU3, RU4, RU6, and R5",
-      check: (id, elem, bool) => {
+      check: (elem, bool) => {
         var zoned = readDropdown(2) !== "Other";
         if (zoned === false && bool === false) show(elem);
         else hide(elem);
@@ -170,7 +170,7 @@ var SEPP = {
       type: "yes/no",
       errormsg:
         "New developments <b>cannot</b> be shipping containers in specific zones",
-      check: (id, elem, bool) => {
+      check: (elem, bool) => {
         var zoned = readDropdown(2) !== "Other";
         if (zoned === false && bool === true) show(elem);
         else hide(elem);
@@ -187,11 +187,10 @@ var SEPP = {
       type: "yes/no",
       errormsg:
         "Rainwater <b>must</b> be properly disposed of <b>without</b> disruption in specific zones",
-      check: (id, elem, bool) => {
-        var zoned = readDropdown(2) !== "Other";
-        if (zoned === false && bool === false) show(elem);
+      check: (elem, bool) => {
+        if (bool === false) show(elem);
         else hide(elem);
-        return bool === null ? 1 : zoned === true || bool === true ? 4 : 2;
+        return bool === null ? 1 : bool === true ? 4 : 2;
       },
     },
     {
@@ -204,11 +203,10 @@ var SEPP = {
       type: "yes/no",
       errormsg:
         "Metal components <b>must</b> be low reflective and factory pre-coloured in specific zones",
-      check: (id, elem, bool) => {
-        var zoned = readDropdown(2) !== "Other";
-        if (zoned === false && bool === false) show(elem);
+      check: (elem, bool) => {
+        if (bool === false) show(elem);
         else hide(elem);
-        return bool === null ? 1 : zoned === true || bool === true ? 4 : 2;
+        return bool === null ? 1 : bool === true ? 4 : 2;
       },
     },
     {
@@ -229,14 +227,13 @@ var SEPP = {
       type: "yes/no",
       errormsg:
         "Fireprone buildings <b>must</b> be a <b>minimum</b> distance from other developments in specific zones",
-      check: (id, elem, bool) => {
-        var zoned = readDropdown(2) !== "Other";
+      check: (elem, bool) => {
         var fireprone = readBool(10);
-        if (zoned === false && bool === true && fireprone === true) show(elem);
+        if (bool === true && fireprone === true) show(elem);
         else hide(elem);
         return bool === null
           ? 1
-          : zoned === true || bool === false || fireprone === false
+          : bool === false || fireprone === false
           ? 4
           : 2;
       },
@@ -259,14 +256,13 @@ var SEPP = {
       type: "yes/no",
       error:
         "The development <b>cannot</b> be in the front yard of a heritage site if it's in specific zones",
-      check: (id, elem, bool) => {
-        var zoned = readDropdown(2) !== "Other";
+      check: (elem, bool) => {
         var heritage = readBool(12);
-        if (zoned === false && bool === false && heritage === true) show(elem);
+        if (bool === false && heritage === true) show(elem);
         else hide(elem);
         return bool === null || heritage === null
           ? 1
-          : zoned === true || bool === true || heritage === false
+          : bool === true || heritage === false
           ? 4
           : 2;
       },
@@ -281,11 +277,10 @@ var SEPP = {
       type: "yes/no",
       errormsg:
         "The development <b>cannot</b> interfere with neighouring buildings if it's built in specific zones",
-      check: (id, elem, bool) => {
-        var zoned = readDropdown(2) !== "Other";
-        if (zoned === false && bool === true) show(elem);
+      check: (elem, bool) => {
+        if (bool === true) show(elem);
         else hide(elem);
-        return bool === null ? 1 : zoned === true || bool === false ? 4 : 2;
+        return bool === null ? 1 : bool === false ? 4 : 2;
       },
     },
     {
@@ -297,11 +292,10 @@ var SEPP = {
       type: "yes/no",
       errormsg:
         "Class 10 buildings <b>cannot</b> be resided in, in specific zones",
-      check: (id, elem, bool) => {
-        var zoned = readDropdown(2) !== "Other";
-        if (zoned === false && bool === true) show(elem);
+      check: (elem, bool) => {
+        if (bool === true) show(elem);
         else hide(elem);
-        return bool === null ? 1 : zoned === true || bool === false ? 4 : 2;
+        return bool === null ? 1 : bool === false ? 4 : 2;
       },
     },
     {
@@ -316,11 +310,10 @@ var SEPP = {
       maximum: 200,
       errormsg:
         "The development <b>must</b> be <b>at least</b> one meter from any registered easement in specific zones",
-      check: (id, elem, v) => {
-        var zoned = readDropdown(2) !== "Other";
-        if (zoned === false && v < 1) show(elem);
+      check: (elem, v) => {
+        if (v !== null && v < 1) show(elem);
         else hide(elem);
-        return v === null || zoned === true || v >= 1 ? 4 : 2;
+        return v === null || v >= 1 ? 4 : 2;
       },
     },
     {
@@ -333,11 +326,10 @@ var SEPP = {
       type: "yes/no",
       errormsg:
         "Cabanas <b>cannot</b> be connect to water services when in specific zones",
-      check: (id, elem, bool) => {
-        var zoned = readDropdown(2) !== "Other";
-        if (zoned === false && bool === true) show(elem);
+      check: (elem, bool) => {
+        if (bool === true) show(elem);
         else hide(elem);
-        return bool === null || zoned === true || bool === false ? 4 : 2;
+        return bool === null || bool === false ? 4 : 2;
       },
     },
     {
@@ -351,7 +343,8 @@ var SEPP = {
       maximum: 20,
       errormsg:
         "You <b>cannot</b> have <b>more than</b> 2 developments on the same lot",
-      check: (id, elem, v) => {
+      check: (elem, v) => {
+        console.log(elem, v);
         if (v >= 2) show(elem);
         else hide(elem);
         return v === null ? 1 : v < 2 ? 4 : 2;
@@ -370,7 +363,7 @@ var SEPP = {
       type: "yes/no", // no
       errormsg:
         "Structure <strong>cannot</strong> be constructed or installed on a heritage item or on land in a foreshore area",
-      check: (id, elem, bool) => {
+      check: (elem, bool) => {
         if (bool === true) show(elem);
         else hide(elem);
         return bool === null ? 1 : bool === false ? 4 : 2;
@@ -393,7 +386,7 @@ var SEPP = {
       type: "numeric",
       errormsg:
         "The replacement deck <strong>must not </strong> be higher than <strong>1m</strong> above ground level",
-      check: (id, elem, v) => {
+      check: (elem, v) => {
         var replacementDeck = readBool(1);
         if (replacementDeck === true && v > 1) show(elem);
         else hide(elem);
@@ -409,7 +402,7 @@ var SEPP = {
       type: "yes/no", // no
       errormsg:
         "The development <strong>must not</strong> have an area of less than 25m²",
-      check: (id, elem, bool) => {
+      check: (elem, bool) => {
         if (bool === true) show(elem);
         else hide(elem);
         return bool === null ? 1 : bool === false ? 4 : 2;
@@ -448,7 +441,7 @@ var SEPP = {
       maximum: 100000,
       errormsg:
         "The total floor area of all structures exceeds the allowed limit for your lot",
-      check: (id, elem, v) => {
+      check: (elem, v) => {
         const lotSize = readNumeric(4);
         const dwellingArea = readNumeric(5);
         let maxAllowed;
@@ -472,7 +465,7 @@ var SEPP = {
       type: "yes/no",
       errormsg:
         "The development <strong>must not</strong> have an an enclosing wall of more than 1.4m",
-      check: (id, elem, bool) => {
+      check: (elem, bool) => {
         if (bool === true) {
           show(elem);
         } else {
@@ -493,7 +486,7 @@ var SEPP = {
     //   maximum: 10,
     //   errormsg:
     //     "The development <strong>must not</strong> have an an enclosing wall of more than 1.4m",
-    //   check: (id, elem, v) => {
+    //   check: (elem, v) => {
     //     var hasEnclosingWall = readBool(7);
     //     if (hasEnclosingWall === true && v > 1.4) show(elem);
     //     else hide(elem);
@@ -525,7 +518,7 @@ var SEPP = {
       maximum: 1000,
       errormsg:
         "If carried out in connection with farm premises, it <strong>must be</strong> more than 50m from a road",
-      check: (id, elem, v) => {
+      check: (elem, v) => {
         var hasFarm = readBool(8);
         if (hasFarm && v <= 50) show(elem);
         else hide(elem);
@@ -546,7 +539,7 @@ var SEPP = {
       type: "yes/no", // yes
       errormsg:
         "If not related to farm premises, it <strong>must be</strong> located behind the building line of a road frontage",
-      check: (id, elem, bool) => {
+      check: (elem, bool) => {
         var hasFarm = readBool(8);
         if (!hasFarm && bool === false) show(elem);
         else hide(elem);
@@ -578,7 +571,7 @@ var SEPP = {
       maximum: 10000,
       errormsg:
         "Distance from lot boundary <strong>must be 5m</strong> for RU1, RU2, RU3, RU4, R6 or R5 zones, <strong>or 90cm</strong> for other zones",
-      check: (id, elem, v) => {
+      check: (elem, v) => {
         var zoned = readDropdown(12) !== "Other";
         if ((zoned === true && v < 5) || (zoned === false && v < 0.9))
           show(elem);
@@ -600,7 +593,7 @@ var SEPP = {
       type: "yes/no", // yes
       errormsg:
         "Metal components <strong>must</strong> be low reflective and factory pre-coloured materials",
-      check: (id, elem, bool) => {
+      check: (elem, bool) => {
         var farmBuilding = readBool(8);
         if (farmBuilding === false && bool === false) show(elem);
         else hide(elem);
@@ -622,7 +615,7 @@ var SEPP = {
       maximum: 100,
       errormsg:
         "The development <strong>must</strong> have a floor height not more than 1m above ground level",
-      check: (id, elem, v) => {
+      check: (elem, v) => {
         if (v > 1) show(elem);
         else hide(elem);
         return v === null ? 1 : v <= 1 ? 4 : 2;
@@ -651,7 +644,7 @@ var SEPP = {
       type: "yes/no",
       errormsg:
         "If the development has a roof, the roof <strong>must not</strong> overhang the structure by more than 60cm on each side",
-      check: (id, elem, bool) => {
+      check: (elem, bool) => {
         var hasRoof = readDropdown(16) === "Roofed structure";
         if (hasRoof && bool === true) show(elem);
         else hide(elem);
@@ -672,7 +665,7 @@ var SEPP = {
       type: "yes/no",
       errormsg:
         "If the development has a roof attached to a dwelling, it <strong>must not</strong> extend the roof gutter line of the dwelling",
-      check: (id, elem, bool) => {
+      check: (elem, bool) => {
         var hasRoofDwelling =
           readDropdown(16) === "Roofed structure attached to a dwelling";
         if (hasRoofDwelling && bool === true) show(elem);
@@ -696,7 +689,7 @@ var SEPP = {
       maximum: 100,
       errormsg:
         "The development <strong>must not</strong> be higher than 3m at its highest point above existing ground level",
-      check: (id, elem, v) => {
+      check: (elem, v) => {
         if (v > 3) show(elem);
         else hide(elem);
         return v === null ? 1 : v <= 3 ? 4 : 2;
@@ -720,7 +713,7 @@ var SEPP = {
       type: "yes/no", // yes
       errormsg:
         "The development <strong>must</strong> follow professional engineer's specifications when connected to a fascia",
-      check: (id, elem, bool) => {
+      check: (elem, bool) => {
         var connectedFascia = readBool(19);
         if (connectedFascia && bool === false) show(elem);
         else hide(elem);
@@ -741,7 +734,7 @@ var SEPP = {
       type: "yes/no", // yes
       errormsg:
         "Roofwater <strong>must</strong> be directed into the existing stormwater drainage system",
-      check: (id, elem, bool) => {
+      check: (elem, bool) => {
         if (bool === false) show(elem);
         else hide(elem);
         return bool === null ? 1 : bool === true ? 4 : 2;
@@ -757,7 +750,7 @@ var SEPP = {
       type: "yes/no", // no
       errormsg:
         "The development <strong>must not</strong> interfere with the functioning of existing drainage fixtures or flow paths",
-      check: (id, elem, bool) => {
+      check: (elem, bool) => {
         if (bool === false) show(elem);
         else hide(elem);
         return bool === null ? 1 : bool === false ? 4 : 2;
@@ -781,7 +774,7 @@ var SEPP = {
       type: "yes/no",
       errormsg:
         "The development <strong>must</strong> use non-combustible materials when on bushfire-prone land within <strong>5m</strong> from a dwelling",
-      check: (id, elem, bool) => {
+      check: (elem, bool) => {
         var fireprone = readBool(23);
         if (bool === true && fireprone === true) show(elem);
         else hide(elem);
@@ -802,7 +795,7 @@ var SEPP = {
       type: "yes/no", // yes
       errormsg:
         "The development <strong>must</strong> use equivalent or improved quality materials",
-      check: (id, elem, bool) => {
+      check: (elem, bool) => {
         if (bool === false) show(elem);
         else hide(elem);
         return bool === null ? 1 : bool === true ? 4 : 2;
@@ -818,7 +811,7 @@ var SEPP = {
       type: "yes/no", // no
       errormsg:
         "The development <strong>must not</strong> change the measurements of the existing deck",
-      check: (id, elem, bool) => {
+      check: (elem, bool) => {
         if (bool === true) show(elem);
         else hide(elem);
         return bool === null ? 1 : bool === false ? 4 : 2;
@@ -845,7 +838,7 @@ var SEPP = {
       type: "yes/no",
       errormsg:
         "Carports <b>cannot</b> be built on heritage or foreshore areas",
-      check: (id, elem, bool) => {
+      check: (elem, bool) => {
         if (bool === true) show(elem);
         else hide(elem);
         return bool === null ? 1 : bool === false ? 4 : 2;
@@ -860,7 +853,7 @@ var SEPP = {
         "Is the carport a structure for storing motor vehicles with <b>2 or more</b> open sides, and <b>more than</b> one-third of its perimeter open?",
       type: "yes/no",
       errormsg: "Carports <b>must</b> follow the legal definition of one",
-      check: (id, elem, bool) => {
+      check: (elem, bool) => {
         if (bool === false) show(elem);
         else hide(elem);
         return bool === null ? 1 : bool === true ? 4 : 2;
@@ -904,7 +897,7 @@ var SEPP = {
         "Floor area <b>exceeds maximum</b> allowed for your lot and zone",
       minimum: 0,
       maximum: 10000,
-      check: (id, elem, v) => {
+      check: (elem, v) => {
         var zoned = readDropdown(2);
         var rural = readBool(3);
         var size = readNumeric(4);
@@ -938,7 +931,7 @@ var SEPP = {
       maximum: 100,
       errormsg:
         "Carport <strong>must not exceed 3m</strong> in height or the roof gutter line if attached to a single-storey dwelling",
-      check: (id, elem, v) => {
+      check: (elem, v) => {
         if (v > 3) show(elem);
         else hide(elem);
         return v === null ? 1 : v <= 3 ? 4 : 2;
@@ -954,7 +947,7 @@ var SEPP = {
       type: "yes/no",
       errormsg:
         "The carport <strong>must not</strong> exceed the roof gutter if attached to an existing single storey dwelling",
-      check: (id, elem, bool) => {
+      check: (elem, bool) => {
         if (bool === true) show(elem);
         else hide(elem);
         return bool === null ? 1 : bool === false ? 4 : 2;
@@ -970,7 +963,7 @@ var SEPP = {
       type: "yes/no",
       errormsg:
         "Carport <strong>must</strong> be located <b>at least 1m behind</b> the building line of any road frontage",
-      check: (id, elem, bool) => {
+      check: (elem, bool) => {
         if (bool === false) show(elem);
         else hide(elem);
         return bool === null ? 1 : bool === true ? 4 : 2;
@@ -987,7 +980,7 @@ var SEPP = {
       maximum: 200,
       errormsg:
         "Distance from lot boundary <strong>must be 5m</strong> for RU1, RU2, RU3, RU4, R6 or R5 zones, <strong>or 900mm</strong> for other zones",
-      check: (id, elem, v) => {
+      check: (elem, v) => {
         var zoned = readDropdown(2) !== "Other";
         if ((zoned === true && v < 5) || (zoned === false && v < 9)) show(elem);
         else hide(elem);
@@ -1008,7 +1001,7 @@ var SEPP = {
       type: "yes/no",
       errormsg:
         "Metal components <strong>must</strong> be low reflective and factory pre-coloured materials",
-      check: (id, elem, bool) => {
+      check: (elem, bool) => {
         if (bool === false) show(elem);
         else hide(elem);
         return bool === null ? 1 : bool === true ? 4 : 2;
@@ -1024,7 +1017,7 @@ var SEPP = {
       type: "yes/no",
       errormsg:
         "You <strong>cannot</strong> construct a new driveway or gutter crossing without consent from relevant road authority under Roads Act 1993",
-      check: (id, elem, bool) => {
+      check: (elem, bool) => {
         if (bool === true) show(elem);
         else hide(elem);
         return bool === null ? 1 : bool === false ? 4 : 2;
@@ -1040,7 +1033,7 @@ var SEPP = {
       type: "yes/no",
       errormsg:
         "Roofwater <strong>must</strong> be directed into the existing stormwater drainage system",
-      check: (id, elem, bool) => {
+      check: (elem, bool) => {
         if (bool === false) show(elem);
         else hide(elem);
         return bool === null ? 1 : bool === true ? 4 : 2;
@@ -1056,7 +1049,7 @@ var SEPP = {
       type: "yes/no",
       errormsg:
         "Carport <strong>must</strong> follow professional engineer's specifications when connected to a fascia",
-      check: (id, elem, bool) => {
+      check: (elem, bool) => {
         if (bool === false) show(elem);
         else hide(elem);
         return bool === null ? 1 : bool === true ? 4 : 2;
@@ -1072,7 +1065,7 @@ var SEPP = {
       type: "yes/no",
       errormsg:
         "Carport <strong>must</strong> use non-combustible materials when on bushfire-prone land within 5m from a dwelling",
-      check: (id, elem, bool) => {
+      check: (elem, bool) => {
         if (bool === false) show(elem);
         else hide(elem);
         return bool === null ? 1 : bool === true ? 4 : 2;
@@ -1088,7 +1081,7 @@ var SEPP = {
       type: "yes/no",
       errormsg:
         "Carport installed on or in heritage item or a draft heritage item <strong>must</strong> be located in the rear yard",
-      check: (id, elem, bool) => {
+      check: (elem, bool) => {
         if (bool === false) show(elem);
         else hide(elem);
         return bool === null ? 1 : bool === true ? 4 : 2;
@@ -1104,7 +1097,7 @@ var SEPP = {
       type: "yes/no",
       errormsg:
         "Carport <strong>must not</strong> reduce vehicular access to, parking, or loading/unloading on the lot",
-      check: (id, elem, bool) => {
+      check: (elem, bool) => {
         if (bool === true) show(elem);
         else hide(elem);
         return bool === null ? 1 : bool === false ? 4 : 2;
@@ -1122,7 +1115,7 @@ var SEPP = {
       maximum: 200,
       errormsg:
         "The roof <strong>must be at least 5m</strong> from each lot boundary",
-      check: (id, elem, v) => {
+      check: (elem, v) => {
         if (v < 5) show(elem);
         else hide(elem);
         return v === null ? 1 : v >= 5 ? 4 : 2;
@@ -1148,7 +1141,7 @@ var SEPP = {
       minimum: 0,
       maximum: 100,
       errormsg: "",
-      check: (id, elem, v) => {
+      check: (elem, v) => {
         var tenants = readNumeric(18);
         if ((tenants === null && v > 1) || (tenants !== null && v > tenants))
           show(elem);
@@ -1172,7 +1165,7 @@ var SEPP = {
       type: "yes/no",
       errormsg:
         "Retaining walls on heritage/draft heritage/off-shore or environmentally sensitive areas are not exempt",
-      check: (id, elem, v) => {
+      check: (elem, v) => {
         if (v === true) show(elem);
         else hide(elem);
         return v === null ? 1 : v === true ? 2 : 4;
@@ -1189,7 +1182,7 @@ var SEPP = {
       minimum: 0,
       maximum: 100,
       errormsg: "Cut or fill cannot exceed 6m",
-      check: (id, elem, v) => {
+      check: (elem, v) => {
         if (v > 6) show(elem);
         else hide(elem);
         return v === null ? 1 : v <= 6 ? 4 : 2;
@@ -1205,7 +1198,7 @@ var SEPP = {
       minimum: 0,
       maximum: 10000,
       errormsg: "Distance from the lot boundary must be at least 1m",
-      check: (id, elem, v) => {
+      check: (elem, v) => {
         if (v < 1) show(elem);
         else hide(elem);
         return v === null ? 1 : v >= 1 ? 4 : 2;
@@ -1229,7 +1222,7 @@ var SEPP = {
       type: "yes/no",
       errormsg:
         "Developments built on a heritage conservation area need to be built in the rear yard",
-      check: (id, elem, bool) => {
+      check: (elem, bool) => {
         var conservation = readBool(3);
         if (conservation === true && bool === false) show(elem);
         else hide(elem);
@@ -1250,7 +1243,7 @@ var SEPP = {
       minimum: 0,
       maximum: 10000,
       errormsg: "Must be at least 40m from a natural waterbody",
-      check: (id, elem, v) => {
+      check: (elem, v) => {
         if (v < 40) show(elem);
         else hide(elem);
         return v === null ? 1 : v >= 40 ? 4 : 2;
@@ -1266,7 +1259,7 @@ var SEPP = {
       type: "yes/no",
       errormsg:
         "Water must not be redirected and sediment must not impact adjoining property",
-      check: (id, elem, bool) => {
+      check: (elem, bool) => {
         if (bool === true) show(elem);
         else hide(elem);
         return bool === null ? 1 : bool === false ? 4 : 2;
@@ -1293,7 +1286,7 @@ var SEPP = {
       maximum: 100,
       errormsg:
         "Retaining wall or structural support developments cannot be taller than 6m",
-      check: (id, elem, v) => {
+      check: (elem, v) => {
         var wall = readBool(7);
         if (wall === true && v > 6) show(elem);
         else hide(elem);
@@ -1314,7 +1307,7 @@ var SEPP = {
       type: "yes/no",
       errormsg:
         "Retaining wall or structural support developments cannot be within 2 meters of other developments of this type",
-      check: (id, elem, bool) => {
+      check: (elem, bool) => {
         var wall = readBool(7);
         if (wall === true && bool === false) show(elem);
         else hide(elem);
@@ -1335,7 +1328,7 @@ var SEPP = {
       type: "yes/no",
       errormsg:
         "Retaining wall or structural support developments must be at least 1 meter from easements, sewer mains, and water mains",
-      check: (id, elem, bool) => {
+      check: (elem, bool) => {
         var wall = readBool(7);
         if (wall === true && bool === false) show(elem);
         else hide(elem);
@@ -1356,7 +1349,7 @@ var SEPP = {
       type: "yes/no",
       errormsg:
         "Retaining wall or structural support developments must be properly connected to existing drainage systems",
-      check: (id, elem, bool) => {
+      check: (elem, bool) => {
         var wall = readBool(7);
         if (wall === true && bool === false) show(elem);
         else hide(elem);
@@ -1376,7 +1369,7 @@ var SEPP = {
         "If the fill is more than 15cm deep, does it occupy more than 25% of the area of the lot? (Leave blank if it's not a fill)",
       type: "yes/no",
       errormsg: "Cannot fill more than a quarter of the lot area",
-      check: (id, elem, bool) => {
+      check: (elem, bool) => {
         if (bool === true) show(elem);
         else hide(elem);
         return bool === null || bool === false ? 4 : 2;
@@ -1391,7 +1384,7 @@ var SEPP = {
         'If a fill is imported to the site, are the materials free of building and other demolition waste, and only contain virgin excavated natural material (VENM) as defined in Part 3 of Schedule 1 to the <a href="https://legislation.nsw.gov.au/view/html/inforce/current/act-1997-156">Protection of the Environment Operations Act 1997</a>? (Leave blank if it\'s not a fill)',
       type: "yes/no",
       errormsg: "The fill must use VENM materials",
-      check: (id, elem, bool) => {
+      check: (elem, bool) => {
         if (bool === false) show(elem);
         else hide(elem);
         return bool === null || bool === true ? 4 : 2;
@@ -1406,7 +1399,7 @@ var SEPP = {
         "If the land is in a rural or conservation zone, is it a fill of more than 100 cubic metres on each lot? (Leave blank if it's not applicable)",
       type: "yes/no",
       errormsg: "The fill cannot modify more than 100 cubic metres of land",
-      check: (id, elem, bool) => {
+      check: (elem, bool) => {
         if (bool === true) show(elem);
         else hide(elem);
         return bool === null || bool === false ? 4 : 2;
@@ -1586,13 +1579,13 @@ function loadSection(str) {
 
           if (question.type === "yes/no") {
             const answer = readBool(question.id);
-            res = question.check(question.id, elem, answer);
+            res = question.check(elem, answer);
           } else if (question.type === "numeric") {
             const answer = readNumeric(question.id);
-            res = question.check(question.id, elem, answer);
+            res = question.check(elem, answer);
           } else if (question.type === "dropdown") {
             const answer = readDropdownPerma(question.id); // Use readDropdownPerma for better validation
-            res = question.check(question.id, elem, answer);
+            res = question.check(elem, answer);
           }
 
           if (res === 1) unknown.push(questionNumber);
