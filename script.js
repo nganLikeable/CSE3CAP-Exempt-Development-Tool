@@ -1,11 +1,10 @@
 function show(elem) {
   elem.style.display = "block";
   requestAnimationFrame(() => {
-    elem.style.opacity = 1;
+    requestAnimationFrame(() => {
+      elem.style.opacity = 1;
+    });
   });
-  setTimeout(() => {
-    elem.style.display = "block";
-  }, 500);
 }
 
 function hide(elem) {
@@ -1544,6 +1543,7 @@ function loadSection(str) {
     const title = document.createElement("h2");
     title.textContent = selectedForm.getAttribute("name");
     title.style.textAlign = "center";
+    title.style.color = "var(--text-color)";
     selectedForm.appendChild(title);
     if (SEPP[str])
       for (
@@ -1661,6 +1661,7 @@ function loadSection(str) {
     resultPass.style.transform = "translate(-50%, 0)";
     resultPass.style.fontWeight = "bold";
     resultPass.style.position = "absolute";
+    resultPass.style.color = "var(--text-color)";
     resultPass.innerText = "✔ Your development is exempt ✔";
     const resultFail = document.createElement("p");
     resultFail.style.marginTop = "15px";
@@ -1668,6 +1669,7 @@ function loadSection(str) {
     resultFail.style.transform = "translate(-50%, 0)";
     resultFail.style.fontWeight = "bold";
     resultFail.style.position = "absolute";
+    resultFail.style.color = "var(--text-color)";
     resultFail.innerText = "❌ Your development isn't exempt ❌";
     const resultUnfinished = document.createElement("p");
     resultUnfinished.style.marginTop = "15px";
@@ -1675,6 +1677,7 @@ function loadSection(str) {
     resultUnfinished.style.transform = "translate(-50%, 0)";
     resultUnfinished.style.fontWeight = "bold";
     resultUnfinished.style.position = "absolute";
+    resultUnfinished.style.color = "var(--text-color)";
     resultUnfinished.innerText = "⚠ Please finish the unanswered questions ⚠";
     selectedForm.appendChild(notes);
     selectedForm.appendChild(check);
