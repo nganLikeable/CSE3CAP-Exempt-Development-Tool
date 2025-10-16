@@ -1619,32 +1619,31 @@ function loadSection(str) {
       });
 
       // Display results based on validation
-      if (good & 2) {
-        // Has validation failures
-        hide(resultPass);
-        show(resultFail);
-        hide(resultUnfinished);
-      } else if (good & 1) {
-        // Has unanswered questions
-        hide(resultPass);
-        hide(resultFail);
-        resultUnfinished.innerText =
-          "⚠ Please finish the unanswered questions ⚠\n(" +
-          unknown.join(", ") +
-          ")";
-        show(resultUnfinished);
-      } else if (good & 4) {
-        // All questions answered and valid
-        show(resultPass);
-        hide(resultFail);
-        hide(resultUnfinished);
-      } else {
-        // Fallback case
-        hide(resultPass);
-        hide(resultFail);
-        resultUnfinished.innerText = "⚠ Please answer all questions ⚠";
-        show(resultUnfinished);
-      }
+    if (good & 2) {
+    hide(resultPass); show(resultFail); hide(resultUnfinished);
+    if (window.togglePdf) window.togglePdf(false);
+    } 
+    
+    else if (good & 1) {
+    hide(resultPass); hide(resultFail);
+    resultUnfinished.innerText =
+    "⚠ Please finish the unanswered questions ⚠\n(" + unknown.join(", ") + ")";
+    show(resultUnfinished);
+    if (window.togglePdf) window.togglePdf(false);
+    }
+
+    else if (good & 4) {
+    show(resultPass); hide(resultFail); hide(resultUnfinished);
+    if (window.togglePdf) window.togglePdf(true);
+    } 
+    
+    else {
+    hide(resultPass); hide(resultFail);
+    resultUnfinished.innerText = "⚠ Please answer all questions ⚠";
+    show(resultUnfinished);
+    if (window.togglePdf) window.togglePdf(false);
+    }
+    
     };
     const permalink = document.createElement("button");
     permalink.type = "button";
