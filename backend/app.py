@@ -13,8 +13,6 @@ app = Flask(
     template_folder=os.path.join(os.path.dirname(__file__), 'templates'),
     static_folder=os.path.join(os.path.dirname(__file__), '../frontend'))
 
-# backend app instance
-
 # Configure the database
 app.config['DATABASE'] = os.path.join(app.instance_path, 'logs.db')
 
@@ -136,6 +134,83 @@ def admin():
 @app.route('/logs-viewer')
 def log_viewer():
     return render_template('logs.html')
+
+# api endpoint to get all logs
+@app.route('/logs')
+def get_logs():
+    try:
+        db = get_db()
+        c = db.cursor()
+        
+        c.execute('''SELECT id, timestamp, development_type, property_address, answers_json 
+                  FROM submissions
+                  ORDER BY timestamp DESC''')
+        
+        submissions = c.fetchall()
+        
+        result = []
+        for s in submissions:
+            result.append({
+                'id': s['id'],
+                'timestamp': s['timestamp'],
+                'dev_type': s['development_type'],
+                'property_address': s['property_address'],
+                'answers_json': json.loads(s['answers_json']) if s['answers_json'] else {},
+                'reference_numbers': None  # Add this field as expected by frontend
+            })
+        
+        return jsonify({
+            'submissions': result,
+            'total_count': len(result)
+        })
+    except Exception as e:
+        return jsonify({'error': f'Failed to fetch logs: {str(e)}'}), 500
+
+# api endpoint to search logs
+@app.route('/logs/search')
+def search_logs():
+    try:
+        dev_type = request.args.get('dev_type', '').strip()
+        address = request.args.get('address', '').strip()
+        
+        db = get_db()
+        c = db.cursor()
+        
+        # dynamic query based on search parameters
+        query = '''SELECT id, timestamp, development_type, property_address, answers_json 
+                  FROM submissions WHERE 1=1'''
+        params = []
+        
+        if dev_type:
+            query += ' AND LOWER(development_type) LIKE LOWER(?)'
+            params.append(f'%{dev_type}%')
+            
+        if address:
+            query += ' AND LOWER(property_address) LIKE LOWER(?)'
+            params.append(f'%{address}%')
+            
+        query += ' ORDER BY timestamp DESC'
+        
+        c.execute(query, params)
+        submissions = c.fetchall()
+        
+        result = []
+        for s in submissions:
+            result.append({
+                'id': s['id'],
+                'timestamp': s['timestamp'],
+                'dev_type': s['development_type'],
+                'property_address': s['property_address'],
+                'answers_json': json.loads(s['answers_json']) if s['answers_json'] else {},
+                'reference_numbers': None  
+            })
+        
+        return jsonify({
+            'submissions': result,
+            'total_count': len(result)
+        })
+    except Exception as e:
+        return jsonify({'error': f'Failed to search logs: {str(e)}'}), 500
 
 # api endpoint to receive and store form submissions
 @app.route('/submit', methods=['POST'])
