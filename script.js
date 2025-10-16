@@ -39,6 +39,24 @@ function readDropdownPerma(id) {
 var SEPP = {
   shed: [
     {
+      id: -1,
+      section: "General Information",
+      sanitised: "User Input",
+      question: "What is the site address of your property?",
+      type: "text",
+      optional: false, 
+      errormsg: "Please enter your site address to continue.",
+      check: (id, elem, value) => {
+        if (!value || value.trim() === "") {
+          show(elem);
+          return 1; 
+        } else {
+          hide(elem);
+          return 4; 
+        }
+      },
+    },
+    {
       id: 0,
       section:
         "https://legislation.nsw.gov.au/view/html/inforce/current/epi-2008-0572#sec.2.17",
@@ -360,6 +378,24 @@ var SEPP = {
     },
   ],
   patio: [
+    {
+      id: -1,
+      section: "General Information",
+      sanitised: "User Input",
+      question: "What is the site address of your property?",
+      type: "text",
+      optional: false, 
+      errormsg: "Please enter your site address to continue.",
+      check: (id, elem, value) => {
+        if (!value || value.trim() === "") {
+          show(elem);
+          return 1; 
+        } else {
+          hide(elem);
+          return 4; 
+        }
+      },
+    },
     {
       id: 0,
       section:
@@ -837,6 +873,24 @@ var SEPP = {
   ],
   carport: [
     {
+      id: -1,
+      section: "General Information",
+      sanitised: "User Input",
+      question: "What is the site address of your property?",
+      type: "text",
+      optional: false, 
+      errormsg: "Please enter your site address to continue.",
+      check: (id, elem, value) => {
+        if (!value || value.trim() === "") {
+          show(elem);
+          return 1; 
+        } else {
+          hide(elem);
+          return 4; 
+        }
+      },
+    },
+    {
       id: 0,
       section:
         "https://legislation.nsw.gov.au/view/html/inforce/current/epi-2008-0572#sec.2.19",
@@ -1164,6 +1218,24 @@ var SEPP = {
   ],
   retaining_wall: [
     {
+      id: -1,
+      section: "General Information",
+      sanitised: "User Input",
+      question: "What is the site address of your property?",
+      type: "text",
+      optional: false, 
+      errormsg: "Please enter your site address to continue.",
+      check: (id, elem, value) => {
+        if (!value || value.trim() === "") {
+          show(elem);
+          return 1; 
+        } else {
+          hide(elem);
+          return 4; 
+        }
+      },
+    },
+    {
       id: 0,
       section:
         "https://legislation.nsw.gov.au/view/html/inforce/current/epi-2008-0572#sec.2.29",
@@ -1442,6 +1514,13 @@ function addQuestion(rule, num) {
       options += `<select id="${String(rule.id) + "dd"}">
 				${rule.options.map((x) => `<option value="${x}">${x}</option>`)}
 			</select>`;
+      break;
+    case "text":
+      options += `<input type="text"
+                          id="${String(rule.id) + "text"}"
+                          placeholder="${rule.placeholder || "Enter address"}"
+                          autocomplete="street-address"
+                          style="width:100%;padding:8px 10px;border:1px solid #cbd5e1;border-radius:6px"><br>`;
       break;
   }
   elem.classList.add("question");
