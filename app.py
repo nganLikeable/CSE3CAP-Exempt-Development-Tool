@@ -11,7 +11,7 @@ app = Flask(
     __name__,
     instance_path=os.path.join(os.path.dirname(__file__), 'instance'),
     template_folder=os.path.join(os.path.dirname(__file__), 'templates'),
-    static_folder=os.path.join(os.path.dirname(__file__), '../frontend'))
+    static_folder=os.path.join(os.path.dirname(__file__), 'static'))
 
 # Configure the database
 app.config['DATABASE'] = os.path.join(app.instance_path, 'logs.db')
@@ -98,15 +98,15 @@ def get_all_submissions():
 # main route
 @app.route('/')
 def home():
-    return send_from_directory(app.static_folder, 'index.html')
+    return send_from_directory(app.template_folder, 'index.html')
 
-# serve frontend static files 
-@app.route('/<path:filename>')
-def serve_frontend_files(filename):
-    try:
-        return send_from_directory(app.static_folder, filename)
-    except FileNotFoundError:
-        return "File not found", 404
+# # serve frontend static files 
+# @app.route('/<path:filename>')
+# def serve_frontend_files(filename):
+#     try:
+#         return send_from_directory(app.static_folder, filename)
+#     except FileNotFoundError:
+#         return "File not found", 404
     
 # admin-dahsboard 
 @app.route('/admin')
@@ -126,15 +126,20 @@ def admin():
         for s in submissions:
             dev_type = s.get('development_type', 'Unknown')
             stats['dev_types'][dev_type] = stats['dev_types'].get(dev_type, 0) + 1 # running count
-        return render_template('admin_dashboard.html', stats=stats)
+        return render_template('/admin/admin_dashboard.html', stats=stats)
     except Exception as e:
         return f'Error loading dashboard: {str(e)}', 500
     
 # display all logs as json
 @app.route('/logs-viewer')
 def log_viewer():
-    return render_template('logs.html')
+    return render_template('/admin/logs.html')
 
+# render map
+@app.route('/maps')
+def maps():
+    return render_template('maps.html')
+    
 # api endpoint to get all logs
 @app.route('/logs')
 def get_logs():

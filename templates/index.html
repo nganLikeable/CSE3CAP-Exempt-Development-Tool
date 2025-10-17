@@ -737,20 +737,20 @@
 		<section style="margin-left: 5%; margin-right: 5%;">
 
 			<!-- This is where we will be working -->
-			<link rel="stylesheet" href="styles.css">
+			<link rel="stylesheet" href="/static/styles/stylesIndex.css">
 			
 			<a href="index.html#sample-box" class="back" onclick="history.back(); return false;">← Back</a>
             <h1 style="text-align: center; margin-top: 50px;">What type of development?</h1>
 
 			<div style="display: flex;">
 				<h2 class="tile">
-					<img src="shed.png"/>
+					<img src="/static/images/shed.png"/>
 					<a href="#shed"></a>
 					<span>Sheds</span>
 					<span class="subtitle">Cabanas, cubby houses, ferneries, garden sheds, gazebos and greenhouses</span>
 				</h2>
 				<h2 class="tile" style="margin-left: 2%;">
-					<img src="verandah.png"/>
+					<img src="/static/images/verandah.png"/>
 					<a href="#patio"></a>
 					<span>Patios</span>
 					<span class="subtitle"> Balconies, decks, patios, pergolas, terraces and verandahs</span>
@@ -758,12 +758,12 @@
 			</div>
 			<div style="display: flex; margin-top: 1%;">
 				<h2 class="tile">
-					<img src="carport.png"/>
+					<img src="/static/images/carport.png"/>
 					<a href="#carport"></a>
 					<span>Carport</span>
 				</h2>
 				<h2 class="tile" style="margin-left: 2%;">
-					<img src="retaining_wall.png"/>
+					<img src='/static/images/retaining_wall.png'>
 					<a href="#retaining_wall"></a>
 					<span>Retaining Walls</span>
 					<span class="subtitle">Earthworks, retaining walls and structural support</span>
@@ -776,7 +776,7 @@
 
 					<section id="sample-box" style="max-width:1000px; margin:24px auto; padding:0 12px">
 						<div style="text-align:center; margin:32px 0 56px;">
-						<a href="maps.html" id="openMapBtn">Map</a>
+						<a href="/maps" id="openMapBtn">Map</a>
 						</div>
 						<div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:10px">
 							<button type="button" onclick="showSamples('shed')">Shed</button>
@@ -798,7 +798,7 @@
 				<form id="retaining_wall" class="tab-form border p-3 rounded bg-light d-none" name="Retaining Wall Exemption Check" style="text-align: center;"></form>
 			</div>
 			<button class = "scroll-btn" onClick="topFunction()" id="scrollUpBtn" title="Go to top">  <i class="fa-solid fa-arrow-up"></i></button>
-			<script src="script.js"></script>
+			<script src="/static/script/script.js"></script>
 		</section>
 		<!-- Design Body End -->
 		<!-- noindex -->
@@ -1049,7 +1049,7 @@
 				deploymentId: 'b8c69752-63e6-4f5f-b4be-f74e233fe260'
 			});
 		</script>
-		<script src="properties.js"></script>
+		<script src="/static/script/properties.js"></script>
 		<script>
 			function showSamples(type){
 				const list = document.getElementById('samples-list');
@@ -1065,7 +1065,7 @@
 							${p.proposal.width_m?`• ${p.proposal.width_m}×${p.proposal.length_m}×${p.proposal.height_m}m`:''}
 						</div>
 					</div>
-					<a href="property.html?id=${encodeURIComponent(p.id)}" style="display:inline-block;margin-top:8px;
+					<a href="/templates/property.html?id=${encodeURIComponent(p.id)}" style="display:inline-block;margin-top:8px;
                        padding:6px 8px;border:1px solid #ddd;border-radius:8px;text-decoration:none;color:#222">
 					   View details
 					</a>
