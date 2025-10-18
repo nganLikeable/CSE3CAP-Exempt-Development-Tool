@@ -1,11 +1,10 @@
 function show(elem) {
   elem.style.display = "block";
   requestAnimationFrame(() => {
-    elem.style.opacity = 1;
+    requestAnimationFrame(() => {
+      elem.style.opacity = 1;
+    });
   });
-  setTimeout(() => {
-    elem.style.display = "block";
-  }, 500);
 }
 
 function hide(elem) {
@@ -82,7 +81,7 @@ var SEPP = {
       errormsg:
         "It <b>cannot</b> replace a pre-existing development higher than one meter above ground level",
       type: "yes/no",
-      check: (id, elem, bool) => {
+      check: (elem, bool) => {
         if (bool === true) show(elem);
         else hide(elem);
         return bool === null ? 1 : bool === false ? 4 : 2;
@@ -108,7 +107,7 @@ var SEPP = {
       maximum: 10000,
       errormsg:
         "The <b>maximum</b> floor area is 50m for zones RU1, RU2, RU3, RU4, RU6, and R5, and 20m for others",
-      check: (id, elem, v) => {
+      check: (elem, v) => {
         var zoned = readDropdown(2) !== "Other";
         if ((zoned === true && v > 50) || (zoned === false && v > 20))
           show(elem);
@@ -132,7 +131,7 @@ var SEPP = {
       type: "numeric",
       minimum: -10,
       maximum: 100,
-      check: (id, elem, v) => {
+      check: (elem, v) => {
         if (v > 3) show(elem);
         else hide(elem);
         return v === null ? 1 : v <= 3 ? 4 : 2;
@@ -148,18 +147,18 @@ var SEPP = {
       minimum: 0,
       maximum: 200,
       errormsg:
-        "The <b>minimum</b> distance is 5m for zones RU1, RU2, RU3, RU4, RU6, and R5, and 9m for others",
-      check: (id, elem, v) => {
+        "The <b>minimum</b> distance is 5m for zones RU1, RU2, RU3, RU4, RU6, and R5, and 900mm for others",
+      check: (elem, v) => {
         var zoned = readDropdown(2) !== "Other";
         if (
           v !== null &&
-          ((zoned === true && v < 5) || (zoned === false && v < 9))
+          ((zoned === true && v < 5) || (zoned === false && v < 0.9))
         )
           show(elem);
         else hide(elem);
         return v === null
           ? 1
-          : (zoned === true && v >= 5) || (zoned === false && v >= 9)
+          : (zoned === true && v >= 5) || (zoned === false && v >= 0.9)
           ? 4
           : 2;
       },
@@ -173,7 +172,7 @@ var SEPP = {
       type: "yes/no",
       error:
         "The development <b>must</b> be <b>behind</b> if its not build in one of the following zones: RU1, RU2, RU3, RU4, RU6, and R5",
-      check: (id, elem, bool) => {
+      check: (elem, bool) => {
         var zoned = readDropdown(2) !== "Other";
         if (zoned === false && bool === false) show(elem);
         else hide(elem);
@@ -189,7 +188,7 @@ var SEPP = {
       type: "yes/no",
       errormsg:
         "New developments <b>cannot</b> be shipping containers in specific zones",
-      check: (id, elem, bool) => {
+      check: (elem, bool) => {
         var zoned = readDropdown(2) !== "Other";
         if (zoned === false && bool === true) show(elem);
         else hide(elem);
@@ -206,11 +205,10 @@ var SEPP = {
       type: "yes/no",
       errormsg:
         "Rainwater <b>must</b> be properly disposed of <b>without</b> disruption in specific zones",
-      check: (id, elem, bool) => {
-        var zoned = readDropdown(2) !== "Other";
-        if (zoned === false && bool === false) show(elem);
+      check: (elem, bool) => {
+        if (bool === false) show(elem);
         else hide(elem);
-        return bool === null ? 1 : zoned === true || bool === true ? 4 : 2;
+        return bool === null ? 1 : bool === true ? 4 : 2;
       },
     },
     {
@@ -223,11 +221,10 @@ var SEPP = {
       type: "yes/no",
       errormsg:
         "Metal components <b>must</b> be low reflective and factory pre-coloured in specific zones",
-      check: (id, elem, bool) => {
-        var zoned = readDropdown(2) !== "Other";
-        if (zoned === false && bool === false) show(elem);
+      check: (elem, bool) => {
+        if (bool === false) show(elem);
         else hide(elem);
-        return bool === null ? 1 : zoned === true || bool === true ? 4 : 2;
+        return bool === null ? 1 : bool === true ? 4 : 2;
       },
     },
     {
@@ -248,14 +245,13 @@ var SEPP = {
       type: "yes/no",
       errormsg:
         "Fireprone buildings <b>must</b> be a <b>minimum</b> distance from other developments in specific zones",
-      check: (id, elem, bool) => {
-        var zoned = readDropdown(2) !== "Other";
+      check: (elem, bool) => {
         var fireprone = readBool(10);
-        if (zoned === false && bool === true && fireprone === true) show(elem);
+        if (bool === true && fireprone === true) show(elem);
         else hide(elem);
         return bool === null
           ? 1
-          : zoned === true || bool === false || fireprone === false
+          : bool === false || fireprone === false
           ? 4
           : 2;
       },
@@ -278,14 +274,13 @@ var SEPP = {
       type: "yes/no",
       error:
         "The development <b>cannot</b> be in the front yard of a heritage site if it's in specific zones",
-      check: (id, elem, bool) => {
-        var zoned = readDropdown(2) !== "Other";
+      check: (elem, bool) => {
         var heritage = readBool(12);
-        if (zoned === false && bool === false && heritage === true) show(elem);
+        if (bool === false && heritage === true) show(elem);
         else hide(elem);
         return bool === null || heritage === null
           ? 1
-          : zoned === true || bool === true || heritage === false
+          : bool === true || heritage === false
           ? 4
           : 2;
       },
@@ -300,11 +295,10 @@ var SEPP = {
       type: "yes/no",
       errormsg:
         "The development <b>cannot</b> interfere with neighouring buildings if it's built in specific zones",
-      check: (id, elem, bool) => {
-        var zoned = readDropdown(2) !== "Other";
-        if (zoned === false && bool === true) show(elem);
+      check: (elem, bool) => {
+        if (bool === true) show(elem);
         else hide(elem);
-        return bool === null ? 1 : zoned === true || bool === false ? 4 : 2;
+        return bool === null ? 1 : bool === false ? 4 : 2;
       },
     },
     {
@@ -316,11 +310,10 @@ var SEPP = {
       type: "yes/no",
       errormsg:
         "Class 10 buildings <b>cannot</b> be resided in, in specific zones",
-      check: (id, elem, bool) => {
-        var zoned = readDropdown(2) !== "Other";
-        if (zoned === false && bool === true) show(elem);
+      check: (elem, bool) => {
+        if (bool === true) show(elem);
         else hide(elem);
-        return bool === null ? 1 : zoned === true || bool === false ? 4 : 2;
+        return bool === null ? 1 : bool === false ? 4 : 2;
       },
     },
     {
@@ -335,11 +328,10 @@ var SEPP = {
       maximum: 200,
       errormsg:
         "The development <b>must</b> be <b>at least</b> one meter from any registered easement in specific zones",
-      check: (id, elem, v) => {
-        var zoned = readDropdown(2) !== "Other";
-        if (zoned === false && v < 1) show(elem);
+      check: (elem, v) => {
+        if (v !== null && v < 1) show(elem);
         else hide(elem);
-        return v === null || zoned === true || v >= 1 ? 4 : 2;
+        return v === null || v >= 1 ? 4 : 2;
       },
     },
     {
@@ -352,11 +344,10 @@ var SEPP = {
       type: "yes/no",
       errormsg:
         "Cabanas <b>cannot</b> be connect to water services when in specific zones",
-      check: (id, elem, bool) => {
-        var zoned = readDropdown(2) !== "Other";
-        if (zoned === false && bool === true) show(elem);
+      check: (elem, bool) => {
+        if (bool === true) show(elem);
         else hide(elem);
-        return bool === null || zoned === true || bool === false ? 4 : 2;
+        return bool === null || bool === false ? 4 : 2;
       },
     },
     {
@@ -370,7 +361,7 @@ var SEPP = {
       maximum: 20,
       errormsg:
         "You <b>cannot</b> have <b>more than</b> 2 developments on the same lot",
-      check: (id, elem, v) => {
+      check: (elem, v) => {
         if (v >= 2) show(elem);
         else hide(elem);
         return v === null ? 1 : v < 2 ? 4 : 2;
@@ -1036,7 +1027,7 @@ var SEPP = {
       section:
         "https://legislation.nsw.gov.au/view/html/inforce/current/epi-2008-0572#sec.2.20",
       sanitised: "Section 2.20 1e of the SEPP (2008)",
-      question: "What is the distance from the lot boundary?",
+      question: "What is the distance from the lot boundary (m)?",
       type: "numeric",
       minimum: 0,
       maximum: 200,
@@ -1044,11 +1035,11 @@ var SEPP = {
         "Distance from lot boundary <strong>must be 5m</strong> for RU1, RU2, RU3, RU4, R6 or R5 zones, <strong>or 900mm</strong> for other zones",
       check: (id, elem, v) => {
         var zoned = readDropdown(2) !== "Other";
-        if ((zoned === true && v < 5) || (zoned === false && v < 9)) show(elem);
+        if ((zoned === true && v < 5) || (zoned === false && v < 0.9)) show(elem);
         else hide(elem);
         return v === null || zoned === null
           ? 1
-          : (zoned === true && v >= 5) || (zoned === false && v >= 9)
+          : (zoned === true && v >= 5) || (zoned === false && v >= 0.9)
           ? 4
           : 2;
       },
@@ -1701,6 +1692,10 @@ function loadSection(str) {
     form.classList.add("d-none");
   });
 
+  document.getElementById("shed").replaceChildren();
+  document.getElementById("patio").replaceChildren();
+  document.getElementById("carport").replaceChildren();
+  document.getElementById("retaining_wall").replaceChildren();
   selectedForm = document.getElementById(str);
   if (selectedForm) {
     while (selectedForm.firstChild)
