@@ -34,6 +34,10 @@ function readDropdownPerma(id) {
   const selected = document.getElementById(String(id) + "dd");
   return selected && selected.selectedIndex !== 0 ? selected.value : null;
 }
+function readText(id) {
+  const el = document.getElementById(String(id) + "text");
+  return el ? el.value : null;
+}
 
 var SEPP = {
   shed: [
@@ -1675,6 +1679,10 @@ function getLink(str) {
       res = readNumeric(SEPP[str][key].id);
     else if (SEPP[str][key].type === "dropdown")
       res = readDropdownPerma(SEPP[str][key].id);
+    else if (SEPP[str][key].type === "text") {
+      const v = readText(SEPP[str][key].id);
+      res = v && v.trim() !== "" ? v : null;
+    }
     if (res !== null)
       urlParams.append(
         String(SEPP[str][key].id + 1).trim(),
@@ -1740,42 +1748,51 @@ function loadSection(str) {
         const questionNumber = Number(key) + 1;
 
         // Check if question has a check function
-        if (question.check) {
-          const elem = document.getElementById(String(question.id) + "e");
-          let res;
+       if (question.check) {
+  const elem = document.getElementById(String(question.id) + "e");
+  let res;
 
-          if (question.type === "yes/no") {
-            const answer = readBool(question.id);
-            res = question.check(question.id, elem, answer);
-          } else if (question.type === "numeric") {
-            const answer = readNumeric(question.id);
-            res = question.check(question.id, elem, answer);
-          } else if (question.type === "dropdown") {
-            const answer = readDropdownPerma(question.id); // Use readDropdownPerma for better validation
-            res = question.check(question.id, elem, answer);
-          }
+    if (question.type === "yes/no") {
+      res = question.check(question.id, elem, readBool(question.id));
+    }
+      else if (question.type === "numeric") {
+        res = question.check(question.id, elem, readNumeric(question.id));
+    } 
+      else if (question.type === "dropdown") {
+        res = question.check(question.id, elem, readDropdownPerma(question.id));
+    } 
+      else if (question.type === "text") {
+        res = question.check(question.id, elem, readText(question.id));
+    }
 
-          if (res === 1) unknown.push(questionNumber);
-          good |= res;
-        } else {
-          // For questions without check functions, validate if they're answered
-          let isAnswered = false;
+      if (res === 1) unknown.push(questionNumber);
+      good |= res;
+    }
+   else {
+    let isAnswered = false;
 
-          if (question.type === "yes/no") {
-            isAnswered = readBool(question.id) !== null;
-          } else if (question.type === "numeric") {
-            isAnswered = readNumeric(question.id) !== null;
-          } else if (question.type === "dropdown") {
-            isAnswered = readDropdownPerma(question.id) !== null;
-          }
+    if (question.type === "yes/no") {
+      isAnswered = readBool(question.id) !== null;
+    }
+      else if (question.type === "numeric") {
+        isAnswered = readNumeric(question.id) !== null;
+    } 
+      else if (question.type === "dropdown") {
+        isAnswered = readDropdownPerma(question.id) !== null;
+    } 
+      else if (question.type === "text") {
+        const v = readText(question.id);
+        isAnswered = v !== null && v.trim() !== "";
+    }
 
-          if (!isAnswered) {
-            unknown.push(questionNumber);
-            good |= 1; // Mark as having unanswered questions
-          } else {
-            good |= 4; // Mark as having valid answers
-          }
-        }
+    if (!isAnswered) {
+      unknown.push(questionNumber);
+      good |= 1;
+    } 
+      else {
+        good |= 4;
+    }
+     }
       });
 
       // Display results based on validation
@@ -1858,18 +1875,25 @@ if (selectedForm) {
   const rules = SEPP[String(window.location.hash).substring(1)];
   params.forEach((value, key) => {
     const id = Number(key) - 1;
-    const rule = Object.entries(rules).find(([_, value]) => value.id === id)[1];
-    if (rule.type === "numeric")
-      document.getElementById(String(id) + "num").value = Number(value);
-    else if (rule.type === "yes/no") {
+    const rule = Object.entries(rules).find(([_, val]) => val.id === id)?.[1];
+    if (!rule) return;
+
+    if (rule.type === "numeric") {
+      const el = document.getElementById(String(id) + "num");
+      if (el) el.value = Number(value);
+    } else if (rule.type === "yes/no") {
       const selected = document.querySelectorAll(`input[id="${id + "yn"}"]`);
       selected.forEach((radio) => {
         radio.checked = radio.value === (value === "t" ? "Yes" : "No");
-        const event = new Event("change", { bubbles: true });
-        radio.dispatchEvent(event);
+        radio.dispatchEvent(new Event("change", { bubbles: true }));
       });
-    } else if (rule.type === "dropdown")
-      document.getElementById(String(id) + "dd").value = value;
+    } else if (rule.type === "dropdown") {
+      const el = document.getElementById(String(id) + "dd");
+      if (el) el.value = value;
+    } else if (rule.type === "text") {
+      const el = document.getElementById(String(id) + "text");
+      if (el) el.value = value;
+    }
   });
 }
 
