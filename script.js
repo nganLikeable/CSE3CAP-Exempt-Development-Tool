@@ -1628,8 +1628,10 @@ async function exportPdf() {
       pdfBtn.id = 'pdfBtn';
       pdfBtn.type = 'button';
       pdfBtn.textContent = 'Download PDF';
-      pdfBtn.style.display = 'none'; 
-      pdfBtn.style.margin = '5px 0';
+      pdfBtn.style.display = 'none';
+      pdfBtn.style.margin = '50px 0 5px'; 
+      pdfBtn.style.position = 'relative'; 
+      pdfBtn.style.zIndex = '10';         
       pdfBtn.addEventListener('click', exportPdf);
       host.appendChild(pdfBtn);
     }
