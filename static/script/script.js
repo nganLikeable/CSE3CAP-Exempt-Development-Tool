@@ -1570,134 +1570,83 @@ function addQuestion(rule, num) {
 // === Report-style PDF (jsPDF + autoTable) ===
 function generateReportPdf() {
   const { jsPDF } = window.jspdf || {};
-  if (!jsPDF || !window.jspdf.jsPDF.API.autoTable) {
-    alert('PDF libraries not loaded (jsPDF/autoTable).');
+  if (!jsPDF) {
+    alert("PDF library (jsPDF) not loaded.");
     return;
   }
 
-  // What section are we on? (shed | patio | carport | retaining_wall)
-  const sectionKey = window.__lastSection || String(window.location.hash).substring(1) || 'shed';
-  const rules = SEPP[sectionKey] || [];
+  const devType  = window.__lastDevType  || "Development";
+  const answers  = window.__lastAnswers  || {};
+  const unknown  = window.__lastUnknown  || [];
+  const goodBits = window.__lastGoodBits || 0;
 
-  // Answers & per-question results saved by the Check click
-  const answers = window.__lastAnswers || {};
-  const perQ = window.__lastPerQuestion || {}; // { [id]: resCode } where 1=unanswered, 2=fail, 4=ok
+  const passed       = Boolean((goodBits & 4) && !(goodBits & 2));
+  const hasUnanswered= Boolean(goodBits & 1);
 
-  // Friendly title
-  const titleMap = {
-    shed: 'Shed Exemption Check',
-    patio: 'Patio Exemption Check',
-    carport: 'Carport Exemption Check',
-    retaining_wall: 'Retaining Wall Exemption Check'
-  };
-  const formTitle = titleMap[sectionKey] || 'Exempt Development Check';
-
-  // Pull address if you used id = 0 (text)
-  let address = '';
-  try {
-    const rule0 = rules.find(r => r.id === 0 && r.type === 'text');
-    if (rule0) address = document.getElementById(String(rule0.id) + 'text')?.value || '';
-  } catch(_) {}
-
-  // Build table rows from the rules & saved answers
-  const rows = rules.map((r, idx) => {
-    const qNum = idx + 1;
-    const aKey = `q${qNum}`;
-    let ans = answers[aKey];
-
-    // Normalise human-friendly answers
-    if (r.type === 'yes/no') {
-      if (ans === true || ans === 'yes') ans = 'Yes';
-      else if (ans === false || ans === 'no') ans = 'No';
-      else ans = ''; // unanswered
-    } else if (ans == null) {
-      ans = '';
-    }
-
-    // Status from the run (1=unanswered, 2=not exempt flag, 4=ok)
-    const res = perQ[r.id]; 
-    const status =
-      res === 1 ? 'Unanswered'
-    : res === 2 ? 'Fails a rule'
-    : res === 4 ? 'OK'
-    : '';
-
-    return [
-      qNum,
-      // strip html tags in the question text for the report
-      String(r.question || '').replace(/<[^>]+>/g, ''),
-      String(ans),
-      status
-    ];
-  });
-
-  // Create PDF
-  const pdf = new jsPDF({ unit: 'pt', format: 'a4' });
-  const margin = 40;
-  let y = margin;
+  const doc = new jsPDF({ unit: "pt", format: "a4" });
+  const pageW = doc.internal.pageSize.getWidth();
+  let y = 60;
+  const left = 50;
+  const right = pageW - 50;
 
   // Header
-  pdf.setFont('helvetica','bold');
-  pdf.setFontSize(16);
-  pdf.text('Exempt Development Check — Report', margin, y);
-  y += 18;
+  doc.setFont("helvetica", "bold"); doc.setFontSize(16);
+  doc.text("Exempt Development Check — Result", left, y); y += 20;
+  doc.setFont("helvetica", "normal"); doc.setFontSize(11);
+  doc.text("Generated: " + new Date().toLocaleString(), left, y); y += 10;
+  doc.text("Development type: " + devType, left, y); y += 20;
 
-  pdf.setFont('helvetica','normal');
-  pdf.setFontSize(10);
-  pdf.text('Generated: ' + new Date().toLocaleString(), margin, y); 
-  y += 16;
+  // Outcome
+  doc.setFont("helvetica", "bold"); doc.setFontSize(13);
+  doc.text("Outcome", left, y); y += 16;
+  doc.setFont("helvetica", "normal"); doc.setFontSize(12);
+  const outcome = passed ? "✔ Your development is exempt"
+                         : hasUnanswered ? "⚠ Incomplete — unanswered questions"
+                                         : "❌ Not exempt";
+  doc.text(outcome, left, y); y += 22;
 
-  if (address) {
-    pdf.text('Site address: ' + address, margin, y);
-    y += 16;
-  }
+  // Answers
+  doc.setFont("helvetica", "bold"); doc.setFontSize(13);
+  doc.text("Answers", left, y); y += 16;
+  doc.setFont("helvetica", "normal"); doc.setFontSize(11);
 
-  pdf.setFont('helvetica','bold');
-  pdf.setFontSize(13);
-  pdf.text(formTitle, margin, y);
-  y += 16;
+  // We’ll use the current SEPP section to expand labels
+  const hash = String(window.location.hash || "").replace("#", "");
+  const rules = SEPP[hash] || [];
 
-  // Table
-  pdf.setFont('helvetica','normal');
-  pdf.autoTable({
-    startY: y,
-    head: [['#', 'Question', 'Answer', 'Status']],
-    body: rows,
-    styles: {
-      font: 'helvetica',
-      fontSize: 10,
-      cellPadding: 6,
-      valign: 'top',
-    },
-    headStyles: {
-      fillColor: [236, 240, 245],
-      textColor: 20
-    },
-    columnStyles: {
-      0: { cellWidth: 28, halign: 'center' },
-      1: { cellWidth: 300 },  // Question
-      2: { cellWidth: 140 },  // Answer
-      3: { cellWidth: 60, halign: 'center' } // Status
-    },
-    didParseCell: (data) => {
-      // light wrap & clean
-      if (data.section === 'body' && data.column.index === 1) {
-        data.cell.text = (Array.isArray(data.cell.text) ? data.cell.text : [data.cell.text])
-          .map(t => String(t).trim());
-      }
-    },
-    didDrawPage: (data) => {
-      // Footer
-      const pageH = pdf.internal.pageSize.getHeight();
-      pdf.setFontSize(9);
-      pdf.setTextColor(120);
-      pdf.text('Albury City — SEPP 2008 helper (not legal advice).', margin, pageH - 16);
-    }
+  // Render each Q/A
+  rules.forEach((q, i) => {
+    const qn = `q${i+1}`;
+    const label = `${i+1}. ${q.question.replace(/\s+/g, " ").trim()}`;
+    const val = answers[qn] == null ? "(blank)" : String(answers[qn]);
+
+    // wrap label
+    const labelLines = doc.splitTextToSize(label, right - left);
+    if (y + labelLines.length * 14 > 780) { doc.addPage(); y = 60; }
+    doc.text(labelLines, left, y); y += labelLines.length * 14;
+
+    // answer
+    const ansLine = `Answer: ${val}`;
+    if (y + 14 > 780) { doc.addPage(); y = 60; }
+    doc.text(ansLine, left + 12, y); y += 18;
   });
 
-  // File name
-  const fileSafe = formTitle.toLowerCase().replace(/\s+/g,'-');
-  pdf.save(`${fileSafe}-report.pdf`);
+  // Unanswered (if any)
+  if (unknown.length) {
+    if (y + 40 > 780) { doc.addPage(); y = 60; }
+    doc.setFont("helvetica", "bold"); doc.setFontSize(13);
+    doc.text("Unanswered Questions", left, y); y += 16;
+    doc.setFont("helvetica", "normal"); doc.setFontSize(11);
+    const u = "Numbers: " + unknown.join(", ");
+    doc.text(u, left, y); y += 18;
+  }
+
+  // Footer
+  if (y + 30 > 780) { doc.addPage(); y = 60; }
+  doc.setFont("helvetica", "normal"); doc.setFontSize(10);
+  doc.text("Generated by Albury City Exempt Development Checker (SEPP 2008)", left, 780);
+
+  doc.save("Exempt_Development_Result.pdf");
 }
 
 function setClipboard(str) {
@@ -1877,6 +1826,15 @@ function loadSection(str) {
     hide(resultPass); hide(resultFail); hide(resultUnfinished);
     if (window.togglePdf) window.togglePdf(false);
   }
+  // ensure button visibility matches outcome
+const pdfBtnEl = document.getElementById("pdfBtn");
+if (pdfBtnEl) {
+  if (isPass) {
+    pdfBtnEl.style.display = "inline-block";
+  } else {
+    pdfBtnEl.style.display = "none";
+  }
+}
 
   // Wire the PDF button to the text-based report generator (not a screenshot)
   const pdfBtn = document.getElementById("pdfBtn");
@@ -1884,49 +1842,68 @@ function loadSection(str) {
     pdfBtn.onclick = generateReportPdf;
   }
 };
-    const permalink = document.createElement("button");
-    permalink.type = "button";
-    permalink.id = "questionnairePermalink";
-    permalink.style.margin = "5px";
-    permalink.innerHTML = `<span title="Copies a permanent link to this completed form.">Copy Perma-link</span>`;
-    permalink.onclick = () => setClipboard(getLink(str));
-    const results = document.createElement("div");
-    results.style.display = "flex";
-    results.style.justifyContent = "horizontal";
-    const resultPass = document.createElement("p");
-    resultPass.style.marginTop = "15px";
-    resultPass.style.left = "50%";
-    resultPass.style.transform = "translate(-50%, 0)";
-    resultPass.style.fontWeight = "bold";
-    resultPass.style.position = "absolute";
-    resultPass.innerText = "✔ Your development is exempt ✔";
-    const resultFail = document.createElement("p");
-    resultFail.style.marginTop = "15px";
-    resultFail.style.left = "50%";
-    resultFail.style.transform = "translate(-50%, 0)";
-    resultFail.style.fontWeight = "bold";
-    resultFail.style.position = "absolute";
-    resultFail.innerText = "❌ Your development isn't exempt ❌";
-    const resultUnfinished = document.createElement("p");
-    resultUnfinished.style.marginTop = "15px";
-    resultUnfinished.style.left = "50%";
-    resultUnfinished.style.transform = "translate(-50%, 0)";
-    resultUnfinished.style.fontWeight = "bold";
-    resultUnfinished.style.position = "absolute";
-    resultUnfinished.innerText = "⚠ Please finish the unanswered questions ⚠";
+const permalink = document.createElement("button");
+permalink.type = "button";
+permalink.id = "questionnairePermalink";
+permalink.style.margin = "5px";
+permalink.innerHTML = `<span title="Copies a permanent link to this completed form.">Copy Perma-link</span>`;
+permalink.onclick = () => setClipboard(getLink(str));
 
-    // append elements to DOM
-    selectedForm.appendChild(notes);
-    selectedForm.appendChild(check);
-    selectedForm.appendChild(permalink);
-    results.appendChild(resultPass);
-    results.appendChild(resultFail);
-    results.appendChild(resultUnfinished);
-    selectedForm.appendChild(results);
-    hide(resultPass);
-    hide(resultFail);
-    hide(resultUnfinished);
-  } else document.getElementById("examples").classList.remove("d-none");
+// --- PDF button (hidden until PASS) ---
+const pdfBtn = document.createElement("button");
+pdfBtn.id = "pdfBtn";
+pdfBtn.type = "button";
+pdfBtn.textContent = "Download PDF";
+pdfBtn.style.display = "none";        // hidden until PASS
+pdfBtn.style.margin = "35px 0 5px";   // push it below the status text a bit
+pdfBtn.style.position = "relative";   // so it won't overlap the status lines
+pdfBtn.addEventListener("click", generateReportPdf);
+
+// --- results container ---
+const results = document.createElement("div");
+results.style.display = "flex";
+results.style.justifyContent = "horizontal";
+
+// --- result messages ---
+const resultPass = document.createElement("p");
+resultPass.style.marginTop = "15px";
+resultPass.style.left = "50%";
+resultPass.style.transform = "translate(-50%, 0)";
+resultPass.style.fontWeight = "bold";
+resultPass.style.position = "absolute";
+resultPass.innerText = "✔ Your development is exempt ✔";
+
+const resultFail = document.createElement("p");
+resultFail.style.marginTop = "15px";
+resultFail.style.left = "50%";
+resultFail.style.transform = "translate(-50%, 0)";
+resultFail.style.fontWeight = "bold";
+resultFail.style.position = "absolute";
+resultFail.innerText = "❌ Your development isn't exempt ❌";
+
+const resultUnfinished = document.createElement("p");
+resultUnfinished.style.marginTop = "15px";
+resultUnfinished.style.left = "50%";
+resultUnfinished.style.transform = "translate(-50%, 0)";
+resultUnfinished.style.fontWeight = "bold";
+resultUnfinished.style.position = "absolute";
+resultUnfinished.innerText = "⚠ Please finish the unanswered questions ⚠";
+
+// append everything to the form in proper order
+selectedForm.appendChild(notes);
+selectedForm.appendChild(check);
+selectedForm.appendChild(permalink);
+selectedForm.appendChild(pdfBtn);   // <-- 👈 HERE (after permalink, before results)
+results.appendChild(resultPass);
+results.appendChild(resultFail);
+results.appendChild(resultUnfinished);
+selectedForm.appendChild(results);
+
+// hide results initially
+hide(resultPass);
+hide(resultFail);
+hide(resultUnfinished);
+} else document.getElementById("examples").classList.remove("d-none");
 }
 
 window.addEventListener("hashchange", () => {
@@ -1956,6 +1933,134 @@ if (selectedForm) {
      if (el) el.value = value;
     }
   });
+}
+
+// Text-based PDF report (no screenshots)
+async function generateReportPdf() {
+  const { jsPDF } = window.jspdf || {};
+  if (!jsPDF) {
+    alert('PDF library not loaded.');
+    return;
+  }
+
+  // Pull data captured by check.onclick
+  const devType   = window.__lastDevType  || 'Development';
+  const answers   = window.__lastAnswers  || {};
+  const refs      = window.__lastRefs     || [];
+  const unknown   = window.__lastUnknown  || [];
+  const goodBits  = window.__lastGoodBits || 0;
+
+  // Find the active rules set to map question numbers -> text
+  const activeKey = (location.hash || '#').slice(1) || 'retaining_wall';
+  const rules     = SEPP[activeKey] || [];
+
+  // Build a safe list of Q&A rows
+  const rows = [];
+  Object.keys(answers).forEach(k => {
+    // keys look like q1, q2...
+    const idx = Number(k.replace('q', '')) - 1;
+    const rule = rules[idx];
+    if (!rule) return;
+
+    const qText = (rule.question || '').replace(/\s+/g, ' ').trim();
+    let aText = answers[k];
+
+    // pretty up booleans/nulls
+    if (aText === true)  aText = 'Yes';
+    if (aText === false) aText = 'No';
+    if (aText === null || aText === undefined || aText === '') aText = '—';
+
+    rows.push({ num: idx + 1, question: qText, answer: String(aText) });
+  });
+
+  // Decide status for the header
+  const status =
+    (goodBits & 2) ? 'NOT EXEMPT' :
+    (goodBits & 4) ? 'EXEMPT' :
+    'INCOMPLETE';
+
+  // Start PDF
+  const pdf = new jsPDF({ unit: 'pt', format: 'a4' });
+  const margin = 46;
+  const pageW  = pdf.internal.pageSize.getWidth();
+  const maxW   = pageW - margin * 2;
+  let y = 56;
+
+  // Header
+  pdf.setFont('helvetica', 'bold'); pdf.setFontSize(16);
+  pdf.text('Exempt Development Check — Result', margin, y); y += 22;
+
+  pdf.setFont('helvetica', 'normal'); pdf.setFontSize(10);
+  pdf.text(`Generated: ${new Date().toLocaleString()}`, margin, y); y += 16;
+  pdf.text(`Development type: ${devType}`, margin, y); y += 22;
+
+  // Status chip
+  pdf.setFont('helvetica', 'bold'); pdf.setFontSize(12);
+  const statusText = `Status: ${status}`;
+  pdf.text(statusText, margin, y);
+  y += 18;
+
+  // Unanswered note (if any)
+  if (unknown.length) {
+    pdf.setFont('helvetica', 'normal'); pdf.setFontSize(10);
+    pdf.text(`Unanswered: ${unknown.join(', ')}`, margin, y);
+    y += 16;
+  }
+
+  // Divider
+  pdf.setDrawColor(180); pdf.line(margin, y, pageW - margin, y); y += 12;
+
+  // Q&A section title
+  pdf.setFont('helvetica', 'bold'); pdf.setFontSize(12);
+  pdf.text('Questions & Answers', margin, y); y += 16;
+
+  // Render rows with wrapping
+  pdf.setFont('helvetica', 'normal'); pdf.setFontSize(11);
+  const lineH = 14;
+
+  const writeWrapped = (label, value) => {
+    const lab = pdf.splitTextToSize(label, maxW);
+    lab.forEach((line, i) => {
+      pdf.text(line, margin, y);
+      y += lineH;
+    });
+    if (value !== undefined) {
+      pdf.setTextColor(80);
+      const val = pdf.splitTextToSize(value, maxW);
+      val.forEach(line => { pdf.text(line, margin, y); y += lineH; });
+      pdf.setTextColor(0);
+    }
+    y += 6;
+  };
+
+  rows.forEach(({ num, question, answer }) => {
+    // Add new page if near bottom
+    if (y > pdf.internal.pageSize.getHeight() - 64) {
+      pdf.addPage(); y = 56;
+    }
+    writeWrapped(`${num}. ${question}`, `Answer: ${answer}`);
+  });
+
+  // References (optional)
+  if (refs.length) {
+    if (y > pdf.internal.pageSize.getHeight() - 96) {
+      pdf.addPage(); y = 56;
+    }
+    pdf.setDrawColor(180); pdf.line(margin, y, pageW - margin, y); y += 12;
+    pdf.setFont('helvetica', 'bold'); pdf.setFontSize(12);
+    pdf.text('References', margin, y); y += 16;
+
+    pdf.setFont('helvetica', 'normal'); pdf.setFontSize(10);
+    refs.forEach((r, i) => {
+      if (y > pdf.internal.pageSize.getHeight() - 48) {
+        pdf.addPage(); y = 56;
+      }
+      pdf.text(`${i + 1}. ${r}`, margin, y);
+      y += 14;
+    });
+  }
+
+  pdf.save(`Exempt_Development_Result_${devType}.pdf`);
 }
 
 async function submitLog(devType, propertyAddress, answers) {
