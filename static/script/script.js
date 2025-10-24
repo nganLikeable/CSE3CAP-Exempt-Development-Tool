@@ -36,8 +36,33 @@ function readDropdownPerma(id) {
   return selected && selected.selectedIndex !== 0 ? selected.value : null;
 }
 
+function readText(id) {
+  const el = document.getElementById(String(id) + "text");
+  if (!el) return null;
+  const v = el.value != null ? String(el.value).trim() : "";
+  return v === "" ? null : v;
+}
+
 var SEPP = {
   shed: [
+    {
+  id: -1,
+  section: "General Information",
+  sanitised: "User Input",
+  question: "What is the property (site) name?",
+  type: "text",
+  optional: false,
+  errormsg: "Please enter the property/site name.",
+  check: (id, elem, value) => {
+    const v = readText(id);
+    if (!v || v.trim() === "") {  
+      show(elem);
+      return 1;                   
+    }
+    hide(elem);
+    return 4;                    
+  },
+},
     {
       id: 0,
       section:
@@ -360,6 +385,24 @@ var SEPP = {
     },
   ],
   patio: [
+    {
+      id: -1,
+      section: "General Information",
+      sanitised: "User Input",
+      question: "What is the property (site) name?",
+      type: "text",
+      optional: false,
+      errormsg: "Please enter the property/site name.",
+      check: (id, elem, value) => {
+        const v = readText(id);
+        if (!v || v.trim() === "") {  
+        show(elem);
+        return 1;                   
+        }
+        hide(elem);
+        return 4;                     
+      },
+    },
     {
       id: 0,
       section:
@@ -836,6 +879,24 @@ var SEPP = {
     // },
   ],
   carport: [
+     {
+      id: -1,
+      section: "General Information",
+      sanitised: "User Input",
+      question: "What is the property (site) name?",
+      type: "text",
+      optional: false,
+      errormsg: "Please enter the property/site name.",
+      check: (id, elem, value) => {
+        const v = readText(id);
+        if (!v || v.trim() === "") {  
+        show(elem);
+        return 1;                   
+        }
+        hide(elem);
+        return 4;                     
+      },
+    },
     {
       id: 0,
       section:
@@ -1163,6 +1224,24 @@ var SEPP = {
     },
   ],
   retaining_wall: [
+     {
+      id: -1,
+      section: "General Information",
+      sanitised: "User Input",
+      question: "What is the property (site) name?",
+      type: "text",
+      optional: false,
+      errormsg: "Please enter the property/site name.",
+      check: (id, elem, value) => {
+        const v = readText(id);
+        if (!v || v.trim() === "") {  
+        show(elem);
+        return 1;                   
+        }
+        hide(elem);
+        return 4;                     
+      },
+    },
     {
       id: 0,
       section:
@@ -1443,7 +1522,13 @@ function addQuestion(rule, num) {
 				${rule.options.map((x) => `<option value="${x}">${x}</option>`)}
 			</select>`;
       break;
-  }
+    case "text":
+      options += `<input type="text"
+                      id="${String(rule.id) + "text"}"
+                      placeholder="${rule.placeholder || "Type here..."}"
+                      style="width:100%;max-width:720px"><br>`;
+      break;
+   }
   elem.classList.add("question");
   elem.innerHTML =
     `
@@ -1519,6 +1604,7 @@ function getLink(str) {
       res = readNumeric(SEPP[str][key].id);
     else if (SEPP[str][key].type === "dropdown")
       res = readDropdownPerma(SEPP[str][key].id);
+    else if (SEPP[str][key].type === "text") 
     if (res !== null)
       urlParams.append(
         String(SEPP[str][key].id + 1).trim(),
@@ -1581,42 +1667,54 @@ function loadSection(str) {
       const devType = str.charAt(0).toUpperCase() + str.slice(1);
 
       Object.keys(SEPP[str]).forEach((key) => {
-        const question = SEPP[str][key];
-        const questionNumber = Number(key) + 1;
+  const question = SEPP[str][key];
+  const questionNumber = Number(key) + 1;
+  const elem = document.getElementById(String(question.id) + "e");
+  let ans = null;
 
-        // collect ans before using
-        let ans = null;
-        if (question.type === "yes/no") {
-          ans = readBool(question.id);
-          allAnswers[`q${questionNumber}`] =
-            ans === true ? "yes" : ans === false ? "no" : null;
-        } else if (question.type === "numeric") {
-          ans = readNumeric(question.id);
-          allAnswers[`q${questionNumber}`] = ans;
-        } else if (question.type === "dropdown") {
-          ans = readDropdownPerma(question.id);
-          allAnswers[`q${questionNumber}`] = ans;
-        }
+  // --- READ ANSWER BASED ON TYPE ---
+  if (question.type === "yes/no") {
+    ans = readBool(question.id);
+    allAnswers[`q${questionNumber}`] =
+      ans === true ? "yes" : ans === false ? "no" : null;
+  } 
+  else if (question.type === "numeric") {
+    ans = readNumeric(question.id);
+    allAnswers[`q${questionNumber}`] = ans;
+  } 
+  else if (question.type === "dropdown") {
+    ans = readDropdownPerma(question.id);
+    allAnswers[`q${questionNumber}`] = ans;
+  } 
+  else if (question.type === "text") {
+    ans = readText(question.id);
+    allAnswers[`q${questionNumber}`] = ans;
+  }
 
-        // Check if question has a check function
-        if (question.check) {
-          const elem = document.getElementById(String(question.id) + "e");
-          let res = question.check(question.id, elem, ans);
+  // --- DETERMINE RESULT ---
+  let res;
+  if (typeof question.check === "function") {
+    // Run its custom validation
+    res = question.check(question.id, elem, ans);
+  } else {
+    // Generic: just see if it's answered
+    const isAnswered =
+      (question.type === "yes/no"   && ans !== null) ||
+      (question.type === "numeric"  && ans !== null) ||
+      (question.type === "dropdown" && ans != null)  ||
+      (question.type === "text"     && (ans != null || question.optional === true));
 
-          if (res === 1) unknown.push(questionNumber);
-          good |= res;
-        } else {
-          // For questions without check functions, validate if they're answered
-          let isAnswered = ans !== null;
+    if (!isAnswered) {
+      res = 1; // unanswered
+    } else {
+      res = 4; // valid
+    }
+  }
 
-          if (!isAnswered) {
-            unknown.push(questionNumber);
-            good |= 1; // Mark as having unanswered questions
-          } else {
-            good |= 4; // Mark as having valid answers
-          }
-        }
-      });
+  // --- RECORD STATUS ---
+  if (res === 1) unknown.push(questionNumber);
+  good |= res;
+});
 
       // determine exemption status
       let exemptionStatus = "";
@@ -1747,6 +1845,10 @@ if (selectedForm) {
       });
     } else if (rule.type === "dropdown")
       document.getElementById(String(id) + "dd").value = value;
+     else if (rule.type === "text") {
+     const el = document.getElementById(String(id) + "text");
+     if (el) el.value = value;
+    }
   });
 }
 
