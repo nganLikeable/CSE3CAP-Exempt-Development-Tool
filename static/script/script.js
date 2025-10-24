@@ -1567,6 +1567,139 @@ function addQuestion(rule, num) {
   }
 }
 
+// === Report-style PDF (jsPDF + autoTable) ===
+function generateReportPdf() {
+  const { jsPDF } = window.jspdf || {};
+  if (!jsPDF || !window.jspdf.jsPDF.API.autoTable) {
+    alert('PDF libraries not loaded (jsPDF/autoTable).');
+    return;
+  }
+
+  // What section are we on? (shed | patio | carport | retaining_wall)
+  const sectionKey = window.__lastSection || String(window.location.hash).substring(1) || 'shed';
+  const rules = SEPP[sectionKey] || [];
+
+  // Answers & per-question results saved by the Check click
+  const answers = window.__lastAnswers || {};
+  const perQ = window.__lastPerQuestion || {}; // { [id]: resCode } where 1=unanswered, 2=fail, 4=ok
+
+  // Friendly title
+  const titleMap = {
+    shed: 'Shed Exemption Check',
+    patio: 'Patio Exemption Check',
+    carport: 'Carport Exemption Check',
+    retaining_wall: 'Retaining Wall Exemption Check'
+  };
+  const formTitle = titleMap[sectionKey] || 'Exempt Development Check';
+
+  // Pull address if you used id = 0 (text)
+  let address = '';
+  try {
+    const rule0 = rules.find(r => r.id === 0 && r.type === 'text');
+    if (rule0) address = document.getElementById(String(rule0.id) + 'text')?.value || '';
+  } catch(_) {}
+
+  // Build table rows from the rules & saved answers
+  const rows = rules.map((r, idx) => {
+    const qNum = idx + 1;
+    const aKey = `q${qNum}`;
+    let ans = answers[aKey];
+
+    // Normalise human-friendly answers
+    if (r.type === 'yes/no') {
+      if (ans === true || ans === 'yes') ans = 'Yes';
+      else if (ans === false || ans === 'no') ans = 'No';
+      else ans = ''; // unanswered
+    } else if (ans == null) {
+      ans = '';
+    }
+
+    // Status from the run (1=unanswered, 2=not exempt flag, 4=ok)
+    const res = perQ[r.id]; 
+    const status =
+      res === 1 ? 'Unanswered'
+    : res === 2 ? 'Fails a rule'
+    : res === 4 ? 'OK'
+    : '';
+
+    return [
+      qNum,
+      // strip html tags in the question text for the report
+      String(r.question || '').replace(/<[^>]+>/g, ''),
+      String(ans),
+      status
+    ];
+  });
+
+  // Create PDF
+  const pdf = new jsPDF({ unit: 'pt', format: 'a4' });
+  const margin = 40;
+  let y = margin;
+
+  // Header
+  pdf.setFont('helvetica','bold');
+  pdf.setFontSize(16);
+  pdf.text('Exempt Development Check — Report', margin, y);
+  y += 18;
+
+  pdf.setFont('helvetica','normal');
+  pdf.setFontSize(10);
+  pdf.text('Generated: ' + new Date().toLocaleString(), margin, y); 
+  y += 16;
+
+  if (address) {
+    pdf.text('Site address: ' + address, margin, y);
+    y += 16;
+  }
+
+  pdf.setFont('helvetica','bold');
+  pdf.setFontSize(13);
+  pdf.text(formTitle, margin, y);
+  y += 16;
+
+  // Table
+  pdf.setFont('helvetica','normal');
+  pdf.autoTable({
+    startY: y,
+    head: [['#', 'Question', 'Answer', 'Status']],
+    body: rows,
+    styles: {
+      font: 'helvetica',
+      fontSize: 10,
+      cellPadding: 6,
+      valign: 'top',
+    },
+    headStyles: {
+      fillColor: [236, 240, 245],
+      textColor: 20
+    },
+    columnStyles: {
+      0: { cellWidth: 28, halign: 'center' },
+      1: { cellWidth: 300 },  // Question
+      2: { cellWidth: 140 },  // Answer
+      3: { cellWidth: 60, halign: 'center' } // Status
+    },
+    didParseCell: (data) => {
+      // light wrap & clean
+      if (data.section === 'body' && data.column.index === 1) {
+        data.cell.text = (Array.isArray(data.cell.text) ? data.cell.text : [data.cell.text])
+          .map(t => String(t).trim());
+      }
+    },
+    didDrawPage: (data) => {
+      // Footer
+      const pageH = pdf.internal.pageSize.getHeight();
+      pdf.setFontSize(9);
+      pdf.setTextColor(120);
+      pdf.text('Albury City — SEPP 2008 helper (not legal advice).', margin, pageH - 16);
+    }
+  });
+
+  // File name
+  const fileSafe = formTitle.toLowerCase().replace(/\s+/g,'-');
+  pdf.save(`${fileSafe}-report.pdf`);
+}
+
 function setClipboard(str) {
   if (!navigator.clipboard) {
     const textarea = document.createElement("textarea");
@@ -1656,128 +1789,101 @@ function loadSection(str) {
     check.id = "questionnaireCheck";
     check.style.margin = "5px";
     check.onclick = () => {
-      // let offset = Math.max(...Array.from(document.getElementsByClassName("navbar")).map(h => h.offsetHeight));
-      // window.scrollTo({top: selectedForm.getBoundingClientRect().top + window.scrollY - offset + 30, behavior: "smooth"});
-      let good = 0;
-      let unknown = [];
-      let allAnswers = {};
-      let referenceNumbers = [];
+  // Collect status and answers
+  let good = 0;                       // bitmask: 1 = unanswered, 2 = fail, 4 = valid
+  let unknown = [];                   // list of question numbers not answered
+  let allAnswers = {};                // for PDF/logging
+  let referenceNumbers = [];          // optional: collect sections/refs
 
-      // reformat dev type to uppercase
-      const devType = str.charAt(0).toUpperCase() + str.slice(1);
+  // Title-case version of the dev type from the hash (e.g. "#retaining_wall" -> "Retaining_wall")
+  const devType = str.charAt(0).toUpperCase() + str.slice(1);
 
-      Object.keys(SEPP[str]).forEach((key) => {
-  const question = SEPP[str][key];
-  const questionNumber = Number(key) + 1;
-  const elem = document.getElementById(String(question.id) + "e");
-  let ans = null;
+  // Walk the questions for this form
+  Object.keys(SEPP[str]).forEach((key) => {
+    const q  = SEPP[str][key];
+    const qn = Number(key) + 1;
+    const elem = document.getElementById(String(q.id) + "e");
+    let ans = null;
 
-  // --- READ ANSWER BASED ON TYPE ---
-  if (question.type === "yes/no") {
-    ans = readBool(question.id);
-    allAnswers[`q${questionNumber}`] =
-      ans === true ? "yes" : ans === false ? "no" : null;
-  } 
-  else if (question.type === "numeric") {
-    ans = readNumeric(question.id);
-    allAnswers[`q${questionNumber}`] = ans;
-  } 
-  else if (question.type === "dropdown") {
-    ans = readDropdownPerma(question.id);
-    allAnswers[`q${questionNumber}`] = ans;
-  } 
-  else if (question.type === "text") {
-    ans = readText(question.id);
-    allAnswers[`q${questionNumber}`] = ans;
-  }
-
-  // --- DETERMINE RESULT ---
-  let res;
-  if (typeof question.check === "function") {
-    // Run its custom validation
-    res = question.check(question.id, elem, ans);
-  } else {
-    // Generic: just see if it's answered
-    const isAnswered =
-      (question.type === "yes/no"   && ans !== null) ||
-      (question.type === "numeric"  && ans !== null) ||
-      (question.type === "dropdown" && ans != null)  ||
-      (question.type === "text"     && (ans != null || question.optional === true));
-
-    if (!isAnswered) {
-      res = 1; // unanswered
-    } else {
-      res = 4; // valid
+    // --- READ ANSWER BY TYPE ---
+    if (q.type === "yes/no") {
+      ans = readBool(q.id);
+      allAnswers[`q${qn}`] = (ans === true) ? "yes" : (ans === false) ? "no" : null;
+    } else if (q.type === "numeric") {
+      ans = readNumeric(q.id);
+      allAnswers[`q${qn}`] = ans;
+    } else if (q.type === "dropdown") {
+      ans = readDropdownPerma(q.id);
+      allAnswers[`q${qn}`] = ans;
+    } else if (q.type === "text") {
+      // Prefer your readText helper if present; fallback to direct DOM read.
+      ans = (typeof readText === "function")
+        ? readText(q.id)
+        : (document.getElementById(String(q.id) + "text")?.value ?? "");
+      allAnswers[`q${qn}`] = ans;
     }
+
+    // --- DETERMINE RESULT FOR THIS QUESTION ---
+    let res;
+    if (typeof q.check === "function") {
+      // Use the rule's custom check (returns 1/2/4)
+      res = q.check(q.id, elem, ans);
+    } else {
+      // Generic: answered or not (text may be optional)
+      const isAnswered =
+        (q.type === "yes/no"   && ans !== null) ||
+        (q.type === "numeric"  && ans !== null) ||
+        (q.type === "dropdown" && ans != null)  ||
+        (q.type === "text"     && ((ans != null && String(ans).trim() !== "") || q.optional === true));
+
+      res = isAnswered ? 4 : 1; // 4 = valid, 1 = unanswered
+    }
+
+    // Record bit + unanswered list
+    if (res === 1) unknown.push(qn);
+    good |= res;
+
+    // Optional: track references for your report footer
+    if (q.section) referenceNumbers.push(q.section);
+  });
+
+  // Persist context for the PDF/report generator
+  window.__lastDevType  = devType;
+  window.__lastAnswers  = allAnswers;
+  window.__lastUnknown  = unknown;
+  window.__lastGoodBits = good;
+  window.__lastRefs     = referenceNumbers;
+
+  // --- OVERALL OUTCOME ---
+  const shouldFail    = Boolean(good & 2);
+  const hasUnanswered = Boolean(good & 1);
+  const isAllValid    = Boolean(good & 4);
+  const isPass        = isAllValid && !shouldFail;
+
+  if (isPass) {
+    show(resultPass); hide(resultFail); hide(resultUnfinished);
+    if (window.togglePdf) window.togglePdf(true);   // show “Download PDF” button
+  } else if (hasUnanswered) {
+    hide(resultPass); hide(resultFail);
+    resultUnfinished.innerText = `⚠ Please finish the unanswered questions ⚠
+(${unknown.join(", ")})`;
+    show(resultUnfinished);
+    if (window.togglePdf) window.togglePdf(false);
+  } else if (shouldFail) {
+    hide(resultPass); show(resultFail); hide(resultUnfinished);
+    if (window.togglePdf) window.togglePdf(false);
+  } else {
+    // Fallback: nothing conclusive
+    hide(resultPass); hide(resultFail); hide(resultUnfinished);
+    if (window.togglePdf) window.togglePdf(false);
   }
 
-  // --- RECORD STATUS ---
-  if (res === 1) unknown.push(questionNumber);
-  good |= res;
-});
-
-      // determine exemption status
-      let exemptionStatus = "";
-      let shouldLogSubmission = false;
-
-      // Display results based on validation
-      if (good & 2) {
-        // Has validation failures
-        hide(resultPass);
-        show(resultFail);
-        hide(resultUnfinished);
-        exemptionStatus = "not_exempt";
-        shouldLogSubmission = true;
-      } else if (good & 1) {
-        // Has unanswered questions
-        hide(resultPass);
-        hide(resultFail);
-        resultUnfinished.innerText =
-          "⚠ Please finish the unanswered questions ⚠\n(" +
-          unknown.join(", ") +
-          ")";
-        show(resultUnfinished);
-        exemptionStatus = "incomplete";
-      } else if (good & 4) {
-        // All questions answered and valid
-        show(resultPass);
-        hide(resultFail);
-        hide(resultUnfinished);
-        exemptionStatus = "exempt";
-        shouldLogSubmission = true;
-      } else {
-        // Fallback case
-        hide(resultPass);
-        hide(resultFail);
-        resultUnfinished.innerText = "⚠ Please answer all questions ⚠";
-        show(resultUnfinished);
-        exemptionStatus = "incomplete";
-      }
-      // log submission if complete
-      if (shouldLogSubmission) {
-        allAnswers["exemption_status"] = exemptionStatus;
-        allAnswers["completion_time"] = new Date().toISOString();
-        allAnswers["development_type"] = devType;
-
-        const propertyAddress = "To be implemented";
-
-        // debug logging
-        console.log("Data to be logged: ", {
-          developmentType: devType,
-          propertyAddress: propertyAddress,
-          formAnswers: allAnswers,
-          exemptionResult: exemptionStatus,
-        });
-
-        submitLog(devType, propertyAddress, allAnswers)
-          .then(() => {
-            console.log("Exemption check logged successfully");
-          })
-          .catch((error) => {
-            console.error("Failed to log exemption check:", error);
-          });
-      }
-    };
+  // Wire the PDF button to the text-based report generator (not a screenshot)
+  const pdfBtn = document.getElementById("pdfBtn");
+  if (pdfBtn && typeof generateReportPdf === "function") {
+    pdfBtn.onclick = generateReportPdf;
+  }
+};
     const permalink = document.createElement("button");
     permalink.type = "button";
     permalink.id = "questionnairePermalink";
