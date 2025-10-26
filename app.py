@@ -71,7 +71,7 @@ def get_all_submissions():
     c = db.cursor() # create cursor obj to execute sql queries 
         
     # select all submissions ordered by newest first - READ only
-    c.execute('''SELECT id, timestamp, development_type, property_address, answers_json 
+    c.execute('''SELECT id, timestamp, development_type, property_address, answers_json, reference_no 
               FROM submissions
               ORDER BY timestamp DESC''')
     
@@ -89,6 +89,7 @@ def get_all_submissions():
             'development_type': s['development_type'],
             'property_address': s['property_address'],
             'answers_json': json.loads(s['answers_json']) if s['answers_json'] else {}, # convert answers json string to python lst
+            'reference_no': s['reference_no']
         })
     
     return result
@@ -147,7 +148,7 @@ def get_logs():
         db = get_db()
         c = db.cursor()
         
-        c.execute('''SELECT id, timestamp, development_type, property_address, answers_json 
+        c.execute('''SELECT id, timestamp, development_type, property_address, answers_json, reference_no  
                   FROM submissions
                   ORDER BY timestamp DESC''')
         
@@ -161,7 +162,7 @@ def get_logs():
                 'dev_type': s['development_type'],
                 'property_address': s['property_address'],
                 'answers_json': json.loads(s['answers_json']) if s['answers_json'] else {},
-                'reference_numbers': None  # Add this field as expected by frontend
+                'reference_number': s['reference_no']  # Add this field as expected by frontend
             })
         
         return jsonify({
@@ -207,7 +208,7 @@ def search_logs():
                 'dev_type': s['development_type'],
                 'property_address': s['property_address'],
                 'answers_json': json.loads(s['answers_json']) if s['answers_json'] else {},
-                'reference_numbers': None  
+                'reference_number': s['reference_no']  
             })
         
         return jsonify({
@@ -228,6 +229,7 @@ def submit_log():
         property_address = data.get('property_address', '')
         answers = data.get('answers', {})
         submission_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        reference_no = data.get('reference_no', '')
         
         # validate all required fields are not null
         if not development_type or not property_address or not answers:
@@ -243,7 +245,7 @@ def submit_log():
         c = db.cursor() 
         
         c.execute('''
-            INSERT INTO submissions (development_type, property_address, answers_json, timestamp ) VALUES (?, ?, ?, ?)''', (development_type, property_address, answers_json, submission_time))
+            INSERT INTO submissions (development_type, property_address, answers_json, timestamp, reference_no ) VALUES (?, ?, ?, ?, ?)''', (development_type, property_address, answers_json, submission_time, reference_no))
         # use ? as parameters placeholders to bind data to query => avoid SQL injection
         
         submission_id = c.lastrowid # generated value for autoincrement id col
@@ -252,7 +254,8 @@ def submit_log():
         
         return jsonify({
             'message': 'Log stored successfully',
-            'submission_id': submission_id,
+            # 'submission_id': submission_id,
+            'reference_no': reference_no,
             'timestamp': submission_time
         })
     except Exception as e:

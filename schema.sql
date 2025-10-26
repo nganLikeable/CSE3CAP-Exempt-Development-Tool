@@ -5,6 +5,6 @@ CREATE TABLE IF NOT EXISTS submissions (
         development_type TEXT NOT NULL,
         property_address TEXT NOT NULL,
         answers_json TEXT NOT NULL,
-        -- reference_no TEXT NOT NULL,
+        reference_no TEXT NOT NULL,
         timestamp TEXT NOT NULL
 )
