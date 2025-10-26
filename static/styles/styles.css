@@ -202,8 +202,9 @@
   transform: translateY(-3px);
 }
 
-/* Admin Dashboard Styles */
-.container {
+/* Admin Dashboard Styles - Scoped to admin pages only */
+.admin-container,
+.logs-container {
   max-width: 1200px;
   margin: 0 auto;
   padding: 20px;
@@ -211,22 +212,22 @@
     sans-serif;
 }
 
-.container h1 {
+/* .container h1 {
   color: #002a3a;
   text-align: center;
   margin-bottom: 30px;
   font-size: 2.2em;
   font-weight: 600;
-}
+} */
 
-.stats {
+.admin-container .stats {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: 20px;
   margin-bottom: 40px;
 }
 
-.stat-card {
+.admin-container .stat-card {
   background: #002a3a;
   color: white;
   padding: 25px;
@@ -235,18 +236,18 @@
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
-.stat-card:hover {
+.admin-container .stat-card:hover {
   transform: translateY(-2px);
   box-shadow: 0 8px 15px rgb(17, 66, 107);
 }
 
-.stat-number {
+.admin-container .stat-number {
   font-size: 2.5em;
   font-weight: 700;
   margin-bottom: 8px;
 }
 
-.stat-label {
+.admin-container .stat-label {
   font-size: 1em;
   opacity: 0.9;
   text-transform: uppercase;
@@ -254,7 +255,7 @@
   font-weight: 500;
 }
 
-.dev_types {
+.admin-container .dev_types {
   background: white;
   padding: 25px;
   border-radius: 12px;
@@ -263,7 +264,7 @@
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
-.dev_types h2 {
+.admin-container .dev_types h2 {
   color: #002a3a;
   margin-bottom: 20px;
   font-size: 1.5em;
@@ -272,7 +273,7 @@
   padding-bottom: 10px;
 }
 
-.dev-type-item {
+.admin-container .dev-type-item {
   padding: 12px 0;
   border-bottom: 1px solid #f0f0f0;
   display: flex;
@@ -280,22 +281,22 @@
   align-items: center;
 }
 
-.dev-type-item:last-child {
+.admin-container .dev-type-item:last-child {
   border-bottom: none;
 }
 
-.dev-type-item strong {
+.admin-container .dev-type-item strong {
   color: #002a3a;
 }
 
-.links {
+.admin-container .links {
   display: flex;
   gap: 15px;
   justify-content: center;
   flex-wrap: wrap;
 }
 
-.links a {
+.admin-container .links a {
   display: inline-block;
   padding: 12px 24px;
   color: white;
@@ -307,41 +308,41 @@
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-.links a:hover {
+.admin-container .links a:hover {
   background: #0e2c42ef;
   transform: translateY(-1px);
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
 }
 
-.links a:active {
+.admin-container .links a:active {
   transform: translateY(0);
 }
 
-/* Responsive adjustments */
+/* Responsive adjustments - Admin pages only */
 @media (max-width: 768px) {
-  .container {
+  .admin-container {
     padding: 15px;
   }
 
-  .stats {
+  .admin-container .stats {
     grid-template-columns: 1fr 1fr;
     gap: 15px;
   }
 
-  .stat-card {
+  .admin-container .stat-card {
     padding: 20px;
   }
 
-  .stat-number {
+  .admin-container .stat-number {
     font-size: 2em;
   }
 
-  .links {
+  .admin-container .links {
     flex-direction: column;
     align-items: center;
   }
 
-  .links a {
+  .admin-container .links a {
     width: 100%;
     max-width: 300px;
     text-align: center;
@@ -349,47 +350,30 @@
 }
 
 @media (max-width: 480px) {
-  .stats {
+  .admin-container .stats {
     grid-template-columns: 1fr;
   }
 }
 
-/* logs style */
-/* body {
-  font-family: Arial, sans-serif;
-  margin: 20px;
-  background-color: #f5f5f5;
-}
-.container {
-  max-width: 1200px;
-  margin: 0 auto;
-  background-color: white;
-  padding: 20px;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-} */
-/* .container h1 {
-  color: #002a3a;
-  text-align: center;
-} */
-.search-section {
+/* Logs page styles - Scoped to logs pages only */
+.logs-container .search-section {
   margin-bottom: 20px;
   padding: 15px;
   background-color: #f8f9fa;
   border-radius: 5px;
 }
-.search-inputs {
+.logs-container .search-inputs {
   display: flex;
   gap: 10px;
   margin-bottom: 10px;
 }
-.search-inputs input {
+.logs-container .search-inputs input {
   flex: 1;
   padding: 8px;
   border: 1px solid #ddd;
   border-radius: 4px;
 }
-.search-inputs button {
+.logs-container .search-inputs button {
   padding: 8px 16px;
   background-color: #002a3a;
   color: white;
@@ -397,17 +381,17 @@
   border-radius: 4px;
   cursor: pointer;
 }
-.search-inputs button:hover {
+.logs-container .search-inputs button:hover {
   background-color: #00415a;
 }
-.stats {
+.logs-container .stats {
   background-color: #96b3c0;
   padding: 10px;
   border-radius: 5px;
   margin-bottom: 20px;
   text-align: center;
 }
-.container table {
+.logs-container table {
   width: 100%;
   border-collapse: collapse;
   margin-top: 20px;
