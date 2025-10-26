@@ -770,15 +770,31 @@
 					<span class="subtitle">Earthworks, retaining walls and structural support</span>
 				</h2>
 			</div>
+			<div style="margin-left: 10%; margin-right: 10%;">
+				<h1 style="text-align: center; margin-top: 50px;">Map</h1>
+				<div class="map-preview-section">
+					<p >Check planning overlays of your properties</p>
+					<div class="map-preview-container" onclick="window.open('/maps', '_blank')">
+						<iframe class="map-preview-iframe" 
+							src="/maps" 
+							title="Map Preview">
+						</iframe>
+						<div class="map-preview-overlay">
+							<div class="map-preview-text">Click to open full map</div>
+						</div>
+					</div>
+				</div>
+
+			</div>
 
 			<div style="margin-left: 10%; margin-right: 10%;">
 				<form id="examples" class="tab-form d-none">
-					<h2 style="text-align: center; margin-top: 50px;">Property Samples</h2>
+					<h1 style="text-align: center; margin-top: 50px;">Property Samples</h1>
 
 					<section id="sample-box" style="max-width:1000px; margin:24px auto; padding:0 12px">
-						<div style="text-align:center; margin:32px 0 56px;">
-						<a href="/maps" id="openMapBtn">Map</a>
-						</div>
+						<!-- <div style="text-align:center; margin:32px 0 56px;">
+						<a href="/maps" id="openMapBtn" target="_blank">Map</a>
+						</div> -->
 						<div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:10px">
 							<button type="button" onclick="showSamples('shed')">Shed</button>
 							<button type="button" onclick="showSamples('verandah')">Verandah</button>
