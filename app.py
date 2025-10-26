@@ -162,7 +162,7 @@ def get_logs():
                 'dev_type': s['development_type'],
                 'property_address': s['property_address'],
                 'answers_json': json.loads(s['answers_json']) if s['answers_json'] else {},
-                'reference_number': s['reference_no']  # Add this field as expected by frontend
+                'reference_no': s['reference_no']  # Add this field as expected by frontend
             })
         
         return jsonify({
@@ -208,7 +208,7 @@ def search_logs():
                 'dev_type': s['development_type'],
                 'property_address': s['property_address'],
                 'answers_json': json.loads(s['answers_json']) if s['answers_json'] else {},
-                'reference_number': s['reference_no']  
+                'reference_no': s['reference_no']  
             })
         
         return jsonify({

@@ -1769,6 +1769,7 @@ function loadSection(str) {
             : "Address not available";
 
           const referenceNumber = generateRefNumber();
+          console.log("this is", referenceNumber);
 
           // debug logging
           console.log("Data to be logged: ", {
@@ -1776,6 +1777,7 @@ function loadSection(str) {
             propertyAddress: propertyAddressText,
             formAnswers: allAnswers,
             exemptionResult: exemptionStatus,
+            referenceNumber: referenceNumber,
           });
 
           submitLog(devType, propertyAddressText, allAnswers, referenceNumber)
@@ -1977,12 +1979,13 @@ async function generateReportPdf() {
   pdf.save(`Exempt_Development_Result_${devType}.pdf`);
 }
 
-async function submitLog(devType, propertyAddress, answers) {
+async function submitLog(devType, propertyAddress, answers, referenceNumber) {
   try {
     const payload = {
       development_type: devType,
       property_address: propertyAddress,
       answers: answers,
+      reference_no: referenceNumber,
     };
 
     const res = await fetch("/submit", {

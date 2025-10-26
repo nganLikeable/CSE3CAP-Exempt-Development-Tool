@@ -49,7 +49,7 @@
             <th>Development Type</th>
             <th>Property Address</th>
             <th>Answers (JSON)</th>
-            <th>Reference Numbers</th>
+            <th>Reference Number</th>
             <th>Timestamp</th>
           </tr>
         </thead>
@@ -162,7 +162,7 @@
                     <td class="dev-type">${submission.dev_type}</td>
                     <td>${submission.property_address}</td>
                     <td class="answers-cell"><pre class="json-formatted">${answersFormatted}</pre></td>
-                    <td>${submission.reference_numbers || "-"}</td>
+                    <td>${submission.reference_no || "-"}</td>
                     <td class="timestamp">${formatTimestamp(
                       submission.timestamp
                     )}</td>
@@ -208,6 +208,45 @@
       function clearSearch() {
         document.getElementById("devTypeSearch").value = "";
         document.getElementById("addressSearch").value = "";
+        loadAllLogs();
+      }
+
+      function formatTimestamp(timestamp) {
+        try {
+          const date = new Date(timestamp);
+          return date.toLocaleString();
+        } catch (error) {
+          return timestamp;
+        }
+      }
+    </script>
+  </body>
+</html>
+   }
+
+      function hideNoData() {
+        document.getElementById("noData").style.display = "none";
+      }
+
+      function clearSearch() {
+        document.getElementById("devTypeSearch").value = "";
+        document.getElementById("addressSearch").value = "";
+        loadAllLogs();
+      }
+
+      function formatTimestamp(timestamp) {
+        try {
+          const date = new Date(timestamp);
+          return date.toLocaleString();
+        } catch (error) {
+          return timestamp;
+        }
+      }
+    </script>
+  </body>
+</html>
+>>>>>>> main
+      document.getElementById("addressSearch").value = "";
         loadAllLogs();
       }
 
