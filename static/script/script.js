@@ -49,10 +49,10 @@ var SEPP = {
       id: -1,
       section: "General Information",
       sanitised: "User Input",
-      question: "What is the property (site) name?",
-      type: "text",
+      question: "Where is the property located?",
+      type: "address",
       optional: false,
-      errormsg: "Please enter the property/site name.",
+      errormsg: "Please enter the address of your property.",
       check: (id, elem, value) => {
         const v = readText(id);
         if (!v || v.trim() === "") {
@@ -389,10 +389,10 @@ var SEPP = {
       id: -1,
       section: "General Information",
       sanitised: "User Input",
-      question: "What is the property (site) name?",
-      type: "text",
+      question: "Where is the property located?",
+      type: "address",
       optional: false,
-      errormsg: "Please enter the property/site name.",
+      errormsg: "Please enter the address of your property.",
       check: (id, elem, value) => {
         const v = readText(id);
         if (!v || v.trim() === "") {
@@ -860,10 +860,10 @@ var SEPP = {
       id: -1,
       section: "General Information",
       sanitised: "User Input",
-      question: "What is the property (site) name?",
-      type: "text",
+      question: "Where is the property located?",
+      type: "address",
       optional: false,
-      errormsg: "Please enter the property/site name.",
+      errormsg: "Please enter the address of your property.",
       check: (id, elem, value) => {
         const v = readText(id);
         if (!v || v.trim() === "") {
@@ -1205,10 +1205,10 @@ var SEPP = {
       id: -1,
       section: "General Information",
       sanitised: "User Input",
-      question: "What is the property (site) name?",
-      type: "text",
+      question: "Where is the property located?",
+      type: "address",
       optional: false,
-      errormsg: "Please enter the property/site name.",
+      errormsg: "Please enter the address of your property.",
       check: (id, elem, value) => {
         const v = readText(id);
         if (!v || v.trim() === "") {
@@ -1499,7 +1499,7 @@ function addQuestion(rule, num) {
 				${rule.options.map((x) => `<option value="${x}">${x}</option>`)}
 			</select>`;
       break;
-    case "text":
+    case "address":
       options += `<input type="text"
                       id="${String(rule.id) + "text"}"
                       placeholder="${rule.placeholder || "Type here..."}"
@@ -1639,7 +1639,7 @@ function loadSection(str) {
         let good = 0;
         let unknown = [];
         let allAnswers = {};
-        let referenceNumbers = [];
+        let referenceNumber = {};
         let propertyAddress = {};
 
         // Capture the str value in the current scope
@@ -1690,7 +1690,7 @@ function loadSection(str) {
         window.__lastAnswers = allAnswers;
         window.__lastUnknown = unknown;
         window.__lastGoodBits = good;
-        window.__lastRefs = referenceNumbers;
+        window.__lastRefs = referenceNumber;
 
         // --- OVERALL OUTCOME ---
         const shouldFail = Boolean(good & 2);
@@ -1760,13 +1760,15 @@ function loadSection(str) {
           allAnswers["completion_time"] = new Date().toISOString();
           allAnswers["development_type"] = devType;
 
-          // Get property address from the address question (usually the first question)
+          // Get property address from the address question
           const addressQuestion = Object.values(SEPP[currentStr]).find(
             (q) => q.type === "address"
           );
           const propertyAddressText = addressQuestion
             ? readText(addressQuestion.id) || "Address not provided"
             : "Address not available";
+
+          const referenceNumber = generateRefNumber();
 
           // debug logging
           console.log("Data to be logged: ", {
@@ -1776,7 +1778,7 @@ function loadSection(str) {
             exemptionResult: exemptionStatus,
           });
 
-          submitLog(devType, propertyAddressText, allAnswers)
+          submitLog(devType, propertyAddressText, allAnswers, referenceNumber)
             .then(() => {
               console.log("Exemption check logged successfully");
             })
@@ -2020,4 +2022,8 @@ function scrollFunction() {
 function topFunction() {
   document.body.scrollTop = 0;
   document.documentElement.scrollTop = 0;
+}
+
+function generateRefNumber() {
+  return `REF-${Math.random().toString(36).substring(2, 10).toUpperCase()}`;
 }
