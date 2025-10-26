@@ -46,23 +46,23 @@ function readText(id) {
 var SEPP = {
   shed: [
     {
-  id: -1,
-  section: "General Information",
-  sanitised: "User Input",
-  question: "What is the property (site) name?",
-  type: "text",
-  optional: false,
-  errormsg: "Please enter the property/site name.",
-  check: (id, elem, value) => {
-    const v = readText(id);
-    if (!v || v.trim() === "") {  
-      show(elem);
-      return 1;                   
-    }
-    hide(elem);
-    return 4;                    
-  },
-},
+      id: -1,
+      section: "General Information",
+      sanitised: "User Input",
+      question: "What is the property (site) name?",
+      type: "text",
+      optional: false,
+      errormsg: "Please enter the property/site name.",
+      check: (id, elem, value) => {
+        const v = readText(id);
+        if (!v || v.trim() === "") {
+          show(elem);
+          return 1;
+        }
+        hide(elem);
+        return 4;
+      },
+    },
     {
       id: 0,
       section:
@@ -395,12 +395,12 @@ var SEPP = {
       errormsg: "Please enter the property/site name.",
       check: (id, elem, value) => {
         const v = readText(id);
-        if (!v || v.trim() === "") {  
-        show(elem);
-        return 1;                   
+        if (!v || v.trim() === "") {
+          show(elem);
+          return 1;
         }
         hide(elem);
-        return 4;                     
+        return 4;
       },
     },
     {
@@ -856,7 +856,7 @@ var SEPP = {
     // },
   ],
   carport: [
-     {
+    {
       id: -1,
       section: "General Information",
       sanitised: "User Input",
@@ -866,12 +866,12 @@ var SEPP = {
       errormsg: "Please enter the property/site name.",
       check: (id, elem, value) => {
         const v = readText(id);
-        if (!v || v.trim() === "") {  
-        show(elem);
-        return 1;                   
+        if (!v || v.trim() === "") {
+          show(elem);
+          return 1;
         }
         hide(elem);
-        return 4;                     
+        return 4;
       },
     },
     {
@@ -1201,7 +1201,7 @@ var SEPP = {
     },
   ],
   retaining_wall: [
-     {
+    {
       id: -1,
       section: "General Information",
       sanitised: "User Input",
@@ -1211,12 +1211,12 @@ var SEPP = {
       errormsg: "Please enter the property/site name.",
       check: (id, elem, value) => {
         const v = readText(id);
-        if (!v || v.trim() === "") {  
-        show(elem);
-        return 1;                   
+        if (!v || v.trim() === "") {
+          show(elem);
+          return 1;
         }
         hide(elem);
-        return 4;                     
+        return 4;
       },
     },
     {
@@ -1505,7 +1505,7 @@ function addQuestion(rule, num) {
                       placeholder="${rule.placeholder || "Type here..."}"
                       style="width:100%;max-width:720px"><br>`;
       break;
-   }
+  }
   elem.classList.add("question");
   elem.innerHTML =
     `
@@ -1544,77 +1544,6 @@ function addQuestion(rule, num) {
   }
 }
 
-
-function generateReportPdf() {
-  const { jsPDF } = window.jspdf || {};
-  if (!jsPDF) { alert("PDF library (jsPDF) not loaded."); return; }
-
-  const devType  = window.__lastDevType  || "Development";
-  const answers  = window.__lastAnswers  || {};
-  const unknown  = window.__lastUnknown  || [];
-  const goodBits = window.__lastGoodBits || 0;
-
-  const passed        = Boolean((goodBits & 4) && !(goodBits & 2));
-  const hasUnanswered = Boolean(goodBits & 1);
-
-  const doc   = new jsPDF({ unit: "pt", format: "a4" });
-  const pageW = doc.internal.pageSize.getWidth();
-  const left  = 50;
-  const right = pageW - 50;
-  let y = 60;
-
- 
-  doc.setFont("helvetica", "bold"); doc.setFontSize(16);
-  doc.text("Exempt Development Check — Result", left, y); y += 20;
-  doc.setFont("helvetica", "normal"); doc.setFontSize(11);
-  doc.text("Generated: " + new Date().toLocaleString(), left, y); y += 10;
-  doc.text("Development type: " + devType, left, y); y += 20;
-
-
-  doc.setFont("helvetica", "bold"); doc.setFontSize(12);
-  const outcome = passed ? "Status: EXEMPT"
-                         : hasUnanswered ? "Status: INCOMPLETE"
-                                         : "Status: NOT EXEMPT";
-  doc.text(outcome, left, y); y += 22;
-
-
-  doc.setFont("helvetica", "normal"); doc.setFontSize(11);
-
-  const hash  = String(window.location.hash || "").replace("#", "");
-  const rules = SEPP[hash] || [];
-
-  rules.forEach((q, i) => {
-    const qn    = `q${i+1}`;
-    const label = `${i+1}. ${q.question.replace(/\s+/g, " ").trim()}`;
-    const val   = answers[qn] == null ? "(blank)" : String(answers[qn]);
-
-   
-    const lines = doc.splitTextToSize(label, right - left);
-    if (y + lines.length * 14 > 780) { doc.addPage(); y = 60; }
-    doc.text(lines, left, y);
-    y += lines.length * 14;
-
-  
-    const ansLine = `Answer: ${val}`;
-    if (y + 14 > 780) { doc.addPage(); y = 60; }
-    doc.text(ansLine, left + 12, y);
-    y += 18;
-  });
-
-  
-  if (unknown.length) {
-    if (y + 30 > 780) { doc.addPage(); y = 60; }
-    doc.text("Unanswered: " + unknown.join(", "), left, y);
-    y += 16;
-  }
-
-
-  doc.setFont("helvetica", "normal"); doc.setFontSize(10);
-  doc.text("Generated by Albury City Exempt Development Checker", left, 780);
-
-
-  doc.save("Exempt_Development_Result.pdf");
-}
 function setClipboard(str) {
   if (!navigator.clipboard) {
     const textarea = document.createElement("textarea");
@@ -1652,12 +1581,12 @@ function getLink(str) {
       res = readNumeric(SEPP[str][key].id);
     else if (SEPP[str][key].type === "dropdown")
       res = readDropdownPerma(SEPP[str][key].id);
-    else if (SEPP[str][key].type === "text") 
-    if (res !== null)
-      urlParams.append(
-        String(SEPP[str][key].id + 1).trim(),
-        String(res).trim()
-      );
+    else if (SEPP[str][key].type === "text")
+      if (res !== null)
+        urlParams.append(
+          String(SEPP[str][key].id + 1).trim(),
+          String(res).trim()
+        );
   });
   const subUrl = urlParams.toString();
   const baseUrl = window.location.origin + window.location.pathname;
@@ -1704,172 +1633,217 @@ function loadSection(str) {
     check.id = "questionnaireCheck";
     check.style.margin = "5px";
     check.onclick = () => {
- 
-  let good = 0;                      
-  let unknown = [];                   
-  let allAnswers = {};                
-  let referenceNumbers = [];          
+      try {
+        console.log("Check button clicked - starting validation");
 
- 
-  const devType = str.charAt(0).toUpperCase() + str.slice(1);
+        let good = 0;
+        let unknown = [];
+        let allAnswers = {};
+        let referenceNumbers = [];
+        let propertyAddress = {};
 
- 
-  Object.keys(SEPP[str]).forEach((key) => {
-    const q  = SEPP[str][key];
-    const qn = Number(key) + 1;
-    const elem = document.getElementById(String(q.id) + "e");
-    let ans = null;
+        // Capture the str value in the current scope
+        const currentStr = str;
+        const devType =
+          currentStr.charAt(0).toUpperCase() + currentStr.slice(1);
 
-   
-    if (q.type === "yes/no") {
-      ans = readBool(q.id);
-      allAnswers[`q${qn}`] = (ans === true) ? "yes" : (ans === false) ? "no" : null;
-    } else if (q.type === "numeric") {
-      ans = readNumeric(q.id);
-      allAnswers[`q${qn}`] = ans;
-    } else if (q.type === "dropdown") {
-      ans = readDropdownPerma(q.id);
-      allAnswers[`q${qn}`] = ans;
-    } else if (q.type === "text") {
-  
-      ans = (typeof readText === "function")
-        ? readText(q.id)
-        : (document.getElementById(String(q.id) + "text")?.value ?? "");
-      allAnswers[`q${qn}`] = ans;
-    }
+        Object.keys(SEPP[currentStr]).forEach((key) => {
+          const question = SEPP[currentStr][key];
+          const questionNumber = Number(key) + 1;
 
-  
-    let res;
-    if (typeof q.check === "function") {
-    
-      res = q.check(q.id, elem, ans);
-    } else {
-     
-      const isAnswered =
-        (q.type === "yes/no"   && ans !== null) ||
-        (q.type === "numeric"  && ans !== null) ||
-        (q.type === "dropdown" && ans != null)  ||
-        (q.type === "text"     && ((ans != null && String(ans).trim() !== "") || q.optional === true));
+          // collect ans before using
+          let ans = null;
+          if (question.type === "yes/no") {
+            ans = readBool(question.id);
+            allAnswers[`q${questionNumber}`] =
+              ans === true ? "yes" : ans === false ? "no" : null;
+          } else if (question.type === "numeric") {
+            ans = readNumeric(question.id);
+            allAnswers[`q${questionNumber}`] = ans;
+          } else if (question.type === "dropdown") {
+            ans = readDropdownPerma(question.id);
+            allAnswers[`q${questionNumber}`] = ans;
+          }
 
-      res = isAnswered ? 4 : 1; // 4 = valid, 1 = unanswered
-    }
+          // Check if question has a check function
+          if (question.check) {
+            const elem = document.getElementById(String(question.id) + "e");
+            let res = question.check(question.id, elem, ans);
 
-    
-    if (res === 1) unknown.push(qn);
-    good |= res;
+            if (res === 1) unknown.push(questionNumber);
+            good |= res;
+          } else {
+            // For questions without check functions, validate if they're answered
+            let isAnswered = ans !== null;
 
-   
-    if (q.section) referenceNumbers.push(q.section);
-  });
+            if (!isAnswered) {
+              unknown.push(questionNumber);
+              good |= 1; // Mark as having unanswered questions
+            } else {
+              good |= 4; // Mark as having valid answers
+            }
+          }
+        });
 
+        // Store validation results for PDF generator and other uses
+        window.__lastDevType = devType;
+        window.__lastAnswers = allAnswers;
+        window.__lastUnknown = unknown;
+        window.__lastGoodBits = good;
+        window.__lastRefs = referenceNumbers;
 
-  window.__lastDevType  = devType;
-  window.__lastAnswers  = allAnswers;
-  window.__lastUnknown  = unknown;
-  window.__lastGoodBits = good;
-  window.__lastRefs     = referenceNumbers;
+        // --- OVERALL OUTCOME ---
+        const shouldFail = Boolean(good & 2);
+        const hasUnanswered = Boolean(good & 1);
+        const isAllValid = Boolean(good & 4);
+        const isPass = isAllValid && !shouldFail && !hasUnanswered;
 
-  // --- OVERALL OUTCOME ---
-  const shouldFail    = Boolean(good & 2);
-  const hasUnanswered = Boolean(good & 1);
-  const isAllValid    = Boolean(good & 4);
-  const isPass        = isAllValid && !shouldFail;
+        // Store the validation results for PDF generator
+        window.__lastValidationResult = {
+          isPass: isPass,
+          shouldFail: shouldFail,
+          hasUnanswered: hasUnanswered,
+          isAllValid: isAllValid,
+        };
 
-  if (isPass) {
-    show(resultPass); hide(resultFail); hide(resultUnfinished);
-    if (window.togglePdf) window.togglePdf(true);   
-  } else if (hasUnanswered) {
-    hide(resultPass); hide(resultFail);
-    resultUnfinished.innerText = `⚠ Please finish the unanswered questions ⚠
-(${unknown.join(", ")})`;
-    show(resultUnfinished);
-    if (window.togglePdf) window.togglePdf(false);
-  } else if (shouldFail) {
-    hide(resultPass); show(resultFail); hide(resultUnfinished);
-    if (window.togglePdf) window.togglePdf(false);
-  } else {
-    // Fallback: nothing conclusive
-    hide(resultPass); hide(resultFail); hide(resultUnfinished);
-    if (window.togglePdf) window.togglePdf(false);
-  }
-  // ensure button visibility matches outcome
-const pdfBtnEl = document.getElementById("pdfBtn");
-if (pdfBtnEl) {
-  if (isPass) {
-    pdfBtnEl.style.display = "inline-block";
-  } else {
-    pdfBtnEl.style.display = "none";
-  }
-}
+        // determine exemption status
+        let exemptionStatus = "";
+        let shouldLogSubmission = false;
 
- 
-  const pdfBtn = document.getElementById("pdfBtn");
-  if (pdfBtn && typeof generateReportPdf === "function") {
+        // Display results based on validation
+        if (shouldFail) {
+          // Has validation failures
+          hide(resultPass);
+          show(resultFail);
+          hide(resultUnfinished);
+          exemptionStatus = "not_exempt";
+          shouldLogSubmission = true;
+        } else if (hasUnanswered) {
+          // Has unanswered questions
+          hide(resultPass);
+          hide(resultFail);
+          resultUnfinished.innerText =
+            "⚠ Please finish the unanswered questions ⚠\n(" +
+            unknown.join(", ") +
+            ")";
+          show(resultUnfinished);
+          exemptionStatus = "incomplete";
+        } else if (isPass) {
+          // All questions answered and valid
+          show(resultPass);
+          hide(resultFail);
+          hide(resultUnfinished);
+          exemptionStatus = "exempt";
+          shouldLogSubmission = true;
+        } else {
+          // Fallback case
+          hide(resultPass);
+          hide(resultFail);
+          resultUnfinished.innerText = "⚠ Please answer all questions ⚠";
+          show(resultUnfinished);
+          exemptionStatus = "incomplete";
+        }
+
+        // PDF button should only be visible when the form passes completely
+        const pdfBtn = document.getElementById("pdfBtn");
+        if (pdfBtn) {
+          if ((isPass && !hasUnanswered) || shouldFail) {
+            pdfBtn.style.display = "inline-block";
+            pdfBtn.onclick = generateReportPdf; // attach PDF generation
+          } else {
+            pdfBtn.style.display = "none";
+          }
+        }
+        // log submission if complete
+        if (shouldLogSubmission) {
+          allAnswers["exemption_status"] = exemptionStatus;
+          allAnswers["completion_time"] = new Date().toISOString();
+          allAnswers["development_type"] = devType;
+
+          // Get property address from the address question (usually the first question)
+          const addressQuestion = Object.values(SEPP[currentStr]).find(
+            (q) => q.type === "address"
+          );
+          const propertyAddressText = addressQuestion
+            ? readText(addressQuestion.id) || "Address not provided"
+            : "Address not available";
+
+          // debug logging
+          console.log("Data to be logged: ", {
+            developmentType: devType,
+            propertyAddress: propertyAddressText,
+            formAnswers: allAnswers,
+            exemptionResult: exemptionStatus,
+          });
+
+          submitLog(devType, propertyAddressText, allAnswers)
+            .then(() => {
+              console.log("Exemption check logged successfully");
+            })
+            .catch((error) => {
+              console.error("Failed to log exemption check:", error);
+            });
+        }
+      } catch (error) {
+        console.error("Error in check button:", error);
+        alert(
+          "An error occurred while checking your answers. Please try again."
+        );
+      }
+    };
+    const permalink = document.createElement("button");
+    permalink.type = "button";
+    permalink.id = "questionnairePermalink";
+    permalink.style.margin = "5px";
+    permalink.innerHTML = `<span title="Copies a permanent link to this completed form.">Copy Perma-link</span>`;
+    permalink.onclick = () => setClipboard(getLink(str));
+
+    const pdfBtn = document.createElement("button");
+    pdfBtn.id = "pdfBtn";
+    pdfBtn.type = "button";
+    pdfBtn.textContent = "Download PDF";
+    pdfBtn.style.display = "none";
+    pdfBtn.style.margin = "5px";
     pdfBtn.onclick = generateReportPdf;
-  }
-};
-const permalink = document.createElement("button");
-permalink.type = "button";
-permalink.id = "questionnairePermalink";
-permalink.style.margin = "5px";
-permalink.innerHTML = `<span title="Copies a permanent link to this completed form.">Copy Perma-link</span>`;
-permalink.onclick = () => setClipboard(getLink(str));
 
+    const results = document.createElement("div");
+    results.style.display = "flex";
+    results.style.justifyContent = "horizontal";
+    const resultPass = document.createElement("p");
+    resultPass.style.marginTop = "15px";
+    resultPass.style.left = "50%";
+    resultPass.style.transform = "translate(-50%, 0)";
+    resultPass.style.fontWeight = "bold";
+    resultPass.style.position = "absolute";
+    resultPass.innerText = "✔ Your development is exempt ✔";
+    const resultFail = document.createElement("p");
+    resultFail.style.marginTop = "15px";
+    resultFail.style.left = "50%";
+    resultFail.style.transform = "translate(-50%, 0)";
+    resultFail.style.fontWeight = "bold";
+    resultFail.style.position = "absolute";
+    resultFail.innerText = "❌ Your development isn't exempt ❌";
+    const resultUnfinished = document.createElement("p");
+    resultUnfinished.style.marginTop = "15px";
+    resultUnfinished.style.left = "50%";
+    resultUnfinished.style.transform = "translate(-50%, 0)";
+    resultUnfinished.style.fontWeight = "bold";
+    resultUnfinished.style.position = "absolute";
+    resultUnfinished.innerText = "⚠ Please finish the unanswered questions ⚠";
 
-const pdfBtn = document.createElement("button");
-pdfBtn.id = "pdfBtn";
-pdfBtn.type = "button";
-pdfBtn.textContent = "Download PDF";
-pdfBtn.style.display = "none";       
-pdfBtn.style.margin = "35px 0 5px";   
-pdfBtn.style.position = "relative";   
-pdfBtn.addEventListener("click", generateReportPdf);
-
-
-const results = document.createElement("div");
-results.style.display = "flex";
-results.style.justifyContent = "horizontal";
-
-
-const resultPass = document.createElement("p");
-resultPass.style.marginTop = "15px";
-resultPass.style.left = "50%";
-resultPass.style.transform = "translate(-50%, 0)";
-resultPass.style.fontWeight = "bold";
-resultPass.style.position = "absolute";
-resultPass.innerText = "✔ Your development is exempt ✔";
-
-const resultFail = document.createElement("p");
-resultFail.style.marginTop = "15px";
-resultFail.style.left = "50%";
-resultFail.style.transform = "translate(-50%, 0)";
-resultFail.style.fontWeight = "bold";
-resultFail.style.position = "absolute";
-resultFail.innerText = "❌ Your development isn't exempt ❌";
-
-const resultUnfinished = document.createElement("p");
-resultUnfinished.style.marginTop = "15px";
-resultUnfinished.style.left = "50%";
-resultUnfinished.style.transform = "translate(-50%, 0)";
-resultUnfinished.style.fontWeight = "bold";
-resultUnfinished.style.position = "absolute";
-resultUnfinished.innerText = "⚠ Please finish the unanswered questions ⚠";
-
-
-selectedForm.appendChild(notes);
-selectedForm.appendChild(check);
-selectedForm.appendChild(permalink);
-selectedForm.appendChild(pdfBtn);   
-results.appendChild(resultPass);
-results.appendChild(resultFail);
-results.appendChild(resultUnfinished);
-selectedForm.appendChild(results);
-
-
-hide(resultPass);
-hide(resultFail);
-hide(resultUnfinished);
-} else document.getElementById("examples").classList.remove("d-none");
+    // append elements to DOM
+    selectedForm.appendChild(notes);
+    selectedForm.appendChild(check);
+    selectedForm.appendChild(permalink);
+    selectedForm.appendChild(pdfBtn);
+    results.appendChild(resultPass);
+    results.appendChild(resultFail);
+    results.appendChild(resultUnfinished);
+    selectedForm.appendChild(results);
+    hide(resultPass);
+    hide(resultFail);
+    hide(resultUnfinished);
+  } else document.getElementById("examples").classList.remove("d-none");
 }
 
 window.addEventListener("hashchange", () => {
@@ -1894,91 +1868,82 @@ if (selectedForm) {
       });
     } else if (rule.type === "dropdown")
       document.getElementById(String(id) + "dd").value = value;
-     else if (rule.type === "text") {
-     const el = document.getElementById(String(id) + "text");
-     if (el) el.value = value;
-    }
   });
 }
-
 
 async function generateReportPdf() {
   const { jsPDF } = window.jspdf || {};
   if (!jsPDF) {
-    alert('PDF library not loaded.');
+    alert("PDF library not loaded.");
     return;
   }
 
-  
-  const devType   = window.__lastDevType  || 'Development';
-  const answers   = window.__lastAnswers  || {};
-  const refs      = window.__lastRefs     || [];
-  const unknown   = window.__lastUnknown  || [];
-  const goodBits  = window.__lastGoodBits || 0;
+  const devType = window.__lastDevType || "Development";
+  const answers = window.__lastAnswers || {};
+  const refs = window.__lastRefs || [];
+  const unknown = window.__lastUnknown || [];
+  const goodBits = window.__lastGoodBits || 0;
 
-  
-  const activeKey = (location.hash || '#').slice(1) || 'retaining_wall';
-  const rules     = SEPP[activeKey] || [];
+  const activeKey = (location.hash || "#").slice(1) || "retaining_wall";
+  const rules = SEPP[activeKey] || [];
 
-  
   const rows = [];
-  Object.keys(answers).forEach(k => {
-   
-    const idx = Number(k.replace('q', '')) - 1;
+  Object.keys(answers).forEach((k) => {
+    const idx = Number(k.replace("q", "")) - 1;
     const rule = rules[idx];
     if (!rule) return;
 
-    const qText = (rule.question || '').replace(/\s+/g, ' ').trim();
+    const qText = (rule.question || "").replace(/\s+/g, " ").trim();
     let aText = answers[k];
 
-
-    if (aText === true)  aText = 'Yes';
-    if (aText === false) aText = 'No';
-    if (aText === null || aText === undefined || aText === '') aText = '—';
+    if (aText === true) aText = "Yes";
+    if (aText === false) aText = "No";
+    if (aText === null || aText === undefined || aText === "") aText = "—";
 
     rows.push({ num: idx + 1, question: qText, answer: String(aText) });
   });
 
- 
   const status =
-    (goodBits & 2) ? 'NOT EXEMPT' :
-    (goodBits & 4) ? 'EXEMPT' :
-    'INCOMPLETE';
+    goodBits & 2 ? "NOT EXEMPT" : goodBits & 4 ? "EXEMPT" : "INCOMPLETE";
 
- 
-  const pdf = new jsPDF({ unit: 'pt', format: 'a4' });
+  const pdf = new jsPDF({ unit: "pt", format: "a4" });
   const margin = 46;
-  const pageW  = pdf.internal.pageSize.getWidth();
-  const maxW   = pageW - margin * 2;
+  const pageW = pdf.internal.pageSize.getWidth();
+  const maxW = pageW - margin * 2;
   let y = 56;
 
   // Header
-  pdf.setFont('helvetica', 'bold'); pdf.setFontSize(16);
-  pdf.text('Exempt Development Check — Result', margin, y); y += 22;
+  pdf.setFont("helvetica", "bold");
+  pdf.setFontSize(16);
+  pdf.text("Exempt Development Check — Result", margin, y);
+  y += 22;
 
-  pdf.setFont('helvetica', 'normal'); pdf.setFontSize(10);
-  pdf.text(`Generated: ${new Date().toLocaleString()}`, margin, y); y += 16;
-  pdf.text(`Development type: ${devType}`, margin, y); y += 22;
+  pdf.setFont("helvetica", "normal");
+  pdf.setFontSize(10);
+  pdf.text(`Generated: ${new Date().toLocaleString()}`, margin, y);
+  y += 16;
+  pdf.text(`Development type: ${devType}`, margin, y);
+  y += 22;
 
- 
-  pdf.setFont('helvetica', 'bold'); pdf.setFontSize(12);
+  pdf.setFont("helvetica", "bold");
+  pdf.setFontSize(12);
   const statusText = `Status: ${status}`;
   pdf.text(statusText, margin, y);
   y += 18;
 
-
   if (unknown.length) {
-    pdf.setFont('helvetica', 'normal'); pdf.setFontSize(10);
-    pdf.text(`Unanswered: ${unknown.join(', ')}`, margin, y);
+    pdf.setFont("helvetica", "normal");
+    pdf.setFontSize(10);
+    pdf.text(`Unanswered: ${unknown.join(", ")}`, margin, y);
     y += 16;
   }
 
+  pdf.setDrawColor(180);
+  pdf.line(margin, y, pageW - margin, y);
+  y += 12;
 
-  pdf.setDrawColor(180); pdf.line(margin, y, pageW - margin, y); y += 12;
-
-
-
-  pdf.setFont('helvetica', 'normal'); pdf.setFontSize(11);
+  pdf.setFont("helvetica", "normal");
+  pdf.setFontSize(11);
   const lineH = 14;
 
   const writeWrapped = (label, value) => {
@@ -1990,20 +1955,22 @@ async function generateReportPdf() {
     if (value !== undefined) {
       pdf.setTextColor(80);
       const val = pdf.splitTextToSize(value, maxW);
-      val.forEach(line => { pdf.text(line, margin, y); y += lineH; });
+      val.forEach((line) => {
+        pdf.text(line, margin, y);
+        y += lineH;
+      });
       pdf.setTextColor(0);
     }
     y += 6;
   };
 
   rows.forEach(({ num, question, answer }) => {
-  
     if (y > pdf.internal.pageSize.getHeight() - 64) {
-      pdf.addPage(); y = 56;
+      pdf.addPage();
+      y = 56;
     }
     writeWrapped(`${num}. ${question}`, `Answer: ${answer}`);
   });
-
 
   pdf.save(`Exempt_Development_Result_${devType}.pdf`);
 }
@@ -2016,7 +1983,6 @@ async function submitLog(devType, propertyAddress, answers) {
       answers: answers,
     };
 
-   
     const res = await fetch("/submit", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -2027,7 +1993,6 @@ async function submitLog(devType, propertyAddress, answers) {
       throw new Error(`HTTP error! status: ${res.status}`);
     }
 
-  
     const data = await res.json();
     console.log("Log stored: ", data);
     return data;
@@ -2039,7 +2004,6 @@ async function submitLog(devType, propertyAddress, answers) {
 
 // Scroll up button
 let myBtn = document.getElementById("scrollUpBtn");
-
 
 window.onscroll = function () {
   scrollFunction();
@@ -2053,8 +2017,7 @@ function scrollFunction() {
   }
 }
 
-
 function topFunction() {
-  document.body.scrollTop = 0; 
-  document.documentElement.scrollTop = 0; 
+  document.body.scrollTop = 0;
+  document.documentElement.scrollTop = 0;
 }
