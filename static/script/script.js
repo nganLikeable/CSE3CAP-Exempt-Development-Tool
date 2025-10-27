@@ -1499,10 +1499,18 @@ function addQuestion(rule, num) {
 				${rule.options.map((x) => `<option value="${x}">${x}</option>`)}
 			</select>`;
       break;
+    // case "address":
+    //   options += `<input type="text"
+    //                   id="${String(rule.id) + "text"}"
+    //                   placeholder="${rule.placeholder || "Type here..."}"
+    //                   style="width:100%;max-width:720px"><br>`;
+    //   break;
     case "address":
       options += `<input type="text"
                       id="${String(rule.id) + "text"}"
-                      placeholder="${rule.placeholder || "Type here..."}"
+                      placeholder="${
+                        rule.placeholder || "Enter property address"
+                      }"
                       style="width:100%;max-width:720px"><br>`;
       break;
   }
@@ -1526,6 +1534,9 @@ function addQuestion(rule, num) {
     `</a> for more information.</p>
 	`;
   selectedForm.appendChild(elem);
+  if (rule.type === "address") {
+    initAutocomplete(String(rule.id) + "text");
+  }
   if (rule.type === "yes/no") {
     const radios = document.getElementsByName(String(rule.id));
     const clear = document.getElementById(String(rule.id) + "ync");
@@ -1543,7 +1554,33 @@ function addQuestion(rule, num) {
     });
   }
 }
+// autocomplete place functionalities
+function initAutocomplete(inputId) {
+  const addressInput = document.getElementById(inputId);
+  if (!addressInput) return;
 
+  // wait for ggl maps api to be ready
+  if (typeof google !== "undefined" && google.maps && google.maps.places) {
+    const autocomplete = new google.maps.places.Autocomplete(addressInput, {
+      componentRestrictions: { country: ["au"] },
+      fields: ["place_id", "geometry", "name", "formatted_address"],
+    });
+
+    autocomplete.addListener("place_changed", function () {
+      const place = autocomplete.getPlace();
+      // if user did not select an address from the drop down, reset input field
+      if (!place.geometry) {
+        addressInput.placeholder = "Enter property address";
+      } else {
+        addressInput.value = place.formatted_address;
+        console.log("Selected place:", place.formatted_address);
+      }
+    });
+  } else {
+    // retry after a short delay if ggl maps isnt ready yet
+    setTimeout(() => initAutocomplete(inputId), 100);
+  }
+}
 function setClipboard(str) {
   if (!navigator.clipboard) {
     const textarea = document.createElement("textarea");
