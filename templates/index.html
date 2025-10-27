@@ -815,6 +815,11 @@
 				<form id="retaining_wall" class="tab-form border p-3 rounded bg-light d-none" name="Retaining Wall Exemption Check" style="text-align: center;"></form>
 			</div>
 			<button class = "scroll-btn" onClick="topFunction()" id="scrollUpBtn" title="Go to top">  <i class="fa-solid fa-arrow-up"></i></button>
+			<!--loads google maps api for auto complete-->
+			<script src="https://maps.googleapis.com/maps/api/js?key={{ google_maps_api_key }}&
+			libraries=places&
+			callback=initAutocomplete" async defer></script>
+
 			<script src="/static/script/script.js"></script>
 		</section>
 		<!-- Design Body End -->
@@ -1090,6 +1095,8 @@
 				`).join('') || `<div style="color:#666">No samples for this type yet.</div>`;
 			}
 		document.addEventListener('DOMContentLoaded', () => showSamples('shed'));
+
+		
 
 		</script>
 		<!-- endnoindex -->

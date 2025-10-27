@@ -3,8 +3,11 @@ from datetime import datetime
 import json
 import sqlite3
 import click 
+import os
+from dotenv import load_dotenv
 
-import os 
+# Load environment variables from .env file
+load_dotenv() 
 
 # initialize a flask instance 
 app = Flask(
@@ -15,6 +18,9 @@ app = Flask(
 
 # Configure the database
 app.config['DATABASE'] = os.path.join(app.instance_path, 'logs.db')
+
+# Configure Google Maps API
+app.config['GOOGLE_MAPS_API_KEY'] = os.environ.get('GOOGLE_MAPS_API_KEY', 'AIzaSyC9A4o6YUKc2bemQEAE1yAFyowRaf6VQVY')
 
 # Ensure the instance folder exists
 try:
@@ -99,7 +105,7 @@ def get_all_submissions():
 # main route
 @app.route('/')
 def home():
-    return send_from_directory(app.template_folder, 'index.html')
+    return render_template('index.html', google_maps_api_key=current_app.config['GOOGLE_MAPS_API_KEY'])
 
 # # serve frontend static files 
 # @app.route('/<path:filename>')
@@ -140,6 +146,11 @@ def log_viewer():
 @app.route('/maps')
 def maps():
     return render_template('maps.html')
+
+# Google Maps Autocomplete Test
+@app.route('/test-autocomplete')
+def test_autocomplete():
+    return render_template('test_autocomplete.html', google_maps_api_key=current_app.config['GOOGLE_MAPS_API_KEY'])
     
 # api endpoint to get all logs
 @app.route('/logs')

@@ -49,6 +49,65 @@
   border-width: 10px;
 }
 
+/* Google Maps Autocomplete Styles */
+.address-input-container {
+  position: relative;
+}
+
+input[type="text"][data-place-id] {
+  border-left: 3px solid #28a745 !important;
+  background-color: #f8f9fa;
+}
+
+input[type="text"].address-warning {
+  border-left: 3px solid #ffc107 !important;
+  background-color: #fff3cd;
+}
+
+/* Style the Google Maps autocomplete dropdown */
+.pac-container {
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  font-family: inherit;
+  z-index: 9999;
+}
+
+.pac-item {
+  padding: 12px 16px;
+  border-bottom: 1px solid #eee;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.pac-item:hover {
+  background-color: #f8f9fa;
+}
+
+.pac-item-selected {
+  background-color: #e3f2fd;
+}
+
+.pac-matched {
+  font-weight: 600;
+  color: #1976d2;
+}
+
+.pac-icon {
+  margin-right: 8px;
+}
+
+/* Loading state for address inputs */
+.address-loading {
+  background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="%23666"><circle cx="12" cy="12" r="10" fill="none" stroke="%23666" stroke-width="2"/><path d="M12 6v6l4 2" stroke="%23666" stroke-width="2" fill="none"/></svg>') !important;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
 .tile:active {
   border-color: #006186;
   transition-duration: 0ms;
