@@ -47,8 +47,8 @@ var SEPP = {
   shed: [
     {
       id: -1,
-      section: "General Information",
-      sanitised: "User Input",
+      section: "",
+      sanitised: "",
       question: "Where is the property located?",
       type: "address",
       optional: false,
@@ -387,8 +387,8 @@ var SEPP = {
   patio: [
     {
       id: -1,
-      section: "General Information",
-      sanitised: "User Input",
+      section: "",
+      sanitised: "",
       question: "Where is the property located?",
       type: "address",
       optional: false,
@@ -858,8 +858,8 @@ var SEPP = {
   carport: [
     {
       id: -1,
-      section: "General Information",
-      sanitised: "User Input",
+      section: "",
+      sanitised: "",
       question: "Where is the property located?",
       type: "address",
       optional: false,
@@ -1203,8 +1203,8 @@ var SEPP = {
   retaining_wall: [
     {
       id: -1,
-      section: "General Information",
-      sanitised: "User Input",
+      section: "",
+      sanitised: "",
       question: "Where is the property located?",
       type: "address",
       optional: false,
