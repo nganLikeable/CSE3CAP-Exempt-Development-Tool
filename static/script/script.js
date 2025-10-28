@@ -1,7 +1,9 @@
 function show(elem) {
   elem.style.display = "block";
   requestAnimationFrame(() => {
-    elem.style.opacity = 1;
+    requestAnimationFrame(() => {
+      elem.style.opacity = 1;
+    });
   });
   setTimeout(() => {
     elem.style.display = "block";
@@ -1633,18 +1635,23 @@ function getLink(str) {
 function loadSection(str) {
   str = String(str).substring(1);
 
-  // Check if we're switching to a different form type
-  const currentFormType = selectedForm ? selectedForm.id : null;
-  if (currentFormType && currentFormType !== str) {
-    // Reload the page with the new form type in the hash
-    window.location.hash = "#" + str;
-    window.location.reload();
-    return;
-  }
+  // // Check if we're switching to a different form type
+  // const currentFormType = selectedForm ? selectedForm.id : null;
+  // if (currentFormType && currentFormType !== str) {
+  //   // Reload the page with the new form type in the hash
+  //   window.location.hash = "#" + str;
+  //   window.location.reload();
+  //   return;
+  // }
 
   document.querySelectorAll(".tab-form").forEach((form) => {
     form.classList.add("d-none");
   });
+
+  document.getElementById("shed").replaceChildren();
+  document.getElementById("patio").replaceChildren();
+  document.getElementById("carport").replaceChildren();
+  document.getElementById("retaining_wall").replaceChildren();
 
   selectedForm = document.getElementById(str);
   if (selectedForm) {
