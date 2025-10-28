@@ -4,10 +4,6 @@ import json
 import sqlite3
 import click 
 import os
-from dotenv import load_dotenv
-
-# Load environment variables from .env file
-load_dotenv() 
 
 # initialize a flask instance 
 app = Flask(
