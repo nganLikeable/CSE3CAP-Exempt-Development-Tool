@@ -291,5 +291,97 @@ window.PROPERTIES = [
       location: "farm",
       setbackFront_m: 20, setbackSide_m: 5, setbackRear_m: 5
     }
+  },
+  {
+  id: "016",
+  address: "48 Sunrise Terrace, East Albury NSW 2640",
+  zone: "R2",
+  lotSize_m2: 740,
+  bushfireProne: false,
+  heritageListed: false,
+  cornerLot: false,
+  floodAffected: false,
+  lat: -36.079248,
+  lang: 146.942016,
+  slopeRise_m: 1.2,
+  proposal: {
+    type: "retaining_wall",
+    wallLength_m: 12,
+    wallHeight_m: 0.9,
+    material: "concrete block",
+    location: "rear boundary",
+    setbackFront_m: 8,
+    setbackSide_m: 1.0,
+    setbackRear_m: 0.6
   }
+},
+{
+  id: "017",
+  address: "420 Heath Street, East Albury NSW 2640",
+  zone: "R1",
+  lotSize_m2: 680,
+  bushfireProne: false,
+  heritageListed: false,
+  cornerLot: true,
+  floodAffected: false,
+  lat: -36.079560,
+  lang: 146.935982,
+  slopeRise_m: 0.8,
+  proposal: {
+    type: "retaining_wall",
+    wallLength_m: 9,
+    wallHeight_m: 0.7,
+    material: "treated timber sleeper",
+    location: "side boundary",
+    setbackFront_m: 6,
+    setbackSide_m: 0.9,
+    setbackRear_m: 1.5
+  }
+},
+{
+  id: "018",
+  address: "Noreuil Park Foreshore, 52 Ebden Street, South Albury NSW 2640",
+  zone: "RE1",
+  lotSize_m2: 12000,
+  bushfireProne: false,
+  heritageListed: false,
+  cornerLot: false,
+  floodAffected: true,
+  lat: -36.085436,
+  lang: 146.909823,
+  slopeRise_m: 1.0,
+  proposal: {
+    type: "retaining_wall",
+    wallLength_m: 45,
+    wallHeight_m: 1.2,
+    material: "stone masonry",
+    location: "riverbank foreshore",
+    setbackFront_m: 0,
+    setbackSide_m: 5,
+    setbackRear_m: 0
+  }
+},
+{
+  id: "019",
+  address: "Monument Hill Park, Memorial Drive, Albury NSW 2640",
+  zone: "RE1",
+  lotSize_m2: 9500,
+  bushfireProne: false,
+  heritageListed: true,
+  cornerLot: false,
+  floodAffected: false,
+  lat: -36.072390,
+  lang: 146.918427,
+  slopeRise_m: 2.5,
+  proposal: {
+    type: "retaining_wall",
+    wallLength_m: 25,
+    wallHeight_m: 1.5,
+    material: "stone block",
+    location: "entrance landscape",
+    setbackFront_m: 0,
+    setbackSide_m: 2,
+    setbackRear_m: 4
+  }
+}
 ];

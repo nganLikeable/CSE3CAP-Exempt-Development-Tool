@@ -224,7 +224,7 @@
 								<a href="https://www.alburycity.nsw.gov.au/council/future-planning/albury-2050" class="nav-link pr-2">Towards Albury 2050</a>
 							</li>
 							<!--<li class="nav-item"><a href="https://www.alburycity.nsw.gov.au/council/about-council/Government-Elections" class="nav-link pr-2">Elections 2024</a></li> -->
-							<li cla <li class="nav-item">
+							<li cla li class="nav-item">
 								<a href="https://www.alburycity.nsw.gov.au/whats-on" class="nav-link pr-2">What's On</a>
 							</li>
 							<li class="nav-item">
@@ -774,13 +774,12 @@
 				<h1 style="text-align: center; margin-top: 50px;">Map</h1>
 				<div class="map-preview-section">
 					<p >Check planning overlays of your properties</p>
-					<div class="map-preview-container" onclick="window.open('/maps', '_blank')">
-						<iframe class="map-preview-iframe" 
-							src="/maps" 
-							title="Map Preview">
-						</iframe>
-						<div class="map-preview-overlay">
-							<div class="map-preview-text">Click to open full map</div>
+                    <div class="map-preview-wrap" style="position:relative; display:inline-block;">
+                        <iframe class="map-preview-iframe" src="./maps.html" title="Map Preview"></iframe>
+                        <a href="./maps.html"
+                           style="position:absolute; inset:0; display:block; text-indent:-9999px;"></a>
+                    </div>
+							 
 						</div>
 					</div>
 				</div>
@@ -792,9 +791,7 @@
 					<h1 style="text-align: center; margin-top: 50px;">Property Samples</h1>
 
 					<section id="sample-box" style="max-width:1000px; margin:24px auto; padding:0 12px">
-						<!-- <div style="text-align:center; margin:32px 0 56px;">
-						<a href="/maps" id="openMapBtn" target="_blank">Map</a>
-						</div> -->
+						
 						<div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:10px">
 							<button type="button" onclick="showSamples('shed')">Shed</button>
 							<button type="button" onclick="showSamples('verandah')">Verandah</button>
