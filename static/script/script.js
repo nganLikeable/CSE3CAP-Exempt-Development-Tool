@@ -1595,6 +1595,16 @@ function getLink(str) {
 
 function loadSection(str) {
   str = String(str).substring(1);
+
+  // Check if we're switching to a different form type
+  const currentFormType = selectedForm ? selectedForm.id : null;
+  if (currentFormType && currentFormType !== str) {
+    // Reload the page with the new form type in the hash
+    window.location.hash = "#" + str;
+    window.location.reload();
+    return;
+  }
+
   document.querySelectorAll(".tab-form").forEach((form) => {
     form.classList.add("d-none");
   });
@@ -1888,7 +1898,12 @@ async function generateReportPdf() {
   const unknown = window.__lastUnknown || [];
   const goodBits = window.__lastGoodBits || 0;
 
-  const activeKey = (location.hash || "#").slice(1) || "retaining_wall";
+  // const activeKey = (location.hash || "#").slice(1) || "retaining_wall";
+  // Get the current form ID from selectedForm instead of hardcoded fallback
+  const activeKey = selectedForm
+    ? selectedForm.id
+    : (location.hash || "#").slice(1) || "shed";
+
   const rules = SEPP[activeKey] || [];
 
   const rows = [];
