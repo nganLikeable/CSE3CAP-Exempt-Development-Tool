@@ -779,7 +779,7 @@ var SEPP = {
       errormsg:
         "The development <strong>must not</strong> interfere with the functioning of existing drainage fixtures or flow paths",
       check: (id, elem, bool) => {
-        if (bool === false) show(elem);
+        if (bool === true) show(elem);
         else hide(elem);
         return bool === null ? 1 : bool === false ? 4 : 2;
       },
