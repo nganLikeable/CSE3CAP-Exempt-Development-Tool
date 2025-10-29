@@ -774,12 +774,13 @@
 				<h1 style="text-align: center; margin-top: 50px;">Map</h1>
 				<div class="map-preview-section">
 					<p >Check planning overlays of your properties</p>
-                    <div class="map-preview-wrap" style="position:relative; display:inline-block;">
-                        <iframe class="map-preview-iframe" src="./maps.html" title="Map Preview"></iframe>
-                        <a href="./maps.html"
-                           style="position:absolute; inset:0; display:block; text-indent:-9999px;"></a>
-                    </div>
-							 
+						<div class="map-preview-container" onclick="window.open('/maps', '_blank')">
+							<iframe class="map-preview-iframe" 
+							src="/maps" 
+							title="Map Preview">
+							</iframe>
+							<div class="map-preview-overlay">
+								<div class="map-preview-text">Click to open full map</div>
 						</div>
 					</div>
 				</div>
