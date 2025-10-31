@@ -63,6 +63,36 @@ def init_db_command():
 sqlite3.register_converter(
     "timestamp", lambda v: datetime.fromisoformat(v.decode())
 )
+# Check if database exists and initialize if needed
+def ensure_db_exists():
+    # path to sqlite db file
+    db_path = app.config['DATABASE']
+    
+    # check if database file exists and has tables
+    needs_init = False
+    
+    if not os.path.exists(db_path):
+        needs_init = True
+        print("Database file not found, initializing...")
+    else:
+        # check if database has the required tables
+        try:
+            with sqlite3.connect(db_path) as conn:
+                cursor = conn.cursor()
+                cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='submissions';")
+                if not cursor.fetchone():
+                    needs_init = True
+                    print("Database exists but tables not found, initializing...")
+        except Exception as e:
+            needs_init = True
+            print(f"Database check failed, reinitializing: {e}")
+    
+    # reinitialize db
+    if needs_init:
+        with app.app_context():
+            init_db()
+            print("Database initialized successfully!")
+
 # Register with the application instance 
 def init_app(app):
     app.teardown_appcontext(close_db)
@@ -270,6 +300,16 @@ def submit_log():
 
 
 init_app(app)
+
     
 if __name__ == "__main__":
+    # make sure that db exists before running app
+    ensure_db_exists()
     app.run(debug=True)
+
+# running on render
+else:
+    try:
+        ensure_db_exists()
+    except Exception as e:
+        print(f'init-db skipped or failed: {e}')
