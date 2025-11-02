@@ -173,6 +173,11 @@ def log_viewer():
 def maps():
     return render_template('maps.html')
 
+# render property details page
+@app.route('/property')
+def property_details():
+    return render_template('property.html')
+
 # Google Maps Autocomplete Test
 @app.route('/test-autocomplete')
 def test_autocomplete():
